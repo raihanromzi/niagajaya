@@ -2,12 +2,18 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Root from "./routes/root";
+import RootLayout from "./components/RootLayout";
+import IndexPage from "./routes/index";
+import RegisterPage from "./routes/register";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Root />,
+    element: <RootLayout />,
+    children: [
+      { index: true, element: <IndexPage /> },
+      { path: "register", element: <RegisterPage /> },
+    ],
   },
 ]);
 
