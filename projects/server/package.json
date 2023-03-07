@@ -1,11 +1,11 @@
 {
   "name": "server",
   "version": "0.1.0",
-  "main": "src/index.js",
+  "main": "src/index.cjs",
   "license": "ISC",
   "private": true,
   "scripts": {
-    "start": "nodemon",
+    "dev": "nodemon",
     "serve": "node ."
   },
   "dependencies": {
