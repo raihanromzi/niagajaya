@@ -33,24 +33,12 @@ model User {
   addresses       UserAddress[]
   primaryAddress  UserPrimaryAddress?
   orders          Order[]
-  sessions        Session[]
-}
-
-model Session {
-  userId  Int
-  code    String
-
-  user    User    @relation(fields: [userId], references: [id])
-
-  @@id([userId, code])
 }
 
 model UserAddress {
   id              Int       @id @default(autoincrement())
   userId          Int
   coordinate      Unsupported("POINT")
-  latitude        Decimal
-  longitude       Decimal
   province        String    @db.VarChar(255)
   city            String    @db.VarChar(255)
   district        String    @db.VarChar(255)
@@ -76,8 +64,7 @@ model Warehouse {
   id              Int               @id @default(autoincrement())
   managerId       Int               @unique
   name            String            @db.VarChar(255)
-  latitude        Decimal       
-  longitude       Decimal       
+  coordinate      Unsupported("POINT")
   province        String            @db.VarChar(255)
   city            String            @db.VarChar(255)
   district        String            @db.VarChar(255)
