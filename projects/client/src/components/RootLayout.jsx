@@ -67,7 +67,7 @@ const RootLayout = () => {
         p={{ base: 6, lg: 10 }}
       >
         <Flex>
-          <Box mr={24}>
+          <Box mr={24} fontWeight="light">
             <Link as={RouterLink} to="#" display="block">
               Tentang Kami
             </Link>

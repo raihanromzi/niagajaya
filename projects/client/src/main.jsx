@@ -4,7 +4,8 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import RootLayout from "./components/RootLayout";
 import IndexPage from "./routes/index";
-import RegisterPage from "./routes/register";
+import RegisterPage, { registerAction } from "./routes/register";
+import VerifyPage from "./routes/verify";
 
 const router = createBrowserRouter([
   {
@@ -12,7 +13,8 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { index: true, element: <IndexPage /> },
-      { path: "register", element: <RegisterPage /> },
+      { path: "register", element: <RegisterPage />, action: registerAction },
+      { path: "verify", element: <VerifyPage /> },
     ],
   },
 ]);
