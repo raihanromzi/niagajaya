@@ -50,7 +50,7 @@ model UserName {
 
 model UserCode {
   userId          Int             @id
-  setPasswordCode String?         @unique
+  code            String?         @unique
 
   updatedAt       DateTime        @updatedAt
 
