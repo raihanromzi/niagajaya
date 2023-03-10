@@ -1,21 +1,32 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
+const { validationResult } = require("express-validator");
+const { randomUUID } = require("crypto");
+const prisma = require("../client.cjs");
 
-/** @type {Object.<string, import("express").RequestHandler>} */
+/** @type {Object<string, import("express").RequestHandler>} */
 module.exports = {
   register: async (req, res) => {
     try {
+      validationResult(req).throw();
+
+      const { email, name } = req.body;
       const user = await prisma.user.create({
         data: {
-          email: req.body.email,
+          email,
           role: "USER",
-          setPasswordCode: crypto.randomUUID(),
+          names: { create: { name } },
+          setPasswordCode: { create: { code: randomUUID() } },
         },
+        include: { names: true, setPasswordCode: true },
       });
-      res.send(user);
+      res.json({ success: true, msg: "Pendaftaran berhasil", user });
     } catch (err) {
-      res.send(err);
+      const errObj = "errors" in err ? { errors: err.array() } : err;
+      console.error(errObj);
+      res.status(400).json({
+        success: false,
+        ...errObj,
+      });
     }
   },
   verify: async (req, res, next) => {
