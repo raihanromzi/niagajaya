@@ -16,12 +16,14 @@ module.exports = {
       },
     },
     name: {
-      isAlphanumeric: {
-        errorMessage:
-          "Kolom nama hanya boleh mengandung huruf, angka, atau spasi",
+      isAlpha: {
+        errorMessage: "Kolom nama hanya boleh mengandung huruf atau spasi",
         options: ["en-US", { ignore: /\s/g }],
       },
-      isLength: { options: { max: 255 } },
+      isLength: {
+        options: { max: 255 },
+        errorMessage: "Kolom nama tidak boleh melebihi 255 karakter",
+      },
     },
   },
   verifySchema: {
