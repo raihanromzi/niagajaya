@@ -18,10 +18,7 @@ const redisStore = new RedisStore({
 // app.set("trust proxy", 1)
 app.use(
   cors({
-    origin: [
-      process.env.WHITELISTED_DOMAIN &&
-        process.env.WHITELISTED_DOMAIN.split(","),
-    ],
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
