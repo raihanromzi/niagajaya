@@ -26,6 +26,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     store: redisStore,
@@ -42,10 +43,6 @@ app.use(
 );
 app.use("/api/v1/auth", auth_routes);
 
-app.listen(+port, (err) => {
-  if (err) {
-    console.error(`ERROR: ${err}`);
-  } else {
-    console.log(`APP RUNNING at ${port} ✅`);
-  }
+app.listen(+port, () => {
+  console.log(`APP RUNNING at ${port} ✅`);
 });
