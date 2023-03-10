@@ -21,11 +21,11 @@ module.exports = {
       });
       res.json({ success: true, msg: "Pendaftaran berhasil", user });
     } catch (err) {
-      const errObj = "errors" in err ? { errors: err.array() } : err;
-      console.error(errObj);
+      const errors = "errors" in err ? err.mapped() : { unknown: err };
+      console.error(errors);
       res.status(400).json({
         success: false,
-        ...errObj,
+        errors,
       });
     }
   },
