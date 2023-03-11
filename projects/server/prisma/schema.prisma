@@ -28,7 +28,6 @@ model User {
   deletedAt       DateTime?
 
   names           UserName[]
-  setPasswordCode UserCode?
   warehouse       Warehouse?
   addresses       UserAddress[]
   primaryAddress  UserPrimaryAddress?
@@ -46,15 +45,6 @@ model UserName {
   user            User            @relation(fields: [userId], references: [id])
 
   @@id([userId, name])
-}
-
-model UserCode {
-  userId          Int             @id
-  code            String?         @unique
-
-  updatedAt       DateTime        @updatedAt
-
-  user            User            @relation(fields: [userId], references: [id])
 }
 
 model UserAddress {
