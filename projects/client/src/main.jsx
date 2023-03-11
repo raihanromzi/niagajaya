@@ -10,13 +10,13 @@ import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <RootLayout />,
+    Component: <RootLayout />,
     children: [
-      { index: true, element: <IndexPage /> },
-      { path: "register", element: <RegisterPage />, action: registerAction },
+      { index: true, Component: <IndexPage /> },
+      { path: "register", Component: <RegisterPage />, action: registerAction },
       {
         path: "set-password/:code",
-        element: <SetPasswordPage />,
+        Component: <SetPasswordPage />,
         action: setPasswordAction,
       },
     ],
