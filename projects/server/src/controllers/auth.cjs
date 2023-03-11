@@ -1,7 +1,11 @@
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
 const { randomUUID } = require("crypto");
-const prisma = require("../client.cjs");
+const prisma = require("../utils/client.cjs");
+const redis = require("../utils/redis.cjs");
+const sendMail = require("../utils/sendMail.cjs");
+
+const passwordPrefix = "pass:";
 
 /** @type {Object<string, import("express").RequestHandler>} */
 module.exports = {
@@ -15,31 +19,52 @@ module.exports = {
           email,
           role: "USER",
           names: { create: { name } },
-          setPasswordCode: { create: { code: randomUUID() } },
         },
-        include: { names: true, setPasswordCode: true },
+        include: { names: true },
       });
+
+      const code = randomUUID();
+
+      await redis.set(passwordPrefix + code, user.id, "EX", 86400); // 24 hours
+
+      await sendMail(
+        email,
+        "Verifkasi Akun",
+        `<a href="http://localhost:5173/set-password/${code}">Setel Kata Kunci</a>`
+      );
+
       res.json({ success: true, msg: "Pendaftaran berhasil", user });
     } catch (err) {
       const errors = "errors" in err ? err.mapped() : { unknown: err };
-      console.error(errors);
       res.status(400).json({
         success: false,
         errors,
       });
     }
   },
-  verify: async (req, res, next) => {
+  setPassword: async (req, res) => {
     try {
-      const { password } = req.body;
+      validationResult(req).throw();
+
+      const { password, code } = req.body;
+
+      const id = +(await redis.getdel(passwordPrefix + code));
+      if (!id) throw new Error("Kode tak sah");
+
       const hashedPassword = await bcrypt.hash(password, 10);
+
       const user = await prisma.user.update({
-        where: {},
+        where: { id },
         data: { hashedPassword },
       });
-      res.send(user);
+
+      res.json({ success: true, msg: "Kata kunci berhasil tersetel", user });
     } catch (err) {
-      res.send(err);
+      const errors = "errors" in err ? err.mapped() : { unknown: err };
+      res.status(400).json({
+        success: false,
+        errors,
+      });
     }
   },
 };

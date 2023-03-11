@@ -5,7 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import RootLayout from "./components/RootLayout";
 import IndexPage from "./routes/index";
 import RegisterPage, { registerAction } from "./routes/register";
-import VerifyPage from "./routes/verify";
+import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
 
 const router = createBrowserRouter([
   {
@@ -14,7 +14,11 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <IndexPage /> },
       { path: "register", element: <RegisterPage />, action: registerAction },
-      { path: "verify", element: <VerifyPage /> },
+      {
+        path: "set-password/:code",
+        element: <SetPasswordPage />,
+        action: setPasswordAction,
+      },
     ],
   },
 ]);
