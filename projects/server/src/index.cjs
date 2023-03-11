@@ -1,17 +1,17 @@
-require("dotenv/config");
+"use strict";
+
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const Redis = require("ioredis").default;
 const session = require("express-session");
-const RedisStore = require("connect-redis").default;
+const { default: RedisStore } = require("connect-redis");
+const redis = require("./utils/redis.cjs");
 const auth_routes = require("./routes/auth.cjs");
 
 const port = process.env.PORT || 8000;
 const app = express();
-const redis = new Redis(process.env.REDIS_URL);
 const redisStore = new RedisStore({
   client: redis,
-  prefix: "myapp:",
   disableTouch: true,
 });
 
