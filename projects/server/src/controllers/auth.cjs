@@ -33,7 +33,7 @@ module.exports = {
         `<a href="http://localhost:5173/set-password/${code}">Setel Kata Kunci</a>`
       );
 
-      res.json({ success: true, msg: "Pendaftaran berhasil", user });
+      res.json({ success: true, msg: "Pendaftaran berhasil!" });
     } catch (err) {
       const errors = "errors" in err ? err.mapped() : { unknown: err };
       res.status(400).json({
@@ -53,12 +53,12 @@ module.exports = {
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const user = await prisma.user.update({
+      await prisma.user.update({
         where: { id },
         data: { hashedPassword },
       });
 
-      res.json({ success: true, msg: "Kata kunci berhasil tersetel", user });
+      res.json({ success: true, msg: "Kata kunci berhasil tersetel!" });
     } catch (err) {
       const errors = "errors" in err ? err.mapped() : { unknown: err };
       res.status(400).json({

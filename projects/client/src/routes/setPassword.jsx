@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import axios from "axios";
-import { useActionData } from "react-router-dom";
+import { useActionData, useNavigation } from "react-router-dom";
 import groceryImg from "../assets/Grocery.png";
 import AuthLayout from "../components/AuthLayout";
 import FormElem from "../components/FormElem";
@@ -22,6 +22,7 @@ export const setPasswordAction = async ({ request, params }) => {
 
 const SetPasswordPage = () => {
   const actionData = useActionData();
+  const navigation = useNavigation();
 
   return (
     <AuthLayout
@@ -45,7 +46,13 @@ const SetPasswordPage = () => {
           placeholder="Konfirmasi Kata Sandi"
         />
       </FormElem>
-      <Button type="submit" bgColor="#009262" color="#FCFCFC" w="full">
+      <Button
+        type="submit"
+        isLoading={navigation.state === "submitting"}
+        bgColor="#009262"
+        color="#FCFCFC"
+        w="full"
+      >
         Setel Kata Sandi
       </Button>
     </AuthLayout>

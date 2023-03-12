@@ -1,6 +1,10 @@
 import { Button, Divider, Link, Text } from "@chakra-ui/react";
 import axios from "axios";
-import { Link as RouterLink, useActionData } from "react-router-dom";
+import {
+  Link as RouterLink,
+  useActionData,
+  useNavigation,
+} from "react-router-dom";
 import ecoBagImg from "../assets/Eco bag with food.png";
 import AuthLayout from "../components/AuthLayout";
 import FormElem from "../components/FormElem";
@@ -22,6 +26,7 @@ export const registerAction = async ({ request }) => {
 
 const RegisterPage = () => {
   const actionData = useActionData();
+  const navigation = useNavigation();
 
   return (
     <AuthLayout
@@ -32,13 +37,13 @@ const RegisterPage = () => {
     >
       <FormElem
         error={actionData?.errors?.email}
-        helperText="Surel verifikasi akan terkirim ke alamat"
+        helperText="Baru di situs ini dan bisa menerima surel masuk"
       >
         <StyledInput type="email" name="email" placeholder="Alamat Surel" />
       </FormElem>
       <FormElem
         error={actionData?.errors?.name}
-        helperText="Nama akan tertampil secara umum"
+        helperText="Hanya huruf alfabet dan spasi"
       >
         <StyledInput
           name="name"
@@ -57,7 +62,13 @@ const RegisterPage = () => {
           Kebijakan Privasi
         </Link>
       </Text>
-      <Button type="submit" bgColor="#009262" color="#FCFCFC" w="full">
+      <Button
+        type="submit"
+        isLoading={navigation.state === "submitting"}
+        bgColor="#009262"
+        color="#FCFCFC"
+        w="full"
+      >
         Buat Akun
       </Button>
       <Divider />

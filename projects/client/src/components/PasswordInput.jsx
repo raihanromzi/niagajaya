@@ -20,6 +20,7 @@ const PaswordInput = (props) => {
           icon={isVisible ? <FaEye /> : <FaEyeSlash />}
           variant="ghost"
           size="sm"
+          tabIndex={-1}
           onClick={handleClick}
         />
       </InputRightElement>
