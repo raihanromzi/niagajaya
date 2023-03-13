@@ -2,12 +2,29 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Root from "./routes/root";
+import RootLayout from "./components/RootLayout";
+import IndexPage from "./routes/index";
+import RegisterPage, { registerAction } from "./routes/register";
+import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
+import SettingsPage from "./routes/settings";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Root />,
+    Component: RootLayout,
+    children: [
+      { index: true, Component: IndexPage },
+      { path: "register", Component: RegisterPage, action: registerAction },
+      {
+        path: "set-password/:code",
+        Component: SetPasswordPage,
+        action: setPasswordAction,
+      },
+      {
+        path: "settings",
+        Component: SettingsPage,
+      },
+    ],
   },
 ]);
 

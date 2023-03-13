@@ -1,74 +1,45 @@
-require("dotenv/config");
+"use strict";
+
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const { join } = require("path");
+const session = require("express-session");
+const { default: RedisStore } = require("connect-redis");
+const redis = require("./utils/redis.cjs");
+const auth_routes = require("./routes/auth.cjs");
 
-const PORT = process.env.PORT || 8000;
+const port = process.env.PORT || 8000;
 const app = express();
+const redisStore = new RedisStore({
+  client: redis,
+  disableTouch: true,
+});
+
+// app.set("trust proxy", 1)
 app.use(
   cors({
-    origin: [
-      process.env.WHITELISTED_DOMAIN &&
-        process.env.WHITELISTED_DOMAIN.split(","),
-    ],
+    origin: "http://localhost:5173",
+    credentials: true,
   })
 );
-
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  session({
+    store: redisStore,
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.SESSION_SECRET,
+    cookie: {
+      maxAge: 31536000000, // 365 days
+      httpOnly: true,
+      sameSite: "lax",
+      secure: "auto",
+    },
+  })
+);
+app.use("/api/v1/auth", auth_routes);
 
-//#region API ROUTES
-
-// ===========================
-// NOTE : Add your routes here
-
-app.get("/api", (req, res) => {
-  res.send(`Hello, this is my API`);
-});
-
-app.get("/api/greetings", (req, res, next) => {
-  res.status(200).json({
-    message: "Hello, Student !",
-  });
-});
-
-// ===========================
-
-// not found
-app.use((req, res, next) => {
-  if (req.path.includes("/api/")) {
-    res.status(404).send("Not found !");
-  } else {
-    next();
-  }
-});
-
-// error
-app.use((err, req, res, next) => {
-  if (req.path.includes("/api/")) {
-    console.error("Error : ", err.stack);
-    res.status(500).send("Error !");
-  } else {
-    next();
-  }
-});
-
-//#endregion
-
-//#region CLIENT
-const clientPath = "../../client/build";
-app.use(express.static(join(__dirname, clientPath)));
-
-// Serve the HTML page
-app.get("*", (req, res) => {
-  res.sendFile(join(__dirname, clientPath, "index.html"));
-});
-
-//#endregion
-
-app.listen(PORT, (err) => {
-  if (err) {
-    console.log(`ERROR: ${err}`);
-  } else {
-    console.log(`APP RUNNING at ${PORT} ✅`);
-  }
+app.listen(+port, () => {
+  console.log(`APP RUNNING at ${port} ✅`);
 });

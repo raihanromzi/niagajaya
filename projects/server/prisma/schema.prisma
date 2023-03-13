@@ -19,78 +19,77 @@ enum UserRole {
 model User {
   id              Int             @id @default(autoincrement())
   email           String          @unique @db.VarChar(255)
-  password        String          @db.VarChar(255)
-  name            String          @db.VarChar(255)
+  hashedPassword  String?          
   imageUrl        String?     
   role            UserRole
-  setPasswordCode String?
 
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   deletedAt       DateTime?
 
+  names           UserName[]
   warehouse       Warehouse?
   addresses       UserAddress[]
   primaryAddress  UserPrimaryAddress?
   orders          Order[]
-  sessions        Session[]
 }
 
-model Session {
-  userId  Int
-  code    String
-
-  user    User    @relation(fields: [userId], references: [id])
-
-  @@id([userId, code])
-}
-
-model UserAddress {
-  id              Int       @id @default(autoincrement())
-  userId          Int
-  coordinate      Unsupported("POINT")
-  latitude        Decimal
-  longitude       Decimal
-  province        String    @db.VarChar(255)
-  city            String    @db.VarChar(255)
-  district        String    @db.VarChar(255)
-  detail          String
+model UserName {
+  userId          Int             
+  name            String          @db.VarChar(255)
+  usageCount      Int             @default(1)
 
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
+
+  user            User            @relation(fields: [userId], references: [id])
+
+  @@id([userId, name])
+}
+
+model UserAddress {
+  id              Int                   @id @default(autoincrement())
+  userId          Int
+  coordinate      Unsupported("POINT")
+  province        String                @db.VarChar(255)
+  city            String                @db.VarChar(255)
+  district        String                @db.VarChar(255)
+  detail          String
+
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
   deletedAt       DateTime?
 
-  user            User      @relation(fields: [userId], references: [id])
+  user            User                  @relation(fields: [userId], references: [id])
   primaryAddress  UserPrimaryAddress?
 }
 
 model UserPrimaryAddress {
-  userId      Int     @id
-  addressId   Int     @unique
+  userId      Int           @id
+  addressId   Int           @unique
 
-  user        User  @relation(fields: [userId], references: [id])
-  address     UserAddress @relation(fields: [addressId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+  address     UserAddress   @relation(fields: [addressId], references: [id])
 }
 
 model Warehouse {
-  id              Int               @id @default(autoincrement())
-  managerId       Int               @unique
-  name            String            @db.VarChar(255)
-  latitude        Decimal       
-  longitude       Decimal       
-  province        String            @db.VarChar(255)
-  city            String            @db.VarChar(255)
-  district        String            @db.VarChar(255)
+  id              Int                   @id @default(autoincrement())
+  managerId       Int                   @unique
+  name            String                @db.VarChar(255)
+  coordinate      Unsupported("POINT")
+  province        String                @db.VarChar(255)
+  city            String                @db.VarChar(255)
+  district        String                @db.VarChar(255)
   detail          String  
 
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
   deletedAt       DateTime?  
 
-  manager         User              @relation(fields: [managerId], references: [id])
+  manager         User                  @relation(fields: [managerId], references: [id])
   stocks          Stock[]
-  exports         StockMutation[]   @relation(name: "Out")
-  imports         StockMutation[]   @relation(name: "In")
+  exports         StockMutation[]       @relation(name: "Out")
+  imports         StockMutation[]       @relation(name: "In")
   orders          Order[]
 }
 
