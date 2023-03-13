@@ -59,11 +59,7 @@ const RootLayout = () => {
                   <Avatar />
                 </MenuButton>
                 <MenuList color="black">
-                  <MenuItem
-                    as={RouterLink}
-                    to="settings/profile"
-                    icon={<FaUserCog />}
-                  >
+                  <MenuItem as={RouterLink} to="settings" icon={<FaUserCog />}>
                     Pengaturan
                   </MenuItem>
                   <MenuItem icon={<FaSignOutAlt />}>Keluar</MenuItem>
@@ -87,7 +83,7 @@ const RootLayout = () => {
           )}
         </Flex>
       </Flex>
-      <Box as="main">
+      <Box as="main" p={{ base: 4, lg: 10 }}>
         <Outlet />
       </Box>
       <Box

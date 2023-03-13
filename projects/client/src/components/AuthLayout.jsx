@@ -13,7 +13,6 @@ const AuthLayout = ({ children, actionData, src, alt, heading }) => {
   return (
     <Flex
       mx="auto"
-      my={10}
       maxW="5xl"
       boxShadow={{ lg: "0 8px 16px rgba(171, 190, 209, 0.4)" }}
       borderRadius="10px"
@@ -28,7 +27,7 @@ const AuthLayout = ({ children, actionData, src, alt, heading }) => {
           <Heading fontSize="3xl" mb={5}>
             {heading}
           </Heading>
-          <Box border="solid #EBEBEB 1px" borderRadius="10px" p={5} w={96}>
+          <Box border="solid #EBEBEB 1px" borderRadius="10px" p={5} maxW={96}>
             <VStack as={Form} method="post" spacing={5}>
               {children}
             </VStack>
