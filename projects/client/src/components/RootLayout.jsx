@@ -1,9 +1,32 @@
-import { Avatar, Box, Flex, Heading, Link, Text, Icon } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  Button,
+  Center,
+  Flex,
+  Heading,
+  Icon,
+  IconButton,
+  Link,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text,
+} from "@chakra-ui/react";
+import {
+  FaFacebook,
+  FaInstagram,
+  FaShoppingCart,
+  FaTwitter,
+  FaYoutube,
+  FaSignOutAlt,
+  FaUserCog,
+} from "react-icons/fa";
 import { Link as RouterLink, Outlet } from "react-router-dom";
-import { FaFacebook, FaTwitter, FaInstagram, FaYoutube } from "react-icons/fa";
 
 const RootLayout = () => {
-  const isLogin = "";
+  const isLoggedin = "a";
 
   return (
     <>
@@ -17,45 +40,52 @@ const RootLayout = () => {
         px={{ base: 6, lg: 10 }}
       >
         <Heading fontSize="xl">Niagajaya</Heading>
-        <Box>
-          {isLogin ? (
+        <Flex>
+          {isLoggedin ? (
             <>
-              <Link as={RouterLink} to="cart"></Link>
-              <Link as={RouterLink} to="profile">
-                <Avatar />
-              </Link>
+              <IconButton
+                as={RouterLink}
+                to="cart"
+                icon={<FaShoppingCart />}
+                color="#009262"
+                bgColor="#FCFCFC"
+                mr={4}
+                size="lg"
+                fontSize="2xl"
+                borderRadius="full"
+              />
+              <Menu>
+                <MenuButton>
+                  <Avatar />
+                </MenuButton>
+                <MenuList color="black">
+                  <MenuItem
+                    as={RouterLink}
+                    to="settings/profile"
+                    icon={<FaUserCog />}
+                  >
+                    Settings
+                  </MenuItem>
+                  <MenuItem icon={<FaSignOutAlt />}>Log out</MenuItem>
+                </MenuList>
+              </Menu>
             </>
           ) : (
             <>
-              <Link
-                as={RouterLink}
-                to="login"
-                display="inline-block"
-                mr={8}
-                fontWeight="bold"
-                py={2.5}
-                px={5}
-                borderRadius="10px"
-                border="solid 1px"
-              >
+              <Button as={RouterLink} to="login" mr={4} variant="outline">
                 Masuk
-              </Link>
-              <Link
+              </Button>
+              <Button
                 as={RouterLink}
                 to="register"
                 bgColor="#FCFCFC"
                 color="#009262"
-                display="inline-block"
-                py={2.5}
-                px={5}
-                borderRadius="10px"
-                fontWeight="bold"
               >
                 Daftar
-              </Link>
+              </Button>
             </>
           )}
-        </Box>
+        </Flex>
       </Flex>
       <Box as="main">
         <Outlet />
@@ -83,33 +113,17 @@ const RootLayout = () => {
               Cari tahu berita terbaru
             </Heading>
             <Flex justifyContent="space-between">
-              <Link
-                as={RouterLink}
-                to="https://www.facebook.com"
-                display="block"
-              >
-                <Icon as={FaFacebook} />
+              <Link as={RouterLink} to="https://www.facebook.com">
+                <Icon as={FaFacebook} boxSize={6} />
               </Link>
-              <Link
-                as={RouterLink}
-                to="https://www.twitter.com"
-                display="block"
-              >
-                <Icon as={FaTwitter} />
+              <Link as={RouterLink} to="https://www.twitter.com">
+                <Icon as={FaTwitter} boxSize={6} />
               </Link>
-              <Link
-                as={RouterLink}
-                to="https://www.instagram.com"
-                display="block"
-              >
-                <Icon as={FaInstagram} />
+              <Link as={RouterLink} to="https://www.instagram.com">
+                <Icon as={FaInstagram} boxSize={6} />
               </Link>
-              <Link
-                as={RouterLink}
-                to="https://www.youtube.com"
-                display="block"
-              >
-                <Icon as={FaYoutube} />
+              <Link as={RouterLink} to="https://www.youtube.com">
+                <Icon as={FaYoutube} boxSize={6} />
               </Link>
             </Flex>
           </Box>
