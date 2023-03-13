@@ -78,7 +78,8 @@ model Warehouse {
   id              Int                   @id @default(autoincrement())
   managerId       Int                   @unique
   name            String                @db.VarChar(255)
-  coordinate      Unsupported("POINT")
+  latitude        Decimal
+  longitude       Decimal
   province        String                @db.VarChar(255)
   city            String                @db.VarChar(255)
   district        String                @db.VarChar(255)
