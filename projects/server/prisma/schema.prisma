@@ -50,11 +50,13 @@ model UserName {
 model UserAddress {
   id              Int                   @id @default(autoincrement())
   userId          Int
-  coordinate      Unsupported("POINT")
+  latitude        Decimal
+  longitude       Decimal
   province        String                @db.VarChar(255)
   city            String                @db.VarChar(255)
-  district        String                @db.VarChar(255)
+  street          String                @db.VarChar(255)
   detail          String
+  postalCode      String                @db.VarChar(255)
 
   createdAt       DateTime              @default(now())
   updatedAt       DateTime              @updatedAt

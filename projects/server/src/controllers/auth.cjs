@@ -67,4 +67,53 @@ module.exports = {
       });
     }
   },
+
+  login: async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      const user = await prisma.user.findFirst({
+        where: { email: email },
+      });
+
+      // const isValid = await bcrypt.compare(password, user.hashedPassword);
+      // if (!isValid) {
+      //   return res.status(400).json({
+      //     message: "Email and Password does not match",
+      //   });
+      // }
+      if (!user) {
+        return res.status(400).json({
+          message: "Email and Password does not match",
+        });
+      }
+
+      const userx = { id: user.id };
+      req.session.user = userx;
+
+      res.send({
+        result: { id: user.id },
+        message: "Login success with Session",
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({
+        message: error,
+      });
+    }
+  },
+
+  check: async (req, res) => {
+    try {
+      if (!req.session) {
+        return res.status(404).send("Session not found");
+      } else {
+        return res.send({ result: { id: req.session.user?.id } });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({
+        message: error,
+      });
+    }
+  },
 };

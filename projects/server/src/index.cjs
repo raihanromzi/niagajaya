@@ -43,5 +43,5 @@ app.use("/auth", routes.authRoute);
 app.use("/address", routes.addressRoute);
 
 app.listen(port, () => {
-    console.log(`APP RUNNING at ${port} ✅`);
+  console.log(`APP RUNNING at ${port} ✅`);
 });

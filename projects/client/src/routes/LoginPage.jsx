@@ -1,14 +1,14 @@
-import { Alert, AlertIcon, Box, Button, Flex, FormControl, FormHelperText, FormLabel, Heading, Image, Input, Link, Text, VStack } from "@chakra-ui/react";
+import { Alert, AlertIcon, Box, Button, Flex, FormControl, FormHelperText, Heading, Image, Input, VStack } from "@chakra-ui/react";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as Yup from 'yup';
 import { axiosInstance } from "../config/config";
 import paperBagImg from "../assets/paper-bag.png";
 import { useDispatch } from "react-redux";
 import user_types from "../redux/auth/types";
 
-export default function LoginPage() {
+const LoginPage = () => {
     let navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -28,11 +28,8 @@ export default function LoginPage() {
             password: Yup.string().required('Password tidak boleh kosong'),
         }),
         onSubmit: async () => {
-            console.log(formik.values);
-
             await axiosInstance
                 .post('/auth/v2', formik.values, { withCredentials: true }).then((res) => {
-                    console.log(res.status);
                     if (res.status === 200) {
                         dispatch({
                             type: user_types.USER_LOGIN,
@@ -41,17 +38,12 @@ export default function LoginPage() {
                         const lastPath = localStorage.getItem("lastPath");
                         if (lastPath) {
                             navigate(lastPath, { replace: true });
-
                         } else {
-
                             navigate('/', { replace: true });
-
                         }
                     }
                 })
                 .catch(error => {
-                    console.log('error');
-                    console.log(error);
                     setStatus(true);
                     setMsg(error.response.data.message);
                 });
@@ -124,9 +116,6 @@ export default function LoginPage() {
                         bgColor="#009262" color="#FCFCFC" w="full"
                         onClick={formik.handleSubmit}
                         isDisabled={enable ? false : true}
-                        // _disabled={{
-                        //     backgroundColor: "#009262"
-                        // }}
                         _hover={{
                             backgroundColor: "#00b377"
 
@@ -141,3 +130,4 @@ export default function LoginPage() {
 }
 
 
+export default LoginPage
