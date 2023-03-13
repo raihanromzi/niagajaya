@@ -2,7 +2,6 @@ import {
   Avatar,
   Box,
   Button,
-  Center,
   Flex,
   Heading,
   Icon,
@@ -18,10 +17,10 @@ import {
   FaFacebook,
   FaInstagram,
   FaShoppingCart,
-  FaTwitter,
-  FaYoutube,
   FaSignOutAlt,
+  FaTwitter,
   FaUserCog,
+  FaYoutube,
 } from "react-icons/fa";
 import { Link as RouterLink, Outlet } from "react-router-dom";
 

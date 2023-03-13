@@ -1,7 +1,6 @@
 import {
   Avatar,
   Box,
-  IconButton,
   Modal,
   ModalBody,
   ModalContent,
@@ -9,29 +8,37 @@ import {
   ModalHeader,
   ModalOverlay,
   TabPanel,
-  Text,
   useDisclosure,
+  VStack,
 } from "@chakra-ui/react";
-import { FaEdit } from "react-icons/fa";
+import ProfileItem from "./ProfileItem";
 
 const ProfilePanel = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <TabPanel>
-      <Box>
-        <Avatar />
+    <TabPanel as={VStack} spacing={4}>
+      <Box w="full">
+        <Avatar size="2xl" />
       </Box>
-      <Box>
-        <Text fontWeight="bold">Nama</Text>
-        <IconButton icon={<FaEdit />} onClick={onOpen} />
-      </Box>
-      <Box>
-        <Text fontWeight="bold">Alamat Surel</Text>
-      </Box>
-      <Box>
-        <Text fontWeight="bold">Kata Sandi</Text>
-      </Box>
+      <ProfileItem
+        id="name"
+        label="Nama"
+        value="John Doe"
+        handleClick={onOpen}
+      />
+      <ProfileItem
+        id="email"
+        label="Alamat Surel"
+        value="johndoe@gmail.com"
+        handleClick={onOpen}
+      />
+      <ProfileItem
+        id="password"
+        label="Kata Sandi"
+        value="****"
+        handleClick={onOpen}
+      />
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
