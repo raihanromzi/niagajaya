@@ -6,6 +6,7 @@ import RootLayout from "./components/RootLayout";
 import IndexPage from "./routes/index";
 import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
+import SettingsPage from "./routes/settings";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
         path: "set-password/:code",
         Component: SetPasswordPage,
         action: setPasswordAction,
+      },
+      {
+        path: "settings",
+        Component: SettingsPage,
       },
     ],
   },
