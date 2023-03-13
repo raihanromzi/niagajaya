@@ -64,9 +64,9 @@ const RootLayout = () => {
                     to="settings/profile"
                     icon={<FaUserCog />}
                   >
-                    Settings
+                    Pengaturan
                   </MenuItem>
-                  <MenuItem icon={<FaSignOutAlt />}>Log out</MenuItem>
+                  <MenuItem icon={<FaSignOutAlt />}>Keluar</MenuItem>
                 </MenuList>
               </Menu>
             </>
