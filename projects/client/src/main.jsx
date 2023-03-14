@@ -10,13 +10,12 @@ import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
 import SettingsPage from "./routes/settings";
 
-import AuthProvider from './hoc/authProvider';
-import rootReducer from './redux/store';
-import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore } from "@reduxjs/toolkit";
+import { Provider } from "react-redux";
+import AuthProvider from "./hoc/authProvider";
+import rootReducer from "./redux/store";
 
-import 'leaflet/dist/leaflet.css'
-import PageProtected from "./routes/protected";
+import "leaflet/dist/leaflet.css";
 
 const router = createBrowserRouter([
   {
@@ -36,11 +35,11 @@ const router = createBrowserRouter([
       },
       {
         path: "login",
-        Component: LoginPage
+        Component: LoginPage,
       },
       {
         path: "address",
-        Component: AddressPage
+        Component: AddressPage,
       },
     ],
   },

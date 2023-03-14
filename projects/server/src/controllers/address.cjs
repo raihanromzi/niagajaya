@@ -3,17 +3,15 @@ const prisma = require("../utils/client.cjs");
 
 /** @type {Object<string, import("express").RequestHandler>} */
 module.exports = {
-  getProvinces: async (req, res) => {
+  getProvinces: async (_req, res) => {
     try {
       const response = await axios.get(
         "https://api.rajaongkir.com/starter/province",
-        {
-          headers: { key: process.env.API_KEY_RAJAONGKIR },
-        }
+        { headers: { key: process.env.API_KEY_RAJAONGKIR } }
       );
       res.send({ results: response.data.rajaongkir.results });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(400).json({
         message: error,
       });
@@ -30,7 +28,7 @@ module.exports = {
       );
       res.send({ results: response.data.rajaongkir.results });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(400).json({
         message: error,
       });
@@ -48,37 +46,60 @@ module.exports = {
         postalCode,
         main,
       } = req.body;
-      const result = await prisma.userAddress.create({
+      // const result = await prisma.userAddress.create({
+      //   data: {
+      //     userId: req.session.user.id,
+      //     latitude: latitude,
+      //     longitude: longitude,
+      //     province: province,
+      //     city: city,
+      //     street: street,
+      //     postalCode: postalCode,
+      //     detail: detail,
+      //   },
+      // });
+      const user = await prisma.user.update({
+        where: { id: req.session.user.id },
         data: {
-          userId: req.session.user.id,
-          latitude: latitude,
-          longitude: longitude,
-          province: province,
-          city: city,
-          street: street,
-          postalCode: postalCode,
-          detail: detail,
+          addresses: {
+            create: {
+              latitude,
+              longitude,
+              province,
+              city,
+              detail,
+              street,
+              postalCode,
+              primaryAddress: main && {
+                connectOrCreate: {
+                  where: { userId: req.session.user.id },
+                  create: { userId: req.session.user.id },
+                },
+              },
+            },
+          },
         },
+        include: { addresses: true },
       });
-      if (main) {
-        const primaryAddress = await prisma.userPrimaryAddress.findFirst({
-          where: { userId: req.session.user.id },
-        });
-        if (primaryAddress) {
-          await prisma.userPrimaryAddress.create({
-            data: { userId: req.session.user.id, addressId: result.id },
-          });
-        } else {
-          await prisma.userPrimaryAddress.update({
-            where: { userId: req.session.user.id },
-            data: { addressId: result.id },
-          });
-        }
-      }
-      console.log(result);
+      // if (main) {
+      //   const primaryAddress = await prisma.userPrimaryAddress.findFirst({
+      //     where: { userId: req.session.user.id },
+      //   });
+      //   if (primaryAddress) {
+      //     await prisma.userPrimaryAddress.create({
+      //       data: { userId: req.session.user.id, addressId: result.id },
+      //     });
+      //   } else {
+      //     await prisma.userPrimaryAddress.update({
+      //       where: { userId: req.session.user.id },
+      //       data: { addressId: result.id },
+      //     });
+      //   }
+      // }
+      console.log(user);
       res.send({ message: "Berhasil" });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(400).json({
         message: error,
       });
@@ -106,35 +127,33 @@ module.exports = {
       }
       res.send(newResult);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(400).json({
         message: error,
       });
     }
   },
-
   updateAddress: async (req, res) => {
     try {
-      const { latitude, longitude, province, city, detail, street, district } =
+      const { latitude, longitude, province, city, detail, district } =
         req.body;
 
       const result = await prisma.userAddress.update({
         where: { id: req.params.id },
         data: {
           userId: req.session.user.id,
-          coordinate: `point(${latitude}, ${longitude})`,
-          latitude: latitude,
-          longitude: longitude,
-          province: province,
-          city: city,
-          district: district,
-          detail: detail,
+          latitude,
+          longitude,
+          province,
+          city,
+          district,
+          detail,
         },
       });
       console.log(result);
       res.send(result);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(400).json({
         message: error,
       });
@@ -156,13 +175,12 @@ module.exports = {
       });
       res.send(result);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(400).json({
         message: error,
       });
     }
   },
-
   deleteAddress: async (req, res) => {
     try {
       const result = await prisma.userAddress.delete({
@@ -170,7 +188,7 @@ module.exports = {
       });
       res.send(result);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(400).json({
         message: error,
       });

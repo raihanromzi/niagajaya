@@ -67,12 +67,11 @@ module.exports = {
       });
     }
   },
-
   login: async (req, res) => {
     try {
-      const { email, password } = req.body;
-      const user = await prisma.user.findFirst({
-        where: { email: email },
+      const { email } = req.body;
+      const user = await prisma.user.findUnique({
+        where: { email },
       });
 
       // const isValid = await bcrypt.compare(password, user.hashedPassword);
@@ -95,13 +94,12 @@ module.exports = {
         message: "Login success with Session",
       });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(400).json({
         message: error,
       });
     }
   },
-
   check: async (req, res) => {
     try {
       if (!req.session) {
@@ -110,7 +108,7 @@ module.exports = {
         return res.send({ result: { id: req.session.user?.id } });
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(400).json({
         message: error,
       });
