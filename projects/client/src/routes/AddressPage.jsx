@@ -583,6 +583,16 @@ const AddressPage = () => {
                                 <DraggableMarker />
                             </MapContainer>
                         ) : null}
+                        <HStack alignItems={'center'} w={'full'}>
+                            <Switch id='isChecked'
+                                colorScheme='teal'
+                                onChange={(e) => {
+                                    setMain(!main)
+                                }}
+                                isChecked={main}
+                            />
+                            <FormLabel htmlFor='isChecked'>Ubah sebagai alamat utama</FormLabel>
+                        </HStack>
                         <Button
                             colorScheme="teal"
                             w={"full"}

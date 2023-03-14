@@ -51,33 +51,58 @@ module.exports = {
         postalCode,
         main,
       } = req.body;
-      const result = await prisma.userAddress.create({
+      const user = await prisma.user.update({
+        where: { id: req.session.user.id },
         data: {
-          userId: req.session.user.id,
-          latitude: latitude,
-          longitude: longitude,
-          province: province,
-          city: city,
-          street: street,
-          postalCode: postalCode,
-          detail: detail,
+          addresses: {
+            create: {
+              latitude,
+              longitude,
+              province,
+              city,
+              detail,
+              street,
+              postalCode,
+              primaryAddress: main && {
+                connectOrCreate: {
+                  where: { userId: req.session.user.id },
+                  create: { userId: req.session.user.id },
+                },
+              },
+            },
+          },
         },
+        include: { addresses: true },
       });
-      if (main) {
-        const primaryAddress = await prisma.userPrimaryAddress.findFirst({
-          where: { userId: req.session.user.id },
-        });
-        if (primaryAddress) {
-          await prisma.userPrimaryAddress.create({
-            data: { userId: req.session.user.id },
-          });
-        } else {
-          await prisma.userPrimaryAddress.update({
-            where: { userId: req.session.user.id },
-            data: { addressId: result.id },
-          });
-        }
-      }
+
+      // const result = await prisma.userAddress.create({
+      //   data: {
+      //     userId: req.session.user.id,
+      //     latitude: latitude,
+      //     longitude: longitude,
+      //     province: province,
+      //     city: city,
+      //     street: street,
+      //     postalCode: postalCode,
+      //     detail: detail,
+      //   },
+      // });
+      // if (main) {
+      //   const primaryAddress = await prisma.userPrimaryAddress.findFirst({
+      //     where: { userId: req.session.user.id },
+      //   });
+      //   if (primaryAddress) {
+      //     await prisma.userPrimaryAddress.create({
+      //       data: { userId: req.session.user.id },
+      //     });
+      //   } else {
+      //     await prisma.userPrimaryAddress.update({
+      //       where: { userId: req.session.user.id },
+      //       data: { addressId: result.id },
+      //     });
+      //   }
+      // }
+      console.log(user);
       res.send({ message: "Berhasil" });
     } catch (error) {
       console.error(error);
