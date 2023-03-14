@@ -102,7 +102,6 @@ module.exports = {
       //     });
       //   }
       // }
-      console.log(user);
       res.send({ message: "Berhasil" });
     } catch (error) {
       console.error(error);
@@ -199,7 +198,6 @@ module.exports = {
           });
         }
       }
-      console.log(result);
       res.send(result);
     } catch (error) {
       console.error(error);
