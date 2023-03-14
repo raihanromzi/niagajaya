@@ -36,6 +36,11 @@ module.exports = {
   },
   createAddress: async (req, res) => {
     try {
+      if (!req.session.user) {
+        return res.status(400).json({
+          message: "Harus login",
+        });
+      }
       const {
         latitude,
         longitude,
@@ -83,6 +88,11 @@ module.exports = {
   },
   getAddresses: async (req, res) => {
     try {
+      if (!req.session.user) {
+        return res.status(400).json({
+          message: "Harus login",
+        });
+      }
       const addresses = await prisma.userAddress.findMany({
         where: { userId: req.session.user.id },
       });
@@ -111,6 +121,11 @@ module.exports = {
   },
   updateAddress: async (req, res) => {
     try {
+      if (!req.session.user) {
+        return res.status(400).json({
+          message: "Harus login",
+        });
+      }
       const {
         latitude,
         longitude,
@@ -171,6 +186,11 @@ module.exports = {
 
   getAddress: async (req, res) => {
     try {
+      if (!req.session.user) {
+        return res.status(400).json({
+          message: "Harus login",
+        });
+      }
       const result = await prisma.userAddress.findFirst({
         where: { id: parseInt(req.params.id) },
         select: {
@@ -201,6 +221,11 @@ module.exports = {
   },
   deleteAddress: async (req, res) => {
     try {
+      if (!req.session.user) {
+        return res.status(400).json({
+          message: "Harus login",
+        });
+      }
       const primaryAddress = await prisma.userPrimaryAddress.findFirst({
         where: { addressId: parseInt(req.params.id) },
       });
