@@ -5,10 +5,12 @@ const {
   setPassword,
   check,
   login,
+  resetPassword,
 } = require("../controllers/auth.cjs");
 const {
   registerSchema,
   setPasswordSchema,
+  resetPasswordSchema,
 } = require("../validations/auth.cjs");
 
 const { validate, loginValidator } = require("../validations/login.cjs");
@@ -19,5 +21,6 @@ router
 
 router.post("/v2", loginValidator(), validate, login);
 router.get("/v3", check);
+router.post("/v4", checkSchema(resetPasswordSchema), resetPassword);
 
 module.exports = router;

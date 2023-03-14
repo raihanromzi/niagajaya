@@ -353,7 +353,7 @@ const AddressPage = () => {
     }
 
     return (
-        <PageProtected needLogin={true} myPath={"/address"}>
+        <PageProtected needLogin={true} >
             <Box
                 w={"md"}
                 minH="50vh"

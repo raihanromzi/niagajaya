@@ -1,21 +1,20 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function PageProtected({
   children,
-  myPath,
   needLogin = false,
   guestOnly = false,
 }) {
   let navigate = useNavigate();
+  let location = useLocation();
+
   const userSelector = useSelector((state) => state.auth);
 
   useEffect(() => {
-    // wajib login
-    console.log("userSelector: ", userSelector);
     if (needLogin && !userSelector?.id) {
-      localStorage.setItem("lastPath", myPath);
+      localStorage.setItem("lastPath", location.pathname);
       return navigate("/login", { replace: true });
     }
 

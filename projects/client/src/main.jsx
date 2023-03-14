@@ -9,6 +9,7 @@ import LoginPage from "./routes/LoginPage";
 import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
 import SettingsPage from "./routes/settings";
+import ResetPasswordEmail from "./routes/setPasswordEmail";
 
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: "address",
         Component: AddressPage,
+      },
+      {
+        path: "reset-password/email",
+        Component: ResetPasswordEmail,
       },
     ],
   },

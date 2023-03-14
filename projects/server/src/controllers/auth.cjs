@@ -114,4 +114,30 @@ module.exports = {
       });
     }
   },
+  resetPassword: async (req, res) => {
+    try {
+      validationResult(req).throw();
+
+      const { email } = req.body;
+      const user = await prisma.user.findFirst({
+        where: { email: email },
+      });
+
+      const code = randomUUID();
+      await redis.set(passwordPrefix + code, user.id, "EX", 86400); // 24 hours
+      await sendMail(
+        email,
+        "Ubah Password",
+        `<a href="http://localhost:5173/set-password/${code}">Setel Kata Kunci</a>`
+      );
+
+      res.json({ success: true, msg: "Kode Verifikasi Berhasil Dikirim!" });
+    } catch (err) {
+      const errors = "errors" in err ? err.mapped() : { unknown: err };
+      res.status(400).json({
+        success: false,
+        errors,
+      });
+    }
+  },
 };
