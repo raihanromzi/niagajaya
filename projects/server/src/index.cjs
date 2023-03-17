@@ -23,25 +23,26 @@ app.use(
 );
 app.use(express.json());
 
-app.use(
-  session({
-    store: redisStore,
-    resave: false,
-    saveUninitialized: false,
-    secret: process.env.SECRET_KEY_SESSION,
-    cookie: {
-      maxAge: 31536000000, // 365 days
-      httpOnly: true,
-      sameSite: "lax",
-      secure: "auto",
-    },
-  })
-);
+// app.use(
+//   session({
+//     store: redisStore,
+//     resave: false,
+//     saveUninitialized: false,
+//     secret: process.env.SECRET_KEY_SESSION,
+//     cookie: {
+//       maxAge: 31536000000, // 365 days
+//       httpOnly: true,
+//       sameSite: "lax",
+//       secure: "auto",
+//     },
+//   })
+// );
 
 const routes = require("./routes/index.cjs");
 app.use("/auth", routes.authRoute);
 app.use("/address", routes.addressRoute);
+app.use("/api", routes.adminAuthRoute);
 
 app.listen(port, () => {
-    console.log(`APP RUNNING at ${port} ✅`);
+  console.log(`APP RUNNING at ${port} ✅`);
 });
