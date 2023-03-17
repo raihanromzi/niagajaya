@@ -7,7 +7,7 @@ const session = require("express-session");
 const { default: RedisStore } = require("connect-redis");
 const redis = require("./utils/redis.cjs");
 
-const port = process.env.PORT || 8000;
+const port = +(process.env.PORT || 8000);
 const app = express();
 const redisStore = new RedisStore({
   client: redis,

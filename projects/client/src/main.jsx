@@ -3,10 +3,20 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import RootLayout from "./components/RootLayout";
+import AddressPage from "./routes/AddressPage";
 import IndexPage from "./routes/index";
+import LoginPage from "./routes/LoginPage";
 import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
 import SettingsPage from "./routes/settings";
+import ResetPasswordEmail from "./routes/setPasswordEmail";
+
+import { configureStore } from "@reduxjs/toolkit";
+import { Provider } from "react-redux";
+import AuthProvider from "./hoc/authProvider";
+import rootReducer from "./redux/store";
+
+import "leaflet/dist/leaflet.css";
 
 const router = createBrowserRouter([
   {
@@ -24,14 +34,32 @@ const router = createBrowserRouter([
         path: "settings",
         Component: SettingsPage,
       },
+      {
+        path: "login",
+        Component: LoginPage,
+      },
+      {
+        path: "address",
+        Component: AddressPage,
+      },
+      {
+        path: "reset-password/email",
+        Component: ResetPasswordEmail,
+      },
     ],
   },
 ]);
 
+const store = configureStore({ reducer: rootReducer });
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ChakraProvider>
-      <RouterProvider router={router} />
-    </ChakraProvider>
+    <Provider store={store}>
+      <ChakraProvider>
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </ChakraProvider>
+    </Provider>
   </StrictMode>
 );

@@ -1,7 +1,7 @@
 import { Button } from "@chakra-ui/react";
 import axios from "axios";
 import { useActionData, useNavigation } from "react-router-dom";
-import groceryImg from "../assets/Grocery.png";
+import paperBagImg from "../assets/paper-bag.png";
 import AuthLayout from "../components/AuthLayout";
 import FormElem from "../components/FormElem";
 import PasswordInput from "../components/PasswordInput";
@@ -27,7 +27,7 @@ const SetPasswordPage = () => {
   return (
     <AuthLayout
       actionData={actionData}
-      src={groceryImg}
+      src={paperBagImg}
       alt="kantong belanja"
       heading="Penyetelan"
     >
