@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
 const { randomUUID } = require("crypto");
 const prisma = require("../utils/client.cjs");
-const redis = require("../utils/redis.cjs");
+// const redis = require("../utils/redis.cjs");
 const sendMail = require("../utils/sendMail.cjs");
 
 const passwordPrefix = "pass:";
@@ -14,23 +14,23 @@ module.exports = {
       validationResult(req).throw();
 
       const { email, name } = req.body;
-      const user = await prisma.user.create({
+      const token = randomUUID();
+      await prisma.user.create({
         data: {
           email,
           role: "USER",
+          token: passwordPrefix + token,
           names: { create: { name } },
         },
-        include: { names: true },
+        select: { id: true },
       });
 
-      const code = randomUUID();
-
-      await redis.set(passwordPrefix + code, user.id, "EX", 86400); // 24 hours
+      // await redis.set(passwordPrefix + token, user.id, "EX", 86400); // 24 hours
 
       await sendMail(
         email,
         "Verifkasi Akun",
-        `<a href="http://localhost:5173/set-password/${code}">Setel Kata Kunci</a>`
+        `<a href="http://localhost:5173/set-password/${token}">Setel Kata Kunci</a>`
       );
 
       res.json({ success: true, msg: "Pendaftaran berhasil!" });
@@ -46,16 +46,21 @@ module.exports = {
     try {
       validationResult(req).throw();
 
-      const { password, code } = req.body;
+      const { password, token } = req.body;
 
-      const id = +(await redis.getdel(passwordPrefix + code));
-      if (!id) throw new Error("Kode tak sah");
+      // const id = +(await redis.getdel(passwordPrefix + token));
+      const user = await prisma.user.findUnique({
+        where: { token: passwordPrefix + token },
+        select: { id: true },
+      });
+      if (!user) throw new Error("Kode tak sah");
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
       await prisma.user.update({
-        where: { id },
-        data: { hashedPassword },
+        where: { id: user.id },
+        // data: { hashedPassword, token: null },
+        data: { hashedPassword, token: randomUUID() },
       });
 
       res.json({ success: true, msg: "Kata kunci berhasil tersetel!" });
@@ -115,3 +120,6 @@ module.exports = {
     }
   },
 };
+
+const path = require("path");
+path.resolve();

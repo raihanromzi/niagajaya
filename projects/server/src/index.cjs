@@ -4,15 +4,13 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
-const { default: RedisStore } = require("connect-redis");
-const redis = require("./utils/redis.cjs");
 
 const port = +(process.env.PORT || 8000);
 const app = express();
-const redisStore = new RedisStore({
-  client: redis,
-  disableTouch: true,
-});
+// const redisStore = new RedisStore({
+//   client: redis,
+//   disableTouch: true,
+// });
 
 // app.set("trust proxy", 1)
 app.use(
@@ -23,7 +21,7 @@ app.use(
 );
 app.use(
   session({
-    store: redisStore,
+    // store: redisStore,
     resave: false,
     saveUninitialized: false,
     secret: process.env.SECRET_KEY_SESSION,
@@ -37,10 +35,16 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static("./public", { index: false }));
 
 const routes = require("./routes/index.cjs");
 app.use("/auth", routes.authRoute);
 app.use("/address", routes.addressRoute);
+
+const authRoutes = require("./routes/auth.cjs");
+const usersRoutes = require("./routes/users.cjs");
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", usersRoutes);
 
 app.listen(port, () => {
   console.log(`APP RUNNING at ${port} ✅`);
