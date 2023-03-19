@@ -9,6 +9,7 @@ import LoginPage from "./routes/LoginPage";
 import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
 import SettingsPage from "./routes/settings";
+import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
 
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
@@ -25,13 +26,20 @@ const router = createBrowserRouter([
       { index: true, Component: IndexPage },
       { path: "register", Component: RegisterPage, action: registerAction },
       {
-        path: "set-password/:code",
+        path: "set-password/:token",
         Component: SetPasswordPage,
         action: setPasswordAction,
       },
       {
         path: "settings",
         Component: SettingsPage,
+        // loader: settingsLoader,
+        // action: settingsAction,
+      },
+      {
+        path: "change-email/:token",
+        Component: ChangeEmailPage,
+        action: changeEmailAction,
       },
       {
         path: "login",
