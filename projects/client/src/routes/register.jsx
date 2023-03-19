@@ -20,6 +20,10 @@ export const registerAction = async ({ request }) => {
     );
     return res.data;
   } catch (err) {
+    const unknownErr = err.response.data.errors.unknown;
+    if (unknownErr) {
+      alert(JSON.stringify(unknownErr));
+    }
     return err.response.data;
   }
 };
