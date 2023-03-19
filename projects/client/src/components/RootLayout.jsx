@@ -13,6 +13,8 @@ import {
   MenuList,
   Text,
 } from "@chakra-ui/react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import {
   FaFacebook,
   FaInstagram,
@@ -22,10 +24,26 @@ import {
   FaUserCog,
   FaYoutube,
 } from "react-icons/fa";
+import { useSelector } from "react-redux";
 import { Link as RouterLink, Outlet } from "react-router-dom";
 
 const RootLayout = () => {
-  const isLoggedin = "a";
+  const userId = useSelector((state) => state.auth.id);
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:8000/api/v1/users/${userId}`,
+          { withCredentials: true }
+        );
+        setData(res.data);
+      } catch (err) {
+        setData(err.response.data);
+      }
+    })();
+  }, [userId]);
 
   return (
     <>
@@ -38,9 +56,11 @@ const RootLayout = () => {
         h={20}
         px={{ base: 6, lg: 10 }}
       >
-        <Heading fontSize="xl">Niagajaya</Heading>
+        <Heading as={RouterLink} to="/" fontSize="xl">
+          Niagajaya
+        </Heading>
         <Flex>
-          {isLoggedin ? (
+          {userId ? (
             <>
               <IconButton
                 as={RouterLink}
@@ -55,7 +75,13 @@ const RootLayout = () => {
               />
               <Menu>
                 <MenuButton>
-                  <Avatar />
+                  <Avatar
+                    src={
+                      data?.user?.imageUrl &&
+                      `http://localhost:8000/avatars/${data?.user?.imageUrl}`
+                    }
+                    name={data?.user?.names[0].name}
+                  />
                 </MenuButton>
                 <MenuList color="black">
                   <MenuItem as={RouterLink} to="settings" icon={<FaUserCog />}>
@@ -83,7 +109,7 @@ const RootLayout = () => {
         </Flex>
       </Flex>
       <Box as="main" p={{ base: 4, lg: 10 }}>
-        <Outlet />
+        <Outlet context={{ userId }} />
       </Box>
       <Box
         as="footer"
