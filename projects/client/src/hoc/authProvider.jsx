@@ -8,19 +8,15 @@ const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log("auth jalan");
     axiosInstance
       .get("/auth/v3", { withCredentials: true })
       .then((res) => {
-        console.log("res.data: ", res.data);
-        console.log("res.data.result: ", res.data.result);
         dispatch({
           type: user_types.USER_LOGIN,
           payload: res.data.result,
         });
       })
       .catch((err) => {
-        console.error("error: ", err);
         if (err.code !== "ERR_NETWORK") {
           dispatch({
             type: user_types.USER_LOGOUT,
