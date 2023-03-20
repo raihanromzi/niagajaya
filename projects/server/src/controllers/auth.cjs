@@ -2,7 +2,6 @@ const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
 const { randomUUID } = require("crypto");
 const prisma = require("../utils/client.cjs");
-const redis = require("../utils/redis.cjs");
 const sendMail = require("../utils/sendMail.cjs");
 
 const passwordPrefix = "pass:";
@@ -27,11 +26,7 @@ module.exports = {
 
       await redis.set(passwordPrefix + code, user.id, "EX", 86400); // 24 hours
 
-      await sendMail(
-        email,
-        "Verifkasi Akun",
-        `<a href="http://localhost:5173/set-password/${code}">Setel Kata Kunci</a>`
-      );
+      await sendMail(email, "Verifkasi Akun", `<a href="http://localhost:5173/set-password/${code}">Setel Kata Kunci</a>`);
 
       res.json({ success: true, msg: "Pendaftaran berhasil!" });
     } catch (err) {
@@ -125,11 +120,7 @@ module.exports = {
 
       const code = randomUUID();
       await redis.set(passwordPrefix + code, user.id, "EX", 86400); // 24 hours
-      await sendMail(
-        email,
-        "Ubah Password",
-        `<a href="http://localhost:5173/set-password/${code}">Setel Kata Kunci</a>`
-      );
+      await sendMail(email, "Ubah Password", `<a href="http://localhost:5173/set-password/${code}">Setel Kata Kunci</a>`);
 
       res.json({ success: true, msg: "Kode Verifikasi Berhasil Dikirim!" });
     } catch (err) {

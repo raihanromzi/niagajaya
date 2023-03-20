@@ -4,12 +4,13 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import RootLayout from "./components/RootLayout";
 import AddressPage from "./routes/AddressPage";
-import IndexPage from "./routes/index";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
 import SettingsPage from "./routes/settings";
 import ResetPasswordEmail from "./routes/setPasswordEmail";
+import AdminLoginPage from "./routes/AdminLoginPage";
+import AdminPage from "./routes/AdminPage";
 
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
@@ -21,9 +22,7 @@ import "leaflet/dist/leaflet.css";
 const router = createBrowserRouter([
   {
     path: "/",
-    Component: RootLayout,
     children: [
-      { index: true, Component: IndexPage },
       { path: "register", Component: RegisterPage, action: registerAction },
       {
         path: "set-password/:code",
@@ -39,12 +38,20 @@ const router = createBrowserRouter([
         Component: LoginPage,
       },
       {
+        path: "/admin/login",
+        Component: AdminLoginPage,
+      },
+      {
+        path: "/admin",
+        Component: AdminPage,
+      },
+      {
         path: "address",
         Component: AddressPage,
       },
       {
         path: "reset-password/email",
-        Component: ResetPasswordEmail,
+        component: ResetPasswordEmail,
       },
     ],
   },

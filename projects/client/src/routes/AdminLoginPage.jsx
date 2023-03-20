@@ -5,12 +5,11 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import paperBagImg from "../assets/paper-bag.png";
 import { axiosInstance } from "../config/config";
 import user_types from "../redux/auth/types";
 import PageProtected from "./protected";
 
-const LoginPage = () => {
+const AdminLoginPage = () => {
   let navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -29,37 +28,30 @@ const LoginPage = () => {
     }),
     onSubmit: () => {
       axiosInstance
-        .post("/auth/v2", formik.values, { withCredentials: true })
+        .post("/api/admin/login", formik.values, { withCredentials: true })
         .then((res) => {
           if (res.status === 200) {
+            console.log(res);
             dispatch({
-              type: user_types.USER_LOGIN,
+              type: user_types.ADMIN_LOGIN,
               payload: res.data.result,
             });
-            const lastPath = localStorage.getItem("lastPath");
-            if (lastPath) {
-              navigate(lastPath, { replace: true });
-            } else {
-              navigate("/", { replace: true });
-            }
+            navigate("/admin", { replace: true });
           }
         })
         .catch((error) => {
           setStatus(true);
-          setMsg(error.response.data.message);
+          setMsg(error.response.data.errors.message);
         });
     },
   });
 
   return (
     <PageProtected guestOnly={true}>
-      <Flex mx="auto" maxW="5xl" boxShadow={{ lg: "0 8px 16px rgba(171, 190, 209, 0.4)" }} borderRadius="10px" justifyContent="space-evenly" flexDir={{ base: "column-reverse", lg: "row" }}>
-        <Center>
-          <Image src={paperBagImg} alt="eco bag with food" />
-        </Center>
+      <Flex mt="100px" mx="auto" w="xl" p={10} boxShadow={{ lg: "0 8px 16px rgba(171, 190, 209, 0.4)" }} borderRadius="10px" justifyContent="space-evenly" flexDir={{ base: "column-reverse", lg: "row" }}>
         <Center flexDir="column">
           <Heading fontSize="3xl" mb={5}>
-            Masuk ke akun Anda
+            NIAGAJAYA ADMIN
           </Heading>
           <Box border="solid #EBEBEB 1px" borderRadius="10px" p={5} w={96}>
             <VStack spacing={5}>
@@ -99,13 +91,13 @@ const LoginPage = () => {
               <Link
                 w={"full"}
                 fontSize={"sm"}
-                textAlign={"right"}
+                textAlign={"center"}
                 textColor={"gray.500"}
                 onClick={() => {
                   navigate("/reset-password/email", { replace: true });
                 }}
               >
-                Lupa Password?
+                Belum Punya Akun? Daftar
               </Link>
               <Button
                 bgColor="#009262"
@@ -126,4 +118,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default AdminLoginPage;
