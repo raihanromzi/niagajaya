@@ -31,8 +31,6 @@ const nameSchema = require("../validations/name.cjs");
 const changePasswordSchema = require("../validations/changePassword.cjs");
 
 const redirectStack = (key) => (req, _, next) => {
-  console.log(req.body);
-  console.log(req.headers["content-type"]);
   if (req.body[key] ?? req.file) {
     next();
   } else {
