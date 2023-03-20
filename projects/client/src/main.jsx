@@ -2,15 +2,18 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import AdminLayout from "./components/AdminLayout";
 import RootLayout from "./components/RootLayout";
 import AddressPage from "./routes/AddressPage";
+import ProductCategoriesPage from "./routes/admin/productCategories";
+import ProductsPage from "./routes/admin/products";
+import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
 import IndexPage from "./routes/index";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
-import SettingsPage from "./routes/settings";
-import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
 import ResetPasswordEmail from "./routes/setPasswordEmail";
+import SettingsPage from "./routes/settings";
 
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
@@ -54,6 +57,14 @@ const router = createBrowserRouter([
         path: "reset-password/email",
         Component: ResetPasswordEmail,
       },
+    ],
+  },
+  {
+    path: "admin",
+    Component: AdminLayout,
+    children: [
+      { path: "product-categories", Component: ProductCategoriesPage },
+      { path: "products", Component: ProductsPage },
     ],
   },
 ]);
