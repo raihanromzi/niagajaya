@@ -40,7 +40,6 @@ const ProductsPage = () => {
   const [tempCategoryId, setTempCategoryId] = useState();
   const [tempSortBy, setTempSortBy] = useState();
   const [sortBy, setSortBy] = useState();
-  const [page, setPage] = useState();
   const [size, setSize] = useState();
   const [categories, setCategories] = useState([]);
 
@@ -105,6 +104,7 @@ const ProductsPage = () => {
       queryParams.entries()
     );
     setName(name);
+    setCurrentPage(page);
     setCategoryId(categoryId);
     setTempCategoryId(categoryId);
     if (sortBy === undefined) {
@@ -114,7 +114,6 @@ const ProductsPage = () => {
       setSortBy(sortBy);
       setTempSortBy(sortBy);
     }
-    setPage(page);
     setSize(size);
     async function fetchProducts() {
       try {
@@ -134,7 +133,6 @@ const ProductsPage = () => {
               filteredParams[key]
             )}`;
           });
-        // /products?name=${name}&categoryId=${categoryId}&sortBy=${sortBy}&page=${page}&size=${size}
         const res = await axiosInstance.get(`/products${queryParams}`, {
           withCredentials: true,
         });
