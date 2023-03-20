@@ -41,6 +41,8 @@ app.use(express.urlencoded({ extended: true }));
 const routes = require("./routes/index.cjs");
 app.use("/auth", routes.authRoute);
 app.use("/address", routes.addressRoute);
+app.use("/products", routes.productRoute);
+app.use("/categories", routes.categoryRoute);
 
 app.listen(port, () => {
   console.log(`APP RUNNING at ${port} ✅`);
