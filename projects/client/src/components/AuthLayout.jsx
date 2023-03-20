@@ -27,7 +27,12 @@ const AuthLayout = ({ children, actionData, src, alt, heading }) => {
           <Heading fontSize="3xl" mb={5}>
             {heading}
           </Heading>
-          <Box border="solid #EBEBEB 1px" borderRadius="10px" p={5} maxW={96}>
+          <Box
+            border="solid #EBEBEB 1px"
+            borderRadius="10px"
+            p={5}
+            w={{ base: "full", lg: 96 }}
+          >
             <VStack as={Form} method="post" spacing={5}>
               {children}
             </VStack>
