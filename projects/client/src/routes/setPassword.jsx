@@ -11,11 +11,15 @@ export const setPasswordAction = async ({ request, params }) => {
   try {
     const res = await axios.post(
       "http://localhost:8000/api/v1/auth/set-password",
-      { code: params.code, ...Object.fromEntries(await request.formData()) },
+      { token: params.token, ...Object.fromEntries(await request.formData()) },
       { headers: { "Content-Type": "application/json" } }
     );
     return res.data;
   } catch (err) {
+    const unknownErr = err.response.data.errors.unknown;
+    if (unknownErr) {
+      alert(JSON.stringify(unknownErr));
+    }
     return err.response.data;
   }
 };
