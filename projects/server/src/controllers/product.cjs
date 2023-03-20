@@ -3,8 +3,6 @@ const prisma = require("../utils/client.cjs");
 /** @type {Object<string, import("express").RequestHandler>} */
 module.exports = {
   getProducts: async (req, res) => {
-    console.log("req.query");
-    console.log(req.query);
     try {
       const {
         name,
