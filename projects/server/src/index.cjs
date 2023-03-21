@@ -46,6 +46,8 @@ const authRoutes = require("./routes/auth.cjs");
 const usersRoutes = require("./routes/users.cjs");
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", usersRoutes);
+app.use("/products", routes.productRoute);
+app.use("/categories", routes.categoryRoute);
 
 app.listen(port, () => {
   console.log(`APP RUNNING at ${port} ✅`);
