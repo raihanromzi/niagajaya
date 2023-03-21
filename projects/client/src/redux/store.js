@@ -7,4 +7,6 @@ const rootReducer = combineReducers({
   authAdmin: adminReducer,
 });
 
+export const store = configureStore({ reducer: rootReducer });
+
 export default rootReducer;

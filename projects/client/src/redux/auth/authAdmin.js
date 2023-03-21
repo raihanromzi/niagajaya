@@ -12,8 +12,6 @@ function adminReducer(state = init_state, action) {
       ...state,
       id: action.payload.id,
     };
-  } else if (action.type === user_types.USER_LOGOUT) {
-    return init_state;
   }
   return state;
 }

@@ -5,9 +5,9 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import { axiosInstance } from "../config/config";
-import user_types from "../redux/auth/types";
-import PageProtected from "./protected";
+import { axiosInstance } from "../../config/config";
+import user_types from "../../redux/auth/types";
+import PageProtected from "../protected";
 
 const AdminLoginPage = () => {
   let navigate = useNavigate();
@@ -31,10 +31,9 @@ const AdminLoginPage = () => {
         .post("/api/admin/login", formik.values, { withCredentials: true })
         .then((res) => {
           if (res.status === 200) {
-            console.log(res);
             dispatch({
               type: user_types.ADMIN_LOGIN,
-              payload: res.data.result,
+              payload: res.data.data.id,
             });
             navigate("/admin", { replace: true });
           }

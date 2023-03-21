@@ -2,15 +2,15 @@ const cleanObject = require("./cleanObject");
 
 const responseSuccess = (code, status, data) =>
   cleanObject({
-    code: code,
-    status: status,
-    data: [data],
+    code,
+    status,
+    data,
   });
 
 const responseError = (code, status, error) =>
   cleanObject({
-    code: code,
-    status: status,
+    code,
+    status,
     errors: error,
   });
 

@@ -8,7 +8,7 @@ import AddressPage from "./routes/AddressPage";
 import ProductCategoriesPage from "./routes/admin/productCategories";
 import ProductsPage from "./routes/admin/products";
 import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
-import IndexPage from "./routes/index";
+// import IndexPage from "./routes/index";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
@@ -19,9 +19,11 @@ import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import AuthProvider from "./hoc/authProvider";
 import rootReducer from "./redux/store";
+import AdminLoginPage from "./routes/admin/AdminLoginPage";
 
 import "leaflet/dist/leaflet.css";
-import ProductsPage from "./routes/products";
+// import ProductsPage from "./routes/products";
+import { store } from "./redux/store";
 
 const router = createBrowserRouter([
   {
@@ -53,10 +55,6 @@ const router = createBrowserRouter([
         Component: AdminLoginPage,
       },
       {
-        path: "/admin",
-        Component: AdminPage,
-      },
-      {
         path: "address",
         Component: AddressPage,
       },
@@ -79,8 +77,6 @@ const router = createBrowserRouter([
     ],
   },
 ]);
-
-const store = configureStore({ reducer: rootReducer });
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

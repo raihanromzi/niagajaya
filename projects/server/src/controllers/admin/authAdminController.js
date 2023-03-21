@@ -1,26 +1,53 @@
 const prisma = require("../../utils/client.cjs");
 const response = require("../../utils/responses");
+const bcrypt = require("bcrypt");
 
 const authAdminController = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
-      const user = await prisma.user.findFirst({
-        where: { email, hashedPassword: password, OR: [{ role: "ADMIN" }, { role: "MANAGER" }] },
-      });
 
+      // Check Email
+      const user = await prisma.user.findFirst({
+        where: { email, OR: [{ role: "ADMIN" }, { role: "MANAGER" }] },
+        select: {
+          id: true,
+          email: true,
+          hashedPassword: true,
+          role: true,
+          imageUrl: true,
+          token: true,
+        },
+      });
       if (!user) {
-        return res.status(400).send.json({
-          message: "Please try again. Email and Password does not match",
-        });
+        res.status(400).send(response.responseError(400, "BAD REQUEST", { message: "Email Not Found!" }));
+        return;
       }
 
-      res.send({
-        result: { id: user.id },
-        message: "Login success",
-      });
+      // Compare Password
+      const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
+      if (!isPasswordValid) {
+        res.status(400).send(response.responseError(400, "BAD REQUEST", { message: "Email and Password Does Not Match!" }));
+        return;
+      }
+
+      // Create Session
+      const userx = { id: user.id };
+      req.session.user = userx;
+
+      res.status(200).send(
+        response.responseSuccess(200, "SUCCESS", {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          imageUrl: user.imageUrl,
+          token: user.token,
+        })
+      );
+      return;
     } catch (e) {
-      res.status(500).send(response.responseError("500", "SERVER_ERROR", { message: "Email and Password does not match" }));
+      console.log(e);
+      res.status(500).send(response.responseError(500, "SERVER_ERROR", `${e}`));
     }
   },
 };

@@ -7,10 +7,6 @@ const session = require("express-session");
 
 const port = +(process.env.PORT || 8000);
 const app = express();
-// const redisStore = new RedisStore({
-//   client: redis,
-//   disableTouch: true,
-// });
 
 app.use(
   cors({
@@ -20,10 +16,9 @@ app.use(
 );
 app.use(
   session({
-    // store: redisStore,
     resave: false,
     saveUninitialized: false,
-    secret: process.env.SECRET_KEY_SESSION,
+    secret: process.env.SESSION_SECRET,
     cookie: {
       maxAge: 31536000000, // 365 days
       httpOnly: true,

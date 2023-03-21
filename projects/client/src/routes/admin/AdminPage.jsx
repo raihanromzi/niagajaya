@@ -1,6 +1,6 @@
 import { Flex, HStack, Text, Box } from "@chakra-ui/react";
 import React from "react";
-import Logo from "../components/Logo";
+import Logo from "../../components/Logo";
 
 function AdminPage() {
   return (
