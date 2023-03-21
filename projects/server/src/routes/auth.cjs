@@ -16,7 +16,7 @@ const { validate, loginValidator } = require("../validations/login.cjs");
 
 router
   .post("/register", checkSchema({ ...emailSchema, ...nameSchema }), register)
-  .post("/set-password", checkSchema({ ...passwordSchema }), setPassword);
+  .post("/set-password", checkSchema(passwordSchema), setPassword);
 
 router.post("/v2", loginValidator(), validate, login);
 router.get("/v3", check);
