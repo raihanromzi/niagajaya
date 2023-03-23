@@ -1,5 +1,5 @@
-const prisma = require("../../utils/client.cjs");
-const response = require("../../utils/responses");
+const prisma = require("../../../utils/client.cjs");
+const response = require("../../../utils/responses");
 const bcrypt = require("bcrypt");
 
 const authAdminController = {
@@ -37,11 +37,9 @@ const authAdminController = {
 
       res.status(200).send(
         response.responseSuccess(200, "SUCCESS", {
-          id: user.id,
           email: user.email,
           role: user.role,
           imageUrl: user.imageUrl,
-          token: user.token,
         })
       );
       return;

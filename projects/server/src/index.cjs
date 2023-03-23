@@ -34,6 +34,8 @@ app.use(express.static("./public", { index: false }));
 const routes = require("./routes/index.cjs");
 app.use("/auth", routes.authRoute);
 app.use("/address", routes.addressRoute);
+
+// Admin
 app.use("/api", routes.adminAuthRoute);
 app.use("/api", routes.userRoute);
 
