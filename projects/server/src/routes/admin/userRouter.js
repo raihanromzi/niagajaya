@@ -3,7 +3,7 @@ const router = express.Router();
 
 const userContoller = require("../../controllers/admin/user/userController");
 
-import { emailValidator } from "../../validations/admin/loginValidation";
+const { emailValidator } = require("../../validations/admin/loginValidation");
 
 // Get All Admin
 // localhost:8000/api/admin?role=User -> Must add req query
