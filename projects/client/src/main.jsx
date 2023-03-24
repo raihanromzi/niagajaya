@@ -19,6 +19,7 @@ import rootReducer from "./redux/store";
 
 import "leaflet/dist/leaflet.css";
 import ProductsPage from "./routes/products";
+import ProductDetailPage from "./routes/productDetail";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
       {
         path: "products",
         Component: ProductsPage,
+      },
+      {
+        path: "products/:id",
+        Component: ProductDetailPage,
       },
     ],
   },
