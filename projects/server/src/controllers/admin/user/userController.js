@@ -4,8 +4,11 @@ const { randomUUID } = require("crypto");
 const bcrypt = require("bcrypt");
 
 const getAllUsers = async (req, res) => {
-  const { role } = req.query;
   try {
+    const { role } = req.query;
+    let { page = 1, limit = 10 } = req.query;
+    let skip = (page - 1) * limit;
+
     if (!req.session.id) {
       return res.status(400).send(response.responseError(401, "UNAUTHORIZED", "NEED TO LOGIN"));
     }
@@ -15,10 +18,13 @@ const getAllUsers = async (req, res) => {
     }
 
     const users = await prisma.user.findMany({
+      take: parseInt(limit),
+      skip: skip,
       where: {
         role: role.toUpperCase(),
       },
       select: {
+        id: true,
         email: true,
         role: true,
         imageUrl: true,
@@ -31,7 +37,10 @@ const getAllUsers = async (req, res) => {
       },
     });
 
-    return res.status(200).send(response.responseSuccess(200, "SUCCESS", users));
+    const resultCount = await prisma.user.count();
+    const totalPage = Math.ceil(resultCount / limit);
+
+    return res.status(200).send(response.responseSuccess(200, "SUCCESS", { current_page: page, total_page: totalPage, totalData: resultCount }, users));
   } catch (e) {
     return res.status(500).send(response.responseError(500, "SERVER_ERROR", { message: e }));
   }
@@ -61,7 +70,7 @@ const createAdmin = async (req, res) => {
       data: { email, hashedPassword, role: "ADMIN", token, names: { create: { name } } },
     });
 
-    res.status(201).send(response.responseSuccess(201, "CREATED", { email: newAdmin.email, name: newAdmin.names[0].name, role: newAdmin.role, image: newAdmin.imageUrl }));
+    res.status(201).send(response.responseSuccess(201, "CREATED", { email: newAdmin.email, name: newAdmin.name, role: newAdmin.role, image: newAdmin.imageUrl }));
   } catch (error) {
     console.log(error);
     res.status(500).send(response.responseError(500, "SERVER_ERROR", "PLEASE TRY AGAIN"));

@@ -15,15 +15,14 @@ import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
 import ResetPasswordEmail from "./routes/setPasswordEmail";
 import SettingsPage from "./routes/settings";
 
-import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import AuthProvider from "./hoc/authProvider";
-import rootReducer from "./redux/store";
 import AdminLoginPage from "./routes/admin/AdminLoginPage";
 
 import "leaflet/dist/leaflet.css";
 // import ProductsPage from "./routes/products";
 import { store } from "./redux/store";
+import AdminManagement from "./routes/admin/AdminManagement";
 
 const router = createBrowserRouter([
   {
@@ -72,6 +71,7 @@ const router = createBrowserRouter([
     path: "admin",
     Component: AdminLayout,
     children: [
+      { path: "management", Component: AdminManagement },
       { path: "product-categories", Component: ProductCategoriesPage },
       { path: "products", Component: ProductsPage },
     ],

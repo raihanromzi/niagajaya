@@ -5,12 +5,12 @@ const userContoller = require("../../controllers/admin/user/userController");
 
 const { emailValidator } = require("../../validations/admin/loginValidation");
 
-// Get All Admin
+// Get user based on role
 // localhost:8000/api/admin?role=User -> Must add req query
 router.get("/admin", userContoller.getAllUsers);
 
 // Create Admin
-router.post("/admins", emailValidator(), userContoller.createAdmin);
+router.post("/admin", emailValidator(), userContoller.createAdmin);
 
 // Update Admin
 router.put("/admin/:adminID", emailValidator(), userContoller.updateAdmin);

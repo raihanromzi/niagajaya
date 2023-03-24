@@ -1,9 +1,10 @@
 const cleanObject = require("./cleanObject");
 
-const responseSuccess = (code, status, data) =>
+const responseSuccess = (code, status, pagination, data) =>
   cleanObject({
     code,
     status,
+    pagination,
     data,
   });
 
