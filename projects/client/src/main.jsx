@@ -18,7 +18,12 @@ import AuthProvider from "./hoc/authProvider";
 import rootReducer from "./redux/store";
 
 import "leaflet/dist/leaflet.css";
+
+import WarehousePage from "./routes/warehouse";
+import WarehouseUpdatePage from "./routes/warehouseUpdate";
+import WarehouseCreatePage from "./routes/warehouseCreate";
 import ProductsPage from "./routes/products";
+
 
 const router = createBrowserRouter([
   {
@@ -54,6 +59,18 @@ const router = createBrowserRouter([
       {
         path: "reset-password/email",
         Component: ResetPasswordEmail,
+      },
+      {
+        path: "warehouses",
+        Component: WarehousePage,
+      },
+      {
+        path: "warehouses/edit/:id",
+        Component: WarehouseUpdatePage,
+      },
+      {
+        path: "warehouses/create",
+        Component: WarehouseCreatePage,
       },
       {
         path: "products",
