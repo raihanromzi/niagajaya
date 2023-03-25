@@ -34,6 +34,7 @@ app.use(express.static("./public", { index: false }));
 const routes = require("./routes/index.cjs");
 app.use("/auth", routes.authRoute);
 app.use("/address", routes.addressRoute);
+app.use("/warehouses", routes.warehousesRoute);
 app.use("/products", routes.productRoute);
 app.use("/categories", routes.categoryRoute);
 
