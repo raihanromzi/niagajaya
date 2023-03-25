@@ -22,6 +22,7 @@ import AdminLoginPage from "./routes/admin/AdminLoginPage";
 import "leaflet/dist/leaflet.css";
 // import ProductsPage from "./routes/products";
 import { store } from "./redux/store";
+import AdminList from "./components/AdminList";
 import AdminManagement from "./routes/admin/AdminManagement";
 
 const router = createBrowserRouter([

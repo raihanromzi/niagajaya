@@ -14,6 +14,7 @@ const adminAPI = createApi({
             method: "GET",
           };
         },
+        providesTags: ["Admin"],
       }),
       getAllManager: builder.query({
         query: () => {
@@ -22,6 +23,7 @@ const adminAPI = createApi({
             method: "GET",
           };
         },
+        providesTags: ["Manager"],
       }),
       getAllUser: builder.query({
         query: () => {
@@ -30,6 +32,7 @@ const adminAPI = createApi({
             method: "GET",
           };
         },
+        providesTags: ["User"],
       }),
       crateAdmin: builder.mutation({
         query: (data) => {
@@ -43,15 +46,13 @@ const adminAPI = createApi({
             },
           };
         },
+        invalidatesTags: ["Admin"],
       }),
       updateAdmin: builder.mutation({
         query: (data) => {
           return {
-            url: "/admin",
+            url: `/admin/${data.id}`,
             method: "PUT",
-            params: {
-              id: data.id,
-            },
             body: {
               email: data.email,
               name: data.name,
@@ -59,17 +60,16 @@ const adminAPI = createApi({
             },
           };
         },
+        invalidatesTags: ["Admin"],
       }),
       deleteAdmin: builder.mutation({
         query: (id) => {
           return {
-            url: "/admin",
+            url: `/admin/${id}`,
             method: "DELETE",
-            params: {
-              id: id,
-            },
           };
         },
+        invalidatesTags: ["Admin"],
       }),
     };
   },
