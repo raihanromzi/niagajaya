@@ -133,32 +133,28 @@ const WarehouseCreatePage = () => {
       const res = await axiosInstance.get(
         `/address/v1/city?province=${province_id}`
       );
-      if (res.status === 200) {
-        const listCity = await res.data.results.map((data) => {
-          return { id: data.city_id, name: data.city_name };
-        });
-        setCitys(listCity);
-      }
+      const listCity = await res.data.results.map((data) => {
+        return { id: data.city_id, name: data.city_name };
+      });
+      setCitys(listCity);
     } catch (error) {
       console.error(error);
       setStatus(true);
-      setMsg(error.message);
+      setMsg("Daftar Kota/Kabupaten gagal dimuat.");
     }
   }
 
   async function fetchProvinces() {
     try {
       const res = await axiosInstance.get("/address/v1/province");
-      if (res.status === 200) {
-        const listProvince = await res.data.results.map((data) => {
-          return { id: data.province_id, name: data.province };
-        });
-        setProvinces(listProvince);
-      }
+      const listProvince = await res.data.results.map((data) => {
+        return { id: data.province_id, name: data.province };
+      });
+      setProvinces(listProvince);
     } catch (error) {
       console.error(error);
       setStatus(true);
-      setMsg(error.message);
+      setMsg("Daftar Provinsi gagal dimuat.");
     }
   }
   async function fetchNonAffiliatedManagers() {

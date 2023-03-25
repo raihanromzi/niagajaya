@@ -141,7 +141,7 @@ const WarehouseUpdatePage = () => {
     } catch (error) {
       console.error(error);
       setStatus("error");
-      setMsg(error.message);
+      setMsg("Daftar Kota/Kabupaten gagal dimuat.");
     }
   }
 
@@ -166,10 +166,43 @@ const WarehouseUpdatePage = () => {
         const res = await axiosInstance.get(`/warehouses/v1/${id}`, {
           withCredentials: true,
         });
-        if (res.status === 200) {
+        try {
           const responseProvinces = await axiosInstance.get(
             "/address/v1/province"
           );
+          const listProvince = await responseProvinces.data.results.map(
+            (data) => {
+              return { id: data.province_id, name: data.province };
+            }
+          );
+          setProvinces(listProvince);
+          let currentProvinceId = 0;
+          await responseProvinces.data.results.map(async (data) => {
+            if (data.province === res.data.province) {
+              setSelectedProvince(data.province_id);
+            }
+          });
+          try {
+            const responseCity = await axiosInstance.get(
+              `/address/v1/city?province=${currentProvinceId}`
+            );
+            const listCity = await responseCity.data.results.map((data) => {
+              return { id: data.city_id, name: data.city_name };
+            });
+            setCitys(listCity);
+            responseCity.data.results.map((data, index) => {
+              if (data.city_name === res.data.city) {
+                setSelectedCity(index + 1);
+              }
+            });
+          } catch (error) {
+            throw new Error("Daftar Kota/Kabupaten gagal dimuat.");
+          }
+        } catch (error) {
+          throw new Error("Daftar Provinsi gagal dimuat.");
+        }
+
+        try {
           const responseManagers = await axiosInstance.get(
             "/warehouses/v2/" + res.data.managerId,
             {
@@ -180,48 +213,22 @@ const WarehouseUpdatePage = () => {
           const listManager = await responseManagers.data.map((data) => {
             return { id: data.id, email: data.email };
           });
-
           setManagers(listManager);
-
-          if (responseProvinces.status === 200) {
-            const listProvince = await responseProvinces.data.results.map(
-              (data) => {
-                return { id: data.province_id, name: data.province };
-              }
-            );
-            setProvinces(listProvince);
-          }
-          responseProvinces.data.results.map(async (data) => {
-            if (data.province === res.data.province) {
-              setSelectedProvince(data.province_id);
-              const responseCity = await axiosInstance.get(
-                `/address/v1/city?province=${data.province_id}`
-              );
-              if (responseCity.status === 200) {
-                const listCity = await responseCity.data.results.map((data) => {
-                  return { id: data.city_id, name: data.city_name };
-                });
-                setCitys(listCity);
-              }
-
-              responseCity.data.results.map((data, index) => {
-                if (data.city_name === res.data.city) {
-                  setSelectedCity(index + 1);
-                }
-              });
-            }
-          });
-
-          formik.setFieldValue("name", res.data.name);
-          formik.setFieldValue("managerId", res.data.managerId);
-          formik.setFieldValue("province", res.data.province);
-          formik.setFieldValue("city", res.data.city);
-          formik.setFieldValue("detail", res.data.detail);
-          formik.setFieldValue("latitude", res.data.latitude);
-          formik.setFieldValue("longitude", res.data.longitude);
+        } catch (error) {
+          throw new Error("Daftar Manager gagal dimuat.");
         }
+
+        formik.setFieldValue("name", res.data.name);
+        formik.setFieldValue("managerId", res.data.managerId);
+        formik.setFieldValue("province", res.data.province);
+        formik.setFieldValue("city", res.data.city);
+        formik.setFieldValue("detail", res.data.detail);
+        formik.setFieldValue("latitude", res.data.latitude);
+        formik.setFieldValue("longitude", res.data.longitude);
       } catch (error) {
         console.error(error);
+        setStatus("error");
+        setMsg(error.message);
       }
     }
     fetchWarehouse(routeParams.id);
