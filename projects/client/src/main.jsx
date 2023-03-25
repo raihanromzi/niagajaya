@@ -6,7 +6,6 @@ import AdminLayout from "./components/AdminLayout";
 import RootLayout from "./components/RootLayout";
 import AddressPage from "./routes/AddressPage";
 import ProductCategoriesPage from "./routes/admin/productCategories";
-import ProductsPage from "./routes/admin/products";
 import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
 // import IndexPage from "./routes/index";
 import LoginPage from "./routes/LoginPage";
@@ -24,6 +23,7 @@ import "leaflet/dist/leaflet.css";
 import { store } from "./redux/store";
 import AdminList from "./components/AdminList";
 import AdminManagement from "./routes/admin/AdminManagement";
+import ProductsPage from "./routes/products";
 
 const router = createBrowserRouter([
   {
@@ -74,7 +74,7 @@ const router = createBrowserRouter([
     children: [
       { path: "management", Component: AdminManagement },
       { path: "product-categories", Component: ProductCategoriesPage },
-      { path: "products", Component: ProductsPage },
+      // { path: "products", Component: ProductsPage },
     ],
   },
 ]);
