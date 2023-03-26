@@ -3,7 +3,6 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import RootLayout from "./components/RootLayout";
-import AddressPage from "./routes/AddressPage";
 import IndexPage from "./routes/index";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage, { registerAction } from "./routes/register";
@@ -23,7 +22,9 @@ import WarehousePage from "./routes/warehouse";
 import WarehouseUpdatePage from "./routes/warehouseUpdate";
 import WarehouseCreatePage from "./routes/warehouseCreate";
 import ProductsPage from "./routes/products";
-
+import SettingAddressPage from "./routes/settingAddress";
+import AddressCreatePage from "./routes/addressCreate";
+import AddressUpdatePage from "./routes/addressUpdate";
 
 const router = createBrowserRouter([
   {
@@ -53,10 +54,6 @@ const router = createBrowserRouter([
         Component: LoginPage,
       },
       {
-        path: "address",
-        Component: AddressPage,
-      },
-      {
         path: "reset-password/email",
         Component: ResetPasswordEmail,
       },
@@ -75,6 +72,18 @@ const router = createBrowserRouter([
       {
         path: "products",
         Component: ProductsPage,
+      },
+      {
+        path: "settings/address",
+        Component: SettingAddressPage,
+      },
+      {
+        path: "settings/address/create",
+        Component: AddressCreatePage,
+      },
+      {
+        path: "settings/address/edit/:id",
+        Component: AddressUpdatePage,
       },
     ],
   },
