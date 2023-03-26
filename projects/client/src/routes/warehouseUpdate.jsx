@@ -180,6 +180,7 @@ const WarehouseUpdatePage = () => {
           await responseProvinces.data.results.map(async (data) => {
             if (data.province === res.data.province) {
               setSelectedProvince(data.province_id);
+              currentProvinceId = data.province_id;
             }
           });
           try {
