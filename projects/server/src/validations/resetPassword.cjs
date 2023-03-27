@@ -7,11 +7,15 @@ module.exports = {
       isEmail: { errorMessage: "Alamat surel tidak sah", bail: true },
       normalizeEmail: true,
       custom: {
-        options: async (email) => {
-          const user = await prisma.user.findFirst({ where: { email } });
+        options: async (email, { req }) => {
+          const user = await prisma.user.findFirst({
+            where: { email, hashedPassword: { not: null } },
+          });
           if (!user) {
-            throw new Error("Alamat surel tidak ditemukan");
+            throw new Error(`User tidak ditemukan.`);
           }
+          console.log("jalan");
+          req.user = user;
         },
       },
     },
