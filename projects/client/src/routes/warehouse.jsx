@@ -41,6 +41,7 @@ import PaginationWarehouse from "../components/PaginationWarehouse";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MdDelete, MdEdit, MdSearch } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
+import PageProtected from "./protected";
 
 const WarehousePage = () => {
   const navigate = useNavigate();
@@ -211,226 +212,229 @@ const WarehousePage = () => {
   }
 
   return (
-    <VStack alignItems={"start"} gap={5}>
-      <Heading w={"full"} textAlign={"center"}>
-        Mengelola Warehouse
-      </Heading>
-      {
-        <>
-          <HStack w={"full"} justifyContent={"space-between"}>
-            <Heading size={"lg"}>Daftar Warehouse</Heading>
-            <ButtonGroup size="sm" isAttached>
-              <IconButton
-                icon={<FaPlus />}
-                onClick={() => {
-                  navigate("/warehouses/create");
-                }}
-              />
-              <Button
-                onClick={() => {
-                  navigate("/warehouses/create");
-                }}
-              >
-                Warehouse
-              </Button>
-            </ButtonGroup>
-          </HStack>
-          <Box mb={3} w={"full"}>
-            <HStack>
-              <ButtonGroup size="sm" isAttached variant="outline">
-                <Button onClick={onOpenDialogFilter}>Tambah Filter</Button>
-                <IconButton onClick={onOpenDialogFilter} icon={<FaPlus />} />
-              </ButtonGroup>
-              <Modal
-                isCentered
-                isOpen={isOpenDialogFilter}
-                onClose={() => {
-                  setTempName(name);
-                  setTempSortBy(sortBy);
-                  onCloseDialogFilter();
-                }}
-              >
-                <ModalOverlay />
-                <ModalContent>
-                  <ModalHeader>Filter dengan</ModalHeader>
-                  <ModalCloseButton />
-                  <ModalBody>
-                    <RadioGroup
-                      onChange={setFilterValue}
-                      defaultValue={filterValue}
-                    >
-                      <HStack spacing="24px">
-                        <Radio value="" colorScheme={"teal"}>
-                          Tidak Memfilter
-                        </Radio>
-                        <Radio value="Nama" colorScheme={"teal"}>
-                          Nama
-                        </Radio>
-                      </HStack>
-                    </RadioGroup>
-                  </ModalBody>
-                  {filterValue ? (
-                    <>
-                      <ModalHeader>Pencarian</ModalHeader>
-                      <ModalCloseButton />
-                      <ModalBody>
-                        <InputGroup>
-                          <InputLeftElement
-                            pointerEvents="none"
-                            children={<MdSearch />}
-                          />
-                          <Input
-                            type="text"
-                            placeholder="Cari Warehouse"
-                            value={tempName}
-                            onChange={(e) => {
-                              setTempName(e.target.value);
-                            }}
-                          />
-                        </InputGroup>
-                      </ModalBody>
-                    </>
-                  ) : null}
-                  <ModalHeader>Urutkan dengan</ModalHeader>
-                  <ModalBody>
-                    <RadioGroup
-                      onChange={setTempSortBy}
-                      defaultValue={tempSortBy}
-                      value={tempSortBy}
-                    >
-                      <HStack gap={"4"} flexWrap={"wrap"}>
-                        {options.map((option, index) => {
-                          return (
-                            <Radio
-                              key={index}
-                              value={option.value}
-                              colorScheme={"teal"}
-                            >
-                              {option.label}
-                            </Radio>
-                          );
-                        })}
-                      </HStack>
-                    </RadioGroup>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button
-                      textColor={"white"}
-                      fontWeight={"semibold"}
-                      bgColor={"#009262"}
-                      onClick={() => {
-                        applyFilter({
-                          page: 1,
-                          name: tempName,
-                          sortBy: tempSortBy,
-                        });
-                        setCurrentPage(1);
-                        onCloseDialogFilter();
-                      }}
-                    >
-                      Terapkan
-                    </Button>
-                  </ModalFooter>
-                </ModalContent>
-              </Modal>
-              {sortBy ? <TagSorting /> : null}
-              {name ? <TagName /> : null}
-            </HStack>
-          </Box>
-          {!warehouses ? (
-            <Center w={"full"} h={"50vh"}>
-              <Heading size={"md"}>Data warehouse tidak ditemukan.</Heading>
-            </Center>
-          ) : (
-            <>
-              <Table>
-                <Thead>
-                  <Tr>
-                    <Th>Nama Warehouse</Th>
-                    <Th>Email Manager</Th>
-                    <Th>Aksi</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {warehouses
-                    ? warehouses.map((warehouse) => (
-                        <Tr key={warehouse.id}>
-                          <Td>{warehouse.name}</Td>
-                          <Td>{warehouse.manager.email}</Td>
-                          <Td>
-                            <IconButton
-                              icon={<MdEdit />}
-                              aria-label="Edit"
-                              size="md"
-                              mr="2"
-                              onClick={() => {
-                                navigate(`/warehouses/edit/${warehouse.id}`);
-                              }}
-                            />
-                            <IconButton
-                              icon={<MdDelete />}
-                              aria-label="Delete"
-                              size="md"
-                              onClick={() => {
-                                onOpenDialogDelete();
-                                setSelectedWarehouse({
-                                  id: warehouse.id,
-                                  name: warehouse.name,
-                                });
-                              }}
-                            />
-                          </Td>
-                        </Tr>
-                      ))
-                    : null}
-                </Tbody>
-              </Table>
-              <Center w={"full"}>
-                <PaginationWarehouse
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
+    <PageProtected adminOnly={true} needLogin={true}>
+      <VStack alignItems={"start"} gap={5}>
+        <Heading w={"full"} textAlign={"center"}>
+          Mengelola Warehouse
+        </Heading>
+        {
+          <>
+            <HStack w={"full"} justifyContent={"space-between"}>
+              <Heading size={"lg"}>Daftar Warehouse</Heading>
+              <ButtonGroup size="sm" isAttached>
+                <IconButton
+                  icon={<FaPlus />}
+                  onClick={() => {
+                    navigate("/warehouses/create");
+                  }}
                 />
+                <Button
+                  onClick={() => {
+                    navigate("/warehouses/create");
+                  }}
+                >
+                  Warehouse
+                </Button>
+              </ButtonGroup>
+            </HStack>
+            <Box mb={3} w={"full"}>
+              <HStack>
+                <ButtonGroup size="sm" isAttached variant="outline">
+                  <Button onClick={onOpenDialogFilter}>Tambah Filter</Button>
+                  <IconButton onClick={onOpenDialogFilter} icon={<FaPlus />} />
+                </ButtonGroup>
+                <Modal
+                  isCentered
+                  isOpen={isOpenDialogFilter}
+                  onClose={() => {
+                    setTempName(name);
+                    setTempSortBy(sortBy);
+                    onCloseDialogFilter();
+                  }}
+                >
+                  <ModalOverlay />
+                  <ModalContent>
+                    <ModalHeader>Filter dengan</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                      <RadioGroup
+                        onChange={setFilterValue}
+                        defaultValue={filterValue}
+                      >
+                        <HStack spacing="24px">
+                          <Radio value="" colorScheme={"teal"}>
+                            Tidak Memfilter
+                          </Radio>
+                          <Radio value="Nama" colorScheme={"teal"}>
+                            Nama
+                          </Radio>
+                        </HStack>
+                      </RadioGroup>
+                    </ModalBody>
+                    {filterValue ? (
+                      <>
+                        <ModalHeader>Pencarian</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody>
+                          <InputGroup>
+                            <InputLeftElement
+                              pointerEvents="none"
+                              children={<MdSearch />}
+                            />
+                            <Input
+                              type="text"
+                              placeholder="Cari Warehouse"
+                              value={tempName}
+                              onChange={(e) => {
+                                setTempName(e.target.value);
+                              }}
+                            />
+                          </InputGroup>
+                        </ModalBody>
+                      </>
+                    ) : null}
+                    <ModalHeader>Urutkan dengan</ModalHeader>
+                    <ModalBody>
+                      <RadioGroup
+                        onChange={setTempSortBy}
+                        defaultValue={tempSortBy}
+                        value={tempSortBy}
+                      >
+                        <HStack gap={"4"} flexWrap={"wrap"}>
+                          {options.map((option, index) => {
+                            return (
+                              <Radio
+                                key={index}
+                                value={option.value}
+                                colorScheme={"teal"}
+                              >
+                                {option.label}
+                              </Radio>
+                            );
+                          })}
+                        </HStack>
+                      </RadioGroup>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button
+                        textColor={"white"}
+                        fontWeight={"semibold"}
+                        bgColor={"#009262"}
+                        onClick={() => {
+                          applyFilter({
+                            page: 1,
+                            name: tempName,
+                            sortBy: tempSortBy,
+                          });
+                          setCurrentPage(1);
+                          onCloseDialogFilter();
+                        }}
+                      >
+                        Terapkan
+                      </Button>
+                    </ModalFooter>
+                  </ModalContent>
+                </Modal>
+                {sortBy ? <TagSorting /> : null}
+                {name ? <TagName /> : null}
+              </HStack>
+            </Box>
+            {!warehouses ? (
+              <Center w={"full"} h={"50vh"}>
+                <Heading size={"md"}>Data warehouse tidak ditemukan.</Heading>
               </Center>
-              <AlertDialog
-                motionPreset="slideInBottom"
-                leastDestructiveRef={cancelRef}
-                onClose={onCloseDialogDelete}
-                isOpen={isOpenDialogDelete}
-                isCentered
-              >
-                <AlertDialogOverlay />
-                <AlertDialogContent>
-                  <AlertDialogHeader>Hapus Warehouse</AlertDialogHeader>
-                  <AlertDialogCloseButton />
-                  <AlertDialogBody>
-                    Apakah Anda yakin ingin menghapus {selectedWarehouse?.name}?
-                  </AlertDialogBody>
-                  <AlertDialogFooter>
-                    <Button
-                      variant={"outline"}
-                      colorScheme={"teal"}
-                      ref={cancelRef}
-                      onClick={onCloseDialogDelete}
-                    >
-                      Nanti Saja
-                    </Button>
-                    <Button
-                      ml={3}
-                      bgColor={"#009262"}
-                      textColor={"white"}
-                      onClick={deleteHandler}
-                    >
-                      Ya, Hapus
-                    </Button>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </>
-          )}
-        </>
-      }
-    </VStack>
+            ) : (
+              <>
+                <Table>
+                  <Thead>
+                    <Tr>
+                      <Th>Nama Warehouse</Th>
+                      <Th>Email Manager</Th>
+                      <Th>Aksi</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {warehouses
+                      ? warehouses.map((warehouse) => (
+                          <Tr key={warehouse.id}>
+                            <Td>{warehouse.name}</Td>
+                            <Td>{warehouse.manager.email}</Td>
+                            <Td>
+                              <IconButton
+                                icon={<MdEdit />}
+                                aria-label="Edit"
+                                size="md"
+                                mr="2"
+                                onClick={() => {
+                                  navigate(`/warehouses/edit/${warehouse.id}`);
+                                }}
+                              />
+                              <IconButton
+                                icon={<MdDelete />}
+                                aria-label="Delete"
+                                size="md"
+                                onClick={() => {
+                                  onOpenDialogDelete();
+                                  setSelectedWarehouse({
+                                    id: warehouse.id,
+                                    name: warehouse.name,
+                                  });
+                                }}
+                              />
+                            </Td>
+                          </Tr>
+                        ))
+                      : null}
+                  </Tbody>
+                </Table>
+                <Center w={"full"}>
+                  <PaginationWarehouse
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </Center>
+                <AlertDialog
+                  motionPreset="slideInBottom"
+                  leastDestructiveRef={cancelRef}
+                  onClose={onCloseDialogDelete}
+                  isOpen={isOpenDialogDelete}
+                  isCentered
+                >
+                  <AlertDialogOverlay />
+                  <AlertDialogContent>
+                    <AlertDialogHeader>Hapus Warehouse</AlertDialogHeader>
+                    <AlertDialogCloseButton />
+                    <AlertDialogBody>
+                      Apakah Anda yakin ingin menghapus{" "}
+                      {selectedWarehouse?.name}?
+                    </AlertDialogBody>
+                    <AlertDialogFooter>
+                      <Button
+                        variant={"outline"}
+                        colorScheme={"teal"}
+                        ref={cancelRef}
+                        onClick={onCloseDialogDelete}
+                      >
+                        Nanti Saja
+                      </Button>
+                      <Button
+                        ml={3}
+                        bgColor={"#009262"}
+                        textColor={"white"}
+                        onClick={deleteHandler}
+                      >
+                        Ya, Hapus
+                      </Button>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
+            )}
+          </>
+        }
+      </VStack>
+    </PageProtected>
   );
 };
 

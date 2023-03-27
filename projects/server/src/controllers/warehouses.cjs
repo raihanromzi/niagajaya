@@ -143,9 +143,6 @@ module.exports = {
         take: parseInt(size),
         orderBy: orderBy,
       });
-      console.log("result");
-      console.log(req.query);
-      console.log(result);
       res.send(result);
     } catch (error) {
       console.error(error);
