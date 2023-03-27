@@ -83,4 +83,31 @@ module.exports = {
       });
     }
   },
+  getProduct: async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const result = await prisma.product.findFirst({
+        where: {
+          id: parseInt(id),
+        },
+        include: {
+          stocks: true,
+          category: true,
+        },
+      });
+
+      const totalQuantity = result.stocks.reduce(
+        (acc, stock) => acc + stock.quantity,
+        0
+      );
+
+      res.send({ ...result, totalQuantity });
+    } catch (error) {
+      console.error(error);
+      res.status(400).json({
+        error,
+      });
+    }
+  },
 };

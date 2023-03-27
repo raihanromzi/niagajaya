@@ -23,6 +23,7 @@ import WarehousePage from "./routes/warehouse";
 import WarehouseUpdatePage from "./routes/warehouseUpdate";
 import WarehouseCreatePage from "./routes/warehouseCreate";
 import ProductsPage from "./routes/products";
+import ProductDetailPage from "./routes/productDetail";
 
 
 const router = createBrowserRouter([
@@ -75,6 +76,10 @@ const router = createBrowserRouter([
       {
         path: "products",
         Component: ProductsPage,
+      },
+      {
+        path: "products/:id",
+        Component: ProductDetailPage,
       },
     ],
   },
