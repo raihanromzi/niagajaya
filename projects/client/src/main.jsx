@@ -2,15 +2,24 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import AdminLayout from "./components/AdminLayout";
 import RootLayout from "./components/RootLayout";
 import AddressPage from "./routes/AddressPage";
+import AdminProductCategoriesPage, {
+  ProductCategoriesLoader,
+  ProductCategoriesAction,
+} from "./routes/admin/productCategories";
+import CreateProductCategoryPage, {
+  CreateProductCategoryAction,
+} from "./routes/admin/productCategories/add";
+import AdminProductsPage from "./routes/admin/products";
+import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
 import IndexPage from "./routes/index";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
-import SettingsPage from "./routes/settings";
-import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
 import ResetPasswordEmail from "./routes/setPasswordEmail";
+import SettingsPage from "./routes/settings";
 
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
@@ -86,6 +95,29 @@ const router = createBrowserRouter([
         path: "no-authority",
         Component: NoAuthorityPage,
       },
+    ],
+  },
+  {
+    path: "admin",
+    Component: AdminLayout,
+    children: [
+      {
+        path: "product-categories",
+        children: [
+          {
+            index: true,
+            Component: AdminProductCategoriesPage,
+            loader: ProductCategoriesLoader,
+            action: ProductCategoriesAction,
+          },
+          {
+            path: "add",
+            Component: CreateProductCategoryPage,
+            action: CreateProductCategoryAction,
+          },
+        ],
+      },
+      { path: "products", Component: AdminProductsPage },
     ],
   },
 ]);
