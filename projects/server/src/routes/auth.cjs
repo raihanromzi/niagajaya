@@ -10,7 +10,7 @@ const {
 const emailSchema = require("../validations/email.cjs");
 const nameSchema = require("../validations/name.cjs");
 const passwordSchema = require("../validations/password.cjs");
-const { resetPasswordSchema } = require("../validations/auth.cjs");
+const { resetPasswordSchema } = require("../validations/resetPassword.cjs");
 
 const { validate, loginValidator } = require("../validations/login.cjs");
 
