@@ -90,12 +90,11 @@ module.exports = {
           message: "Email and Password does not match",
         });
       }
-
       const userx = { id: user.id };
       req.session.user = userx;
 
       res.send({
-        result: { id: user.id },
+        result: { id: user.id, role: user.role },
         message: "Login success with Session",
       });
     } catch (error) {
@@ -107,11 +106,15 @@ module.exports = {
   },
   check: async (req, res) => {
     try {
-      if (!req.session) {
+      if (!req.session.user?.id) {
         return res.status(404).send("Session not found");
-      } else {
-        return res.send({ result: { id: req.session.user?.id } });
       }
+
+      const user = await prisma.user.findFirst({
+        where: { id: req.session.user?.id },
+      });
+
+      res.send({ result: { id: user.id, role: user.role } });
     } catch (error) {
       console.error(error);
       res.status(400).json({
