@@ -1,10 +1,25 @@
-const { Prisma } = require("@prisma/client");
 const prisma = require("../utils/client.cjs");
 
 /** @type {Object<string, import("express").RequestHandler>} */
 module.exports = {
   createWarehouse: async (req, res) => {
     try {
+      if (!req.session.user) {
+        return res.status(400).json({
+          message: "Harus login",
+        });
+      }
+
+      const user = await prisma.user.findFirst({
+        where: { id: req.session.user.id },
+      });
+
+      if (user.role !== "ADMIN") {
+        return res.status(400).json({
+          message: "Anda tidak memiliki otoritas untuk membuat data ini",
+        });
+      }
+
       const {
         name,
         managerId,
@@ -71,14 +86,54 @@ module.exports = {
   },
   getWarehouses: async (req, res) => {
     try {
-      const { page = 1, size = 10 } = req.query;
+      if (!req.session.user) {
+        return res.status(400).json({
+          message: "Harus login",
+        });
+      }
+
+      const user = await prisma.user.findFirst({
+        where: { id: req.session.user.id },
+      });
+
+      if (user.role !== "ADMIN") {
+        return res.status(400).json({
+          message: "Anda tidak memiliki otoritas untuk membuat data ini",
+        });
+      }
+
+      const { name, sortBy, page = 1, size = 10 } = req.query;
       const skip = (page - 1) * size;
+
+      let orderBy;
+      switch (sortBy) {
+        case "latest":
+          orderBy = { updatedAt: "desc" };
+          break;
+        case "oldest":
+          orderBy = { updatedAt: "asc" };
+          break;
+        default:
+          orderBy = { updatedAt: "desc" };
+          break;
+      }
+      const where = {};
+      if (name) {
+        where.OR = [
+          { name: { contains: name } },
+          { province: { contains: name } },
+          { city: { contains: name } },
+          { district: { contains: name } },
+          { detail: { contains: name } },
+        ];
+      }
 
       const result = await prisma.warehouse.findMany({
         //softdelete
         // where: {
         //   deletedAt: null,
         // },
+        where,
         include: {
           manager: {
             select: { email: true },
@@ -86,7 +141,11 @@ module.exports = {
         },
         skip: parseInt(skip),
         take: parseInt(size),
+        orderBy: orderBy,
       });
+      console.log("result");
+      console.log(req.query);
+      console.log(result);
       res.send(result);
     } catch (error) {
       console.error(error);
@@ -97,8 +156,21 @@ module.exports = {
   },
   getTotalPage: async (req, res) => {
     try {
-      const { size = 10 } = req.query;
-      const totalProduct = await prisma.warehouse.count();
+      const { name, size = 10 } = req.query;
+      const where = {};
+
+      if (name) {
+        where.OR = [
+          { name: { contains: name } },
+          { province: { contains: name } },
+          { city: { contains: name } },
+          { district: { contains: name } },
+          { detail: { contains: name } },
+        ];
+      }
+      const totalProduct = await prisma.warehouse.count({
+        where,
+      });
       const totalPage = Math.ceil(totalProduct / size);
       res.send({ totalPage });
     } catch (error) {
@@ -110,6 +182,15 @@ module.exports = {
   },
   deleteWarehouse: async (req, res) => {
     try {
+      const user = await prisma.user.findFirst({
+        where: { id: req.session.user.id },
+      });
+
+      if (user.role !== "ADMIN") {
+        return res.status(400).json({
+          message: "Anda tidak memiliki otoritas untuk membuat data ini",
+        });
+      }
       //softdelete
       // const result = await prisma.warehouse.update({
       //   data: { deletedAt: new Date() },
@@ -127,6 +208,21 @@ module.exports = {
   },
   getWarehouse: async (req, res) => {
     try {
+      if (!req.session.user) {
+        return res.status(400).json({
+          message: "Harus login",
+        });
+      }
+
+      const user = await prisma.user.findFirst({
+        where: { id: req.session.user.id },
+      });
+
+      if (user.role !== "ADMIN") {
+        return res.status(400).json({
+          message: "Anda tidak memiliki otoritas untuk membuat data ini",
+        });
+      }
       const result = await prisma.warehouse.findFirst({
         where: { id: parseInt(req.params.id) },
       });
