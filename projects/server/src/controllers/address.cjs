@@ -117,7 +117,7 @@ module.exports = {
           message: "Harus login",
         });
       }
-      const { name, page = 1, size = 1, sortBy = "latest" } = req.query;
+      const { name, page = 1, size = 5, sortBy = "latest" } = req.query;
       const skip = (page - 1) * size;
 
       let orderBy;
@@ -345,7 +345,7 @@ module.exports = {
           message: "Harus login",
         });
       }
-      const { name, size = 1 } = req.query;
+      const { name, size = 5 } = req.query;
 
       const where = {
         AND: {
