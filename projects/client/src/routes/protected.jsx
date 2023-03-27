@@ -6,6 +6,7 @@ function PageProtected({
   children,
   needLogin = false,
   guestOnly = false,
+  adminOnly = false,
 }) {
   let navigate = useNavigate();
   let location = useLocation();
@@ -17,9 +18,11 @@ function PageProtected({
       localStorage.setItem("lastPath", location.pathname);
       return navigate("/login", { replace: true });
     }
-
     if (guestOnly && userSelector?.id) {
       return navigate("/", { replace: true });
+    }
+    if (adminOnly && userSelector?.role !== "ADMIN") {
+      return navigate("/no-authority", { replace: true });
     }
   }, []);
   return children;
