@@ -50,14 +50,11 @@ const AddressCreatePage = () => {
       detail: Yup.string().required("Keterangan tidak boleh kosong"),
     }),
     onSubmit: () => {
-      console.log("jalan");
       axios
         .get(
           `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${formik.values.latitude}&lon=${formik.values.longitude}&accept-language=id`
         )
         .then((res) => {
-          console.log("jalanx");
-
           axiosInstance
             .post(
               `/address`,
@@ -86,8 +83,6 @@ const AddressCreatePage = () => {
       const res = await axios.get(
         `https://nominatim.openstreetmap.org/?addressdetails=1&street=${street}&city=${city_name}&country=Indonesia&state=${province_name}&format=json&limit=1`
       );
-      console.log("res.data");
-      console.log(res.data);
       if (res.data.length) {
         formik.setFieldValue(
           "street",
@@ -152,7 +147,6 @@ const AddressCreatePage = () => {
 
   useEffect(() => {
     fetchProvinces();
-    console.log("jalan");
   }, []);
 
   useEffect(() => {
@@ -164,7 +158,6 @@ const AddressCreatePage = () => {
   }, [selectedProvince]);
 
   useEffect(() => {
-    console.log(`${selectedProvince} ${selectedCity} ${formik.values.street}`);
     if (selectedProvince && selectedCity && formik.values.street) {
       fetchPosition(
         provinces[selectedProvince - 1]?.name,
