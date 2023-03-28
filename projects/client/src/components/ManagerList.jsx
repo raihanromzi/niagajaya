@@ -8,8 +8,6 @@ import { EditAdmin } from "./EditAdmin";
 function ManagerList() {
   const { data, isError, isLoading } = useGetAllManagerQuery();
 
-  console.log(data);
-
   // const [pagination, setPagination] = useState(0);
   // const [pages, setPages] = useState("");
 

@@ -27,11 +27,7 @@ module.exports = {
 
       // await redis.set(passwordPrefix + token, user.id, "EX", 86400); // 24 hours
 
-      await sendMail(
-        email,
-        "Verifkasi Akun",
-        `<a href="http://localhost:5173/set-password/${token}">Setel Kata Kunci</a>`
-      );
+      await sendMail(email, "Verifkasi Akun", `<a href="http://localhost:5173/set-password/${token}">Setel Kata Kunci</a>`);
 
       res.json({ success: true, msg: "Pendaftaran berhasil!" });
     } catch (err) {
@@ -135,11 +131,7 @@ module.exports = {
           token: passwordPrefix + code,
         },
       });
-      await sendMail(
-        req.user.email,
-        "Ubah Password",
-        `<a href="http://localhost:5173/set-password/${code}">Setel Kata Kunci</a>`
-      );
+      await sendMail(req.user.email, "Ubah Password", `<a href="http://localhost:5173/set-password/${code}">Setel Kata Kunci</a>`);
 
       res.json({ success: true, msg: "Kode Verifikasi Berhasil Dikirim!" });
     } catch (error) {

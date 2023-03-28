@@ -36,11 +36,17 @@ const authAdminController = {
       req.session.user = userx;
 
       res.status(200).send(
-        response.responseSuccess(200, "SUCCESS", {
-          email: user.email,
-          role: user.role,
-          imageUrl: user.imageUrl,
-        })
+        response.responseSuccess(
+          200,
+          "SUCCESS",
+          {},
+          {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            imageUrl: user.imageUrl,
+          }
+        )
       );
       return;
     } catch (e) {

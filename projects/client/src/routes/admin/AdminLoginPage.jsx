@@ -33,14 +33,19 @@ const AdminLoginPage = () => {
           if (res.status === 200) {
             dispatch({
               type: user_types.ADMIN_LOGIN,
-              payload: res.data.data.id,
+              payload: res.data.data,
             });
-            navigate("/admin", { replace: true });
+            const lastPath = localStorage.getItem("lastPath");
+            if (lastPath) {
+              navigate(lastPath, { replace: true });
+            } else {
+              navigate("/admin", { replace: true });
+            }
           }
         })
         .catch((error) => {
           setStatus(true);
-          setMsg(error.response.data.errors.message);
+          setMsg(error.response?.data?.errors?.message);
         });
     },
   });
