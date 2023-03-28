@@ -2,21 +2,32 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import AdminLayout from "./components/AdminLayout";
 import RootLayout from "./components/RootLayout";
-import IndexPage from "./routes/index";
+
+import AddressPage from "./routes/AddressPage";
+import ProductCategoriesPage from "./routes/admin/productCategories";
+import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
+// import IndexPage from "./routes/index";
+import AdminProductCategoriesPage, { ProductCategoriesLoader, ProductCategoriesAction } from "./routes/admin/productCategories/index";
+import CreateProductCategoryPage, { CreateProductCategoryAction } from "./routes/admin/productCategories/add";
+import AdminProductsPage from "./routes/admin/products";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
-import SettingsPage from "./routes/settings";
-import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
 import ResetPasswordEmail from "./routes/setPasswordEmail";
+import SettingsPage from "./routes/settings";
 
-import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import AuthProvider from "./hoc/authProvider";
-import rootReducer from "./redux/store";
+import AdminLoginPage from "./routes/admin/AdminLoginPage";
 
 import "leaflet/dist/leaflet.css";
+
+// import ProductsPage from "./routes/products";
+import { store } from "./redux/store";
+import AdminList from "./components/AdminList";
+import AdminManagement from "./routes/admin/AdminManagement";
 
 import WarehousePage from "./routes/warehouse";
 import WarehouseUpdatePage from "./routes/warehouseUpdate";
@@ -26,13 +37,15 @@ import SettingAddressPage from "./routes/settingAddress";
 import AddressCreatePage from "./routes/addressCreate";
 import AddressUpdatePage from "./routes/addressUpdate";
 import PageProtected from "./routes/protected";
+import NoAuthorityPage from "./routes/noAuthority";
+import ProductDetailPage from "./routes/productDetail";
+
 
 const router = createBrowserRouter([
   {
     path: "/",
     Component: RootLayout,
     children: [
-      { index: true, Component: IndexPage },
       { path: "register", Component: RegisterPage, action: registerAction },
       {
         path: "set-password/:token",
@@ -55,8 +68,16 @@ const router = createBrowserRouter([
         Component: LoginPage,
       },
       {
+        path: "/admin/login",
+        Component: AdminLoginPage,
+      },
+      {
+        path: "address",
+        Component: AddressPage,
+      },
+      {
         path: "reset-password/email",
-        Component: ResetPasswordEmail,
+        component: ResetPasswordEmail,
       },
       {
         path: "warehouses",
@@ -98,11 +119,41 @@ const router = createBrowserRouter([
           </PageProtected>
         ),
       },
+      {
+        path: "products/:id",
+        Component: ProductDetailPage,
+      },
+      {
+        path: "no-authority",
+        Component: NoAuthorityPage,
+      },
+    ],
+  },
+  {
+    path: "admin",
+    Component: AdminLayout,
+    children: [
+      {
+        path: "product-categories",
+        children: [
+          {
+            index: true,
+            Component: AdminProductCategoriesPage,
+            loader: ProductCategoriesLoader,
+            action: ProductCategoriesAction,
+          },
+          {
+            path: "add",
+            Component: CreateProductCategoryPage,
+            action: CreateProductCategoryAction,
+          },
+        ],
+      },
+      { path: "products", Component: AdminProductsPage },
+      { path: "management", Component: AdminManagement },
     ],
   },
 ]);
-
-const store = configureStore({ reducer: rootReducer });
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

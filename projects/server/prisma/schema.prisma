@@ -19,8 +19,8 @@ enum UserRole {
 model User {
   id              Int             @id @default(autoincrement())
   email           String          @unique @db.VarChar(255)
-  hashedPassword  String?          
-  imageUrl        String?     
+  hashedPassword  String?
+  imageUrl        String?
   role            UserRole
   token           String?         @unique
 
@@ -36,14 +36,14 @@ model User {
 }
 
 model UserName {
-  userId          Int             
+  userId          Int
   name            String          @db.VarChar(255)
   usageCount      Int             @default(1)
 
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
-  user            User            @relation(fields: [userId], references: [id])
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([userId, name])
 }
@@ -84,11 +84,11 @@ model Warehouse {
   province        String                @db.VarChar(255)
   city            String                @db.VarChar(255)
   district        String                @db.VarChar(255)
-  detail          String  
+  detail          String
 
   createdAt       DateTime              @default(now())
   updatedAt       DateTime              @updatedAt
-  deletedAt       DateTime?  
+  deletedAt       DateTime?
 
   manager         User                  @relation(fields: [managerId], references: [id])
   stocks          Stock[]
@@ -109,17 +109,21 @@ model Product {
   updatedAt           DateTime    @updatedAt
   deletedAt           DateTime?
 
-  category        ProductCategory @relation(fields: [categoryId], references: [id])
-  stocks          Stock[]
-  stockMutations  StockMutation[]
-  orders          OrderDetail[]
+  category            ProductCategory @relation(fields: [categoryId], references: [id])
+  stocks              Stock[]
+  stockMutations      StockMutation[]
+  orders              OrderDetail[]
 }
 
 model ProductCategory {
-  id        Int         @id @default(autoincrement())
-  name      String      @unique @db.VarChar(255)
+  id          Int         @id @default(autoincrement())
+  name        String      @unique @db.VarChar(255)
 
-  products  Product[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?
+
+  products    Product[]
 }
 
 model Stock {
