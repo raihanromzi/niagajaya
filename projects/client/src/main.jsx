@@ -8,6 +8,16 @@ import AddressPage from "./routes/AddressPage";
 import ProductCategoriesPage from "./routes/admin/productCategories";
 import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
 // import IndexPage from "./routes/index";
+import AdminProductCategoriesPage, {
+  ProductCategoriesLoader,
+  ProductCategoriesAction,
+} from "./routes/admin/productCategories";
+import CreateProductCategoryPage, {
+  CreateProductCategoryAction,
+} from "./routes/admin/productCategories/add";
+import AdminProductsPage from "./routes/admin/products";
+import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
+import IndexPage from "./routes/index";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
@@ -100,9 +110,23 @@ const router = createBrowserRouter([
     path: "admin",
     Component: AdminLayout,
     children: [
-      { path: "management", Component: AdminManagement },
-      { path: "product-categories", Component: ProductCategoriesPage },
-      // { path: "products", Component: ProductsPage },
+      {
+        path: "product-categories",
+        children: [
+          {
+            index: true,
+            Component: AdminProductCategoriesPage,
+            loader: ProductCategoriesLoader,
+            action: ProductCategoriesAction,
+          },
+          {
+            path: "add",
+            Component: CreateProductCategoryPage,
+            action: CreateProductCategoryAction,
+          },
+        ],
+      },
+      { path: "products", Component: AdminProductsPage },
     ],
   },
 ]);

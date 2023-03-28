@@ -3,6 +3,7 @@ const prisma = require("../utils/client.cjs");
 /** @type {import("express-validator").Schema} */
 module.exports = {
   name: {
+    optional: true,
     isAlpha: {
       errorMessage: "Nama hanya boleh mengandung huruf atau spasi",
       options: ["en-US", { ignore: /\s/g }],

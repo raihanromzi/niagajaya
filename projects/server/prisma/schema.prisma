@@ -109,17 +109,21 @@ model Product {
   updatedAt           DateTime    @updatedAt
   deletedAt           DateTime?
 
-  category        ProductCategory @relation(fields: [categoryId], references: [id])
-  stocks          Stock[]
-  stockMutations  StockMutation[]
-  orders          OrderDetail[]
+  category            ProductCategory @relation(fields: [categoryId], references: [id])
+  stocks              Stock[]
+  stockMutations      StockMutation[]
+  orders              OrderDetail[]
 }
 
 model ProductCategory {
-  id        Int         @id @default(autoincrement())
-  name      String      @unique @db.VarChar(255)
+  id          Int         @id @default(autoincrement())
+  name        String      @unique @db.VarChar(255)
 
-  products  Product[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?
+
+  products    Product[]
 }
 
 model Stock {
