@@ -19,6 +19,7 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import { axiosInstance } from "../config/config";
+import PageProtected from "./protected";
 
 const WarehouseUpdatePage = () => {
   const navigate = useNavigate();
@@ -141,7 +142,7 @@ const WarehouseUpdatePage = () => {
     } catch (error) {
       console.error(error);
       setStatus("error");
-      setMsg(error.message);
+      setMsg("Daftar Kota/Kabupaten gagal dimuat.");
     }
   }
 
@@ -166,10 +167,44 @@ const WarehouseUpdatePage = () => {
         const res = await axiosInstance.get(`/warehouses/v1/${id}`, {
           withCredentials: true,
         });
-        if (res.status === 200) {
+        try {
           const responseProvinces = await axiosInstance.get(
             "/address/v1/province"
           );
+          const listProvince = await responseProvinces.data.results.map(
+            (data) => {
+              return { id: data.province_id, name: data.province };
+            }
+          );
+          setProvinces(listProvince);
+          let currentProvinceId = 0;
+          await responseProvinces.data.results.map(async (data) => {
+            if (data.province === res.data.province) {
+              setSelectedProvince(data.province_id);
+              currentProvinceId = data.province_id;
+            }
+          });
+          try {
+            const responseCity = await axiosInstance.get(
+              `/address/v1/city?province=${currentProvinceId}`
+            );
+            const listCity = await responseCity.data.results.map((data) => {
+              return { id: data.city_id, name: data.city_name };
+            });
+            setCitys(listCity);
+            responseCity.data.results.map((data, index) => {
+              if (data.city_name === res.data.city) {
+                setSelectedCity(index + 1);
+              }
+            });
+          } catch (error) {
+            throw new Error("Daftar Kota/Kabupaten gagal dimuat.");
+          }
+        } catch (error) {
+          throw new Error("Daftar Provinsi gagal dimuat.");
+        }
+
+        try {
           const responseManagers = await axiosInstance.get(
             "/warehouses/v2/" + res.data.managerId,
             {
@@ -180,48 +215,22 @@ const WarehouseUpdatePage = () => {
           const listManager = await responseManagers.data.map((data) => {
             return { id: data.id, email: data.email };
           });
-
           setManagers(listManager);
-
-          if (responseProvinces.status === 200) {
-            const listProvince = await responseProvinces.data.results.map(
-              (data) => {
-                return { id: data.province_id, name: data.province };
-              }
-            );
-            setProvinces(listProvince);
-          }
-          responseProvinces.data.results.map(async (data) => {
-            if (data.province === res.data.province) {
-              setSelectedProvince(data.province_id);
-              const responseCity = await axiosInstance.get(
-                `/address/v1/city?province=${data.province_id}`
-              );
-              if (responseCity.status === 200) {
-                const listCity = await responseCity.data.results.map((data) => {
-                  return { id: data.city_id, name: data.city_name };
-                });
-                setCitys(listCity);
-              }
-
-              responseCity.data.results.map((data, index) => {
-                if (data.city_name === res.data.city) {
-                  setSelectedCity(index + 1);
-                }
-              });
-            }
-          });
-
-          formik.setFieldValue("name", res.data.name);
-          formik.setFieldValue("managerId", res.data.managerId);
-          formik.setFieldValue("province", res.data.province);
-          formik.setFieldValue("city", res.data.city);
-          formik.setFieldValue("detail", res.data.detail);
-          formik.setFieldValue("latitude", res.data.latitude);
-          formik.setFieldValue("longitude", res.data.longitude);
+        } catch (error) {
+          throw new Error("Daftar Manager gagal dimuat.");
         }
+
+        formik.setFieldValue("name", res.data.name);
+        formik.setFieldValue("managerId", res.data.managerId);
+        formik.setFieldValue("province", res.data.province);
+        formik.setFieldValue("city", res.data.city);
+        formik.setFieldValue("detail", res.data.detail);
+        formik.setFieldValue("latitude", res.data.latitude);
+        formik.setFieldValue("longitude", res.data.longitude);
       } catch (error) {
         console.error(error);
+        setStatus("error");
+        setMsg(error.message);
       }
     }
     fetchWarehouse(routeParams.id);
@@ -244,210 +253,211 @@ const WarehouseUpdatePage = () => {
       setShowMap(true);
     }
   }, [showMap]);
-
   return (
-    <VStack alignItems={"start"} gap={5}>
-      <Heading w={"full"} textAlign={"center"}>
-        Mengelola Warehouse
-      </Heading>
-      <Heading size={"md"}>Edit Warehouse</Heading>{" "}
-      <FormControl>
-        <Input
-          type="text"
-          name="name"
-          bgColor="#F1FBF8"
-          placeholder="Name"
-          value={formik.values.name}
-          onChange={(e) => formik.setFieldValue("name", e.target.value)}
-        />
-        <FormHelperText w={"full"} textAlign={"start"}>
-          {formik.errors.name}
-        </FormHelperText>
-      </FormControl>
-      <FormControl>
-        <Select
-          name="manager"
-          placeholder="Pilih Manager"
-          bgColor="#F1FBF8"
-          onChange={(e) => {
-            formik.setFieldValue("managerId", e.target.value);
-          }}
-          value={formik.values.managerId ? formik.values.managerId : 0}
-        >
-          {managers.map((manager) => {
-            return (
-              <option key={manager.id} value={manager.id}>
-                {manager.email}
-              </option>
-            );
-          })}
-        </Select>
-        <FormHelperText w={"full"} textAlign={"start"}>
-          {formik.errors.managerId}
-        </FormHelperText>
-      </FormControl>
-      <FormControl>
-        <Select
-          name="province"
-          placeholder="Pilih Provinsi"
-          bgColor="#F1FBF8"
-          value={selectedProvince ? selectedProvince : 0}
-          onChange={(e) => {
-            formik.setFieldValue("latitude", 0);
-            formik.setFieldValue("longitude", 0);
-            setShowMap(false);
-            setSelectedProvince(e.target.value);
-            formik.setFieldValue(
-              "province",
-              provinces[e.target.value - 1]?.name
-            );
-          }}
-        >
-          {provinces.map((province, index) => {
-            return (
-              <option key={province.id} value={index + 1}>
-                {province.name}
-              </option>
-            );
-          })}
-        </Select>
-        <FormHelperText w={"full"} textAlign={"start"}>
-          {formik.errors.province}
-        </FormHelperText>
-      </FormControl>
-      <FormControl>
-        <Select
-          name="city"
-          placeholder="Pilih Kota/Kabupaten"
-          bgColor="#F1FBF8"
-          value={selectedCity ? selectedCity : 0}
-          onChange={(e) => {
-            setShowMap(false);
-            setSelectedCity(e.target.value);
-            formik.setFieldValue("latitude", 0);
-            formik.setFieldValue("longitude", 0);
-            formik.setFieldValue("city", citys[e.target.value - 1]?.name);
-          }}
-        >
-          {citys.map((city, index) => {
-            return (
-              <option key={city.id} value={index + 1}>
-                {city.name}
-              </option>
-            );
-          })}
-        </Select>
-        <FormHelperText w={"full"} textAlign={"start"}>
-          {formik.errors.city}
-        </FormHelperText>
-      </FormControl>
-      <FormControl>
-        <Textarea
-          name="detail"
-          bgColor="#F1FBF8"
-          placeholder="Keterangan"
-          value={formik.values.detail}
-          onChange={(e) => {
-            formik.setFieldValue("detail", e.target.value);
-          }}
-        />
-        <FormHelperText w={"full"} textAlign={"start"}>
-          {formik.errors.detail}
-        </FormHelperText>
-      </FormControl>
-      {status === "error" ? (
-        <Alert
-          status="error"
-          zIndex={2}
-          variant="top-accent"
-          fontSize={"md"}
-          mb={"1"}
-        >
-          <AlertIcon />
-          {msg}
-        </Alert>
-      ) : status === "success" ? (
-        <Alert
-          status="success"
-          zIndex={2}
-          variant="top-accent"
-          fontSize={"md"}
-          mb={"1"}
-        >
-          <AlertIcon />
-          {msg}
-        </Alert>
-      ) : null}
-      <Button
-        colorScheme="teal"
-        variant="outline"
-        w={"full"}
-        leftIcon={<MdLocationOn />}
-        isDisabled={selectedCity ? false : true}
-        onClick={() => {
-          setShowMap(!showMap);
-        }}
-      >
-        Tambah Titik Lokasi
-      </Button>
-      {showMap && formik.values.latitude && formik.values.longitude ? (
-        <MapContainer
-          center={{
-            lat: formik.values.latitude,
-            lng: formik.values.longitude,
-          }}
-          zoom={16}
-          scrollWheelZoom={false}
-          style={{ height: 400, width: "100%", zIndex: 94 }}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    <PageProtected adminOnly={true} needLogin={true}>
+      <VStack alignItems={"start"} gap={5}>
+        <Heading w={"full"} textAlign={"center"}>
+          Mengelola Warehouse
+        </Heading>
+        <Heading size={"md"}>Edit Warehouse</Heading>{" "}
+        <FormControl>
+          <Input
+            type="text"
+            name="name"
+            bgColor="#F1FBF8"
+            placeholder="Name"
+            value={formik.values.name}
+            onChange={(e) => formik.setFieldValue("name", e.target.value)}
           />
-          <Marker
-            draggable={true}
-            eventHandlers={eventHandlers}
-            position={{
+          <FormHelperText w={"full"} textAlign={"start"}>
+            {formik.errors.name}
+          </FormHelperText>
+        </FormControl>
+        <FormControl>
+          <Select
+            name="manager"
+            placeholder="Pilih Manager"
+            bgColor="#F1FBF8"
+            onChange={(e) => {
+              formik.setFieldValue("managerId", e.target.value);
+            }}
+            value={formik.values.managerId ? formik.values.managerId : 0}
+          >
+            {managers.map((manager) => {
+              return (
+                <option key={manager.id} value={manager.id}>
+                  {manager.email}
+                </option>
+              );
+            })}
+          </Select>
+          <FormHelperText w={"full"} textAlign={"start"}>
+            {formik.errors.managerId}
+          </FormHelperText>
+        </FormControl>
+        <FormControl>
+          <Select
+            name="province"
+            placeholder="Pilih Provinsi"
+            bgColor="#F1FBF8"
+            value={selectedProvince ? selectedProvince : 0}
+            onChange={(e) => {
+              formik.setFieldValue("latitude", 0);
+              formik.setFieldValue("longitude", 0);
+              setShowMap(false);
+              setSelectedProvince(e.target.value);
+              formik.setFieldValue(
+                "province",
+                provinces[e.target.value - 1]?.name
+              );
+            }}
+          >
+            {provinces.map((province, index) => {
+              return (
+                <option key={province.id} value={index + 1}>
+                  {province.name}
+                </option>
+              );
+            })}
+          </Select>
+          <FormHelperText w={"full"} textAlign={"start"}>
+            {formik.errors.province}
+          </FormHelperText>
+        </FormControl>
+        <FormControl>
+          <Select
+            name="city"
+            placeholder="Pilih Kota/Kabupaten"
+            bgColor="#F1FBF8"
+            value={selectedCity ? selectedCity : 0}
+            onChange={(e) => {
+              setShowMap(false);
+              setSelectedCity(e.target.value);
+              formik.setFieldValue("latitude", 0);
+              formik.setFieldValue("longitude", 0);
+              formik.setFieldValue("city", citys[e.target.value - 1]?.name);
+            }}
+          >
+            {citys.map((city, index) => {
+              return (
+                <option key={city.id} value={index + 1}>
+                  {city.name}
+                </option>
+              );
+            })}
+          </Select>
+          <FormHelperText w={"full"} textAlign={"start"}>
+            {formik.errors.city}
+          </FormHelperText>
+        </FormControl>
+        <FormControl>
+          <Textarea
+            name="detail"
+            bgColor="#F1FBF8"
+            placeholder="Keterangan"
+            value={formik.values.detail}
+            onChange={(e) => {
+              formik.setFieldValue("detail", e.target.value);
+            }}
+          />
+          <FormHelperText w={"full"} textAlign={"start"}>
+            {formik.errors.detail}
+          </FormHelperText>
+        </FormControl>
+        {status === "error" ? (
+          <Alert
+            status="error"
+            zIndex={2}
+            variant="top-accent"
+            fontSize={"md"}
+            mb={"1"}
+          >
+            <AlertIcon />
+            {msg}
+          </Alert>
+        ) : status === "success" ? (
+          <Alert
+            status="success"
+            zIndex={2}
+            variant="top-accent"
+            fontSize={"md"}
+            mb={"1"}
+          >
+            <AlertIcon />
+            {msg}
+          </Alert>
+        ) : null}
+        <Button
+          colorScheme="teal"
+          variant="outline"
+          w={"full"}
+          leftIcon={<MdLocationOn />}
+          isDisabled={selectedCity ? false : true}
+          onClick={() => {
+            setShowMap(!showMap);
+          }}
+        >
+          Tambah Titik Lokasi
+        </Button>
+        {showMap && formik.values.latitude && formik.values.longitude ? (
+          <MapContainer
+            center={{
               lat: formik.values.latitude,
               lng: formik.values.longitude,
             }}
-            ref={markerRef}
+            zoom={16}
+            scrollWheelZoom={false}
+            style={{ height: 400, width: "100%", zIndex: 94 }}
           >
-            <Popup minWidth={90}>
-              <span>Penunjuk dapat digeser.</span>
-            </Popup>
-          </Marker>
-        </MapContainer>
-      ) : null}
-      <HStack w={"full"}>
-        <Button
-          onClick={() => {
-            navigate("/warehouses");
-          }}
-        >
-          Kembali
-        </Button>
-        <Button
-          textColor={"white"}
-          fontWeight={"medium"}
-          bgColor={"#009262"}
-          w={"full"}
-          isDisabled={
-            formik.values.latitude && formik.values.longitude && selectedCity
-              ? false
-              : true
-          }
-          _hover={{
-            backgroundColor: "#00b377",
-          }}
-          onClick={() => {
-            formik.handleSubmit();
-          }}
-        >
-          Simpan
-        </Button>
-      </HStack>
-    </VStack>
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker
+              draggable={true}
+              eventHandlers={eventHandlers}
+              position={{
+                lat: formik.values.latitude,
+                lng: formik.values.longitude,
+              }}
+              ref={markerRef}
+            >
+              <Popup minWidth={90}>
+                <span>Penunjuk dapat digeser.</span>
+              </Popup>
+            </Marker>
+          </MapContainer>
+        ) : null}
+        <HStack w={"full"}>
+          <Button
+            onClick={() => {
+              navigate("/warehouses");
+            }}
+          >
+            Kembali
+          </Button>
+          <Button
+            textColor={"white"}
+            fontWeight={"medium"}
+            bgColor={"#009262"}
+            w={"full"}
+            isDisabled={
+              formik.values.latitude && formik.values.longitude && selectedCity
+                ? false
+                : true
+            }
+            _hover={{
+              backgroundColor: "#00b377",
+            }}
+            onClick={() => {
+              formik.handleSubmit();
+            }}
+          >
+            Simpan
+          </Button>
+        </HStack>
+      </VStack>
+    </PageProtected>
   );
 };
 

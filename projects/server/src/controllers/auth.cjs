@@ -90,12 +90,11 @@ module.exports = {
           message: "Email and Password does not match",
         });
       }
-
       const userx = { id: user.id };
       req.session.user = userx;
 
       res.send({
-        result: { id: user.id },
+        result: { id: user.id, role: user.role },
         message: "Login success with Session",
       });
     } catch (error) {
@@ -107,11 +106,15 @@ module.exports = {
   },
   check: async (req, res) => {
     try {
-      if (!req.session) {
+      if (!req.session.user?.id) {
         return res.status(404).send("Session not found");
-      } else {
-        return res.send({ result: { id: req.session.user?.id } });
       }
+
+      const user = await prisma.user.findFirst({
+        where: { id: req.session.user?.id },
+      });
+
+      res.send({ result: { id: user.id, role: user.role } });
     } catch (error) {
       console.error(error);
       res.status(400).json({
@@ -123,18 +126,25 @@ module.exports = {
     try {
       validationResult(req).throw();
 
-      const { email } = req.body;
-      const user = await prisma.user.findFirst({
-        where: { email: email },
-      });
-
       const code = randomUUID();
-      await redis.set(passwordPrefix + code, user.id, "EX", 86400); // 24 hours
-      await sendMail(email, "Ubah Password", `<a href="http://localhost:5173/set-password/${code}">Setel Kata Kunci</a>`);
+
+      await prisma.user.update({
+        // untuk mengecek apakah user telah verifikasi atau belum.
+        where: { id: req.user.id },
+        data: {
+          token: passwordPrefix + code,
+        },
+      });
+      await sendMail(
+        req.user.email,
+        "Ubah Password",
+        `<a href="http://localhost:5173/set-password/${code}">Setel Kata Kunci</a>`
+      );
 
       res.json({ success: true, msg: "Kode Verifikasi Berhasil Dikirim!" });
-    } catch (err) {
-      const errors = "errors" in err ? err.mapped() : { unknown: err };
+    } catch (error) {
+      console.error(error);
+      const errors = "errors" in error ? error.mapped() : { unknown: error };
       res.status(400).json({
         success: false,
         errors,
