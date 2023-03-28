@@ -25,6 +25,7 @@ import ProductsPage from "./routes/products";
 import SettingAddressPage from "./routes/settingAddress";
 import AddressCreatePage from "./routes/addressCreate";
 import AddressUpdatePage from "./routes/addressUpdate";
+import PageProtected from "./routes/protected";
 
 const router = createBrowserRouter([
   {
@@ -75,15 +76,27 @@ const router = createBrowserRouter([
       },
       {
         path: "settings/address",
-        Component: SettingAddressPage,
+        Component: () => (
+          <PageProtected needLogin={true}>
+            <SettingAddressPage />
+          </PageProtected>
+        ),
       },
       {
         path: "settings/address/create",
-        Component: AddressCreatePage,
+        Component: () => (
+          <PageProtected needLogin={true}>
+            <AddressCreatePage />
+          </PageProtected>
+        ),
       },
       {
         path: "settings/address/edit/:id",
-        Component: AddressUpdatePage,
+        Component: () => (
+          <PageProtected needLogin={true}>
+            <AddressUpdatePage />
+          </PageProtected>
+        ),
       },
     ],
   },
