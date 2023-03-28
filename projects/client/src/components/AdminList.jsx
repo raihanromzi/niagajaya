@@ -13,7 +13,7 @@ function AdminList() {
   // const [pagination, setPagination] = useState(0);
   // const [pages, setPages] = useState("");
 
-  const deleteWarning = async (id) => {
+  const deleteWarning = async (admin) => {
     try {
       Swal.fire({
         title: "Are you sure?",
@@ -25,8 +25,8 @@ function AdminList() {
         confirmButtonText: "Yes, delete it!",
       }).then((result) => {
         if (result.isConfirmed) {
-          deleteAdmin(id);
-          Swal.fire("Deleted!", "Your file has been deleted.", "success");
+          deleteAdmin(admin.id);
+          Swal.fire("Deleted!", `${admin.names[0].name} has been deleted`, "success");
         }
       });
     } catch (err) {
@@ -65,7 +65,7 @@ function AdminList() {
                 <EditAdmin admin={admin} />
                 <IconButton
                   onClick={() => {
-                    deleteWarning(admin.id);
+                    deleteWarning(admin);
                   }}
                   bg={"none"}
                   color={"#ff4d4d"}

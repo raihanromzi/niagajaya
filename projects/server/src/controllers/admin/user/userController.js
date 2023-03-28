@@ -19,7 +19,7 @@ const getAllUsers = async (req, res) => {
 
     const users = await prisma.user.findMany({
       take: parseInt(limit),
-      skip: skip,
+      skip,
       where: {
         role: role.toUpperCase(),
       },
@@ -37,11 +37,16 @@ const getAllUsers = async (req, res) => {
       },
     });
 
-    const resultCount = await prisma.user.count();
+    const resultCount = await prisma.user.count({
+      where: {
+        role: role.toUpperCase(),
+      },
+    });
     const totalPage = Math.ceil(resultCount / limit);
 
     return res.status(200).send(response.responseSuccess(200, "SUCCESS", { current_page: page, total_page: totalPage, totalData: resultCount }, users));
   } catch (e) {
+    console.log(e);
     return res.status(500).send(response.responseError(500, "SERVER_ERROR", { message: e }));
   }
 };

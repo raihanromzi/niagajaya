@@ -43,19 +43,15 @@ const WarehousePage = () => {
       let queryParams = "";
       const filteredParams = { size };
       Object.keys(filteredParams)
-        .filter(
-          (key) =>
-            filteredParams[key] !== undefined && filteredParams[key] !== ""
-        )
+        .filter((key) => filteredParams[key] !== undefined && filteredParams[key] !== "")
         .forEach((key, index) => {
           const prefix = index === 0 ? "?" : "&";
-          queryParams += `${prefix}${key}=${encodeURIComponent(
-            filteredParams[key]
-          )}`;
+          queryParams += `${prefix}${key}=${encodeURIComponent(filteredParams[key])}`;
         });
       const res = await axiosInstance.get(`/warehouses/v3${queryParams}`, {
         withCredentials: true,
       });
+      console.log(res);
       setTotalPages(res.data.totalPage);
     } catch (error) {}
   }
@@ -76,14 +72,10 @@ const WarehousePage = () => {
     let queryParams = "";
     const filteredParams = { name, sortBy, page, size };
     Object.keys(filteredParams)
-      .filter(
-        (key) => filteredParams[key] !== undefined && filteredParams[key] !== ""
-      )
+      .filter((key) => filteredParams[key] !== undefined && filteredParams[key] !== "")
       .forEach((key, index) => {
         const prefix = index === 0 ? "?" : "&";
-        queryParams += `${prefix}${key}=${encodeURIComponent(
-          filteredParams[key]
-        )}`;
+        queryParams += `${prefix}${key}=${encodeURIComponent(filteredParams[key])}`;
       });
     navigate(`/warehouses${queryParams}`);
   }
@@ -99,24 +91,17 @@ const WarehousePage = () => {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const { name, sortBy, page, size } = Object.fromEntries(
-      queryParams.entries()
-    );
+    const { name, sortBy, page, size } = Object.fromEntries(queryParams.entries());
     setSize(size);
     async function fetchWarehouses() {
       try {
         let queryParams = "";
         const filteredParams = { name, sortBy, page, size };
         Object.keys(filteredParams)
-          .filter(
-            (key) =>
-              filteredParams[key] !== undefined && filteredParams[key] !== ""
-          )
+          .filter((key) => filteredParams[key] !== undefined && filteredParams[key] !== "")
           .forEach((key, index) => {
             const prefix = index === 0 ? "?" : "&";
-            queryParams += `${prefix}${key}=${encodeURIComponent(
-              filteredParams[key]
-            )}`;
+            queryParams += `${prefix}${key}=${encodeURIComponent(filteredParams[key])}`;
           });
         const res = await axiosInstance.get(`/warehouses${queryParams}`, {
           withCredentials: true,
@@ -190,41 +175,19 @@ const WarehousePage = () => {
             </Tbody>
           </Table>
           <Center w={"full"}>
-            <PaginationWarehouse
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
+            <PaginationWarehouse currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
           </Center>
-          <AlertDialog
-            motionPreset="slideInBottom"
-            leastDestructiveRef={cancelRef}
-            onClose={onClose}
-            isOpen={isOpen}
-            isCentered
-          >
+          <AlertDialog motionPreset="slideInBottom" leastDestructiveRef={cancelRef} onClose={onClose} isOpen={isOpen} isCentered>
             <AlertDialogOverlay />
             <AlertDialogContent>
               <AlertDialogHeader>Hapus Warehouse</AlertDialogHeader>
               <AlertDialogCloseButton />
-              <AlertDialogBody>
-                Apakah Anda yakin ingin menghapus {selectedWarehouse?.name}?
-              </AlertDialogBody>
+              <AlertDialogBody>Apakah Anda yakin ingin menghapus {selectedWarehouse?.name}?</AlertDialogBody>
               <AlertDialogFooter>
-                <Button
-                  variant={"outline"}
-                  colorScheme={"teal"}
-                  ref={cancelRef}
-                  onClick={onClose}
-                >
+                <Button variant={"outline"} colorScheme={"teal"} ref={cancelRef} onClick={onClose}>
                   Nanti Saja
                 </Button>
-                <Button
-                  ml={3}
-                  bgColor={"#009262"}
-                  textColor={"white"}
-                  onClick={deleteHandler}
-                >
+                <Button ml={3} bgColor={"#009262"} textColor={"white"} onClick={deleteHandler}>
                   Ya, Hapus
                 </Button>
               </AlertDialogFooter>
