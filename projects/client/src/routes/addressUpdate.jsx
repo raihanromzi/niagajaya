@@ -258,6 +258,7 @@ const AddressUpdatePage = () => {
         formik.setFieldValue("street", res.data.street);
         formik.setFieldValue("latitude", res.data.latitude);
         formik.setFieldValue("longitude", res.data.longitude);
+        formik.setFieldValue("main", res.data.main);
       } catch (error) {
         console.error(error);
         setStatus("error");

@@ -14,7 +14,6 @@ module.exports = {
           if (!user) {
             throw new Error(`User tidak ditemukan.`);
           }
-          console.log("jalan");
           req.user = user;
         },
       },

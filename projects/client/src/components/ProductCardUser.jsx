@@ -10,15 +10,22 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const ProductCardUser = ({ product }) => {
-  const handleClick = () => {
-    console.log("Card clicked!");
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/products/${product.id}`);
+  };
+
+  const handleCartClick = () => {
+    console.log("Cart Clicked");
   };
 
   return (
-    <Card maxW={["md", "xs", "xs", "lg"]} onClick={handleClick}>
-      <CardBody mb={{ lg: "4", xl: "2" }}>
+    <Card maxW={["md", "xs", "xs", "lg"]}>
+      <CardBody mb={{ lg: "4", xl: "2" }} onClick={handleCardClick}>
         <Image
           src={product.imageUrl}
           alt="Green double couch with wooden legs"
@@ -49,6 +56,7 @@ const ProductCardUser = ({ product }) => {
             bg: "gray.200",
             color: "gray.600",
           }}
+          onClick={handleCartClick}
         >
           Keranjang
         </Button>
