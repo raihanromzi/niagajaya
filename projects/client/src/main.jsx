@@ -8,16 +8,9 @@ import AddressPage from "./routes/AddressPage";
 import ProductCategoriesPage from "./routes/admin/productCategories";
 import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
 // import IndexPage from "./routes/index";
-import AdminProductCategoriesPage, {
-  ProductCategoriesLoader,
-  ProductCategoriesAction,
-} from "./routes/admin/productCategories";
-import CreateProductCategoryPage, {
-  CreateProductCategoryAction,
-} from "./routes/admin/productCategories/add";
+import AdminProductCategoriesPage, { ProductCategoriesLoader, ProductCategoriesAction } from "./routes/admin/productCategories/index";
+import CreateProductCategoryPage, { CreateProductCategoryAction } from "./routes/admin/productCategories/add";
 import AdminProductsPage from "./routes/admin/products";
-import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
-import IndexPage from "./routes/index";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
@@ -41,7 +34,6 @@ import WarehouseCreatePage from "./routes/warehouseCreate";
 import ProductsPage from "./routes/products";
 import NoAuthorityPage from "./routes/noAuthority";
 import ProductDetailPage from "./routes/productDetail";
-
 
 const router = createBrowserRouter([
   {
@@ -127,6 +119,7 @@ const router = createBrowserRouter([
         ],
       },
       { path: "products", Component: AdminProductsPage },
+      { path: "management", Component: AdminManagement },
     ],
   },
 ]);
