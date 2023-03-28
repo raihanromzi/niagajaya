@@ -1,8 +1,17 @@
-import { combineReducers } from "redux";
 import userReducer from "./auth/auth";
+import adminReducer from "./auth/authAdmin";
+import { configureStore } from "@reduxjs/toolkit";
+import { adminAPI } from "./apis/adminAPI";
 
-const rootReducer = combineReducers({
-  auth: userReducer,
+export const store = configureStore({
+  reducer: {
+    auth: userReducer,
+    authAdmin: adminReducer,
+    [adminAPI.reducerPath]: adminAPI.reducer,
+  },
+  middleware: (getDefaultMiddleware) => {
+    return getDefaultMiddleware().concat(adminAPI.middleware);
+  },
 });
 
-export default rootReducer;
+export { useGetAllAdminQuery, useGetAllManagerQuery, useGetAllUserQuery, useCrateAdminMutation, useUpdateAdminMutation, useDeleteAdminMutation } from "./apis/adminAPI";
