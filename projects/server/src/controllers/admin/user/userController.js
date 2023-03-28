@@ -34,6 +34,9 @@ const getAllUsers = async (req, res) => {
             name: true,
           },
         },
+        warehouse: {
+          select: { name: true },
+        },
       },
     });
 

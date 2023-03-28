@@ -1,15 +1,11 @@
 import React from "react";
 import { useGetAllManagerQuery } from "../redux/store";
 import { Spinner, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Flex, Box, Center, Input, InputGroup, InputRightElement, IconButton, Skeleton, Stack, Text } from "@chakra-ui/react";
-import Swal from "sweetalert2";
-import { BsFillTrashFill } from "react-icons/bs";
-import { EditAdmin } from "./EditAdmin";
 
 function ManagerList() {
   const { data, isError, isLoading } = useGetAllManagerQuery();
 
-  // const [pagination, setPagination] = useState(0);
-  // const [pages, setPages] = useState("");
+  console.log(data);
 
   const tableHead = [
     { name: "Id", origin: "id", width: "5em" },
@@ -35,19 +31,6 @@ function ManagerList() {
             <Td textAlign={"center"}>{manager.names[0]?.name}</Td>
             <Td textAlign={"center"}>{manager.role}</Td>
             <Td textAlign={"center"}>{manager.warehouse?.name || "Belum ada"}</Td>
-            {/* <Td>
-              <Flex gap={"20px"} justifyContent={"center"} alignItems={"center"}>
-                <EditAdmin />
-                <IconButton
-                  onClick={() => {
-                    deleteWarning(admin.id);
-                  }}
-                  bg={"none"}
-                  color={"#ff4d4d"}
-                  icon={<BsFillTrashFill />}
-                />
-              </Flex>
-            </Td> */}
           </Tr>
         </Tbody>
       );
