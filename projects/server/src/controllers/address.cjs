@@ -51,57 +51,57 @@ module.exports = {
         postalCode,
         main,
       } = req.body;
-      // const user = await prisma.user.update({
-      //   where: { id: req.session.user.id },
-      //   data: {
-      //     addresses: {
-      //       create: {
-      //         latitude,
-      //         longitude,
-      //         province,
-      //         city,
-      //         detail,
-      //         street,
-      //         postalCode,
-      //         primaryAddress: main && {
-      //           connectOrCreate: {
-      //             where: { userId: req.session.user.id },
-      //             create: { userId: req.session.user.id },
-      //           },
-      //         },
-      //       },
-      //     },
-      //   },
-      //   include: { addresses: true },
-      // });
-
-      const result = await prisma.userAddress.create({
+      const user = await prisma.user.update({
+        where: { id: req.session.user.id },
         data: {
-          userId: req.session.user.id,
-          latitude: latitude,
-          longitude: longitude,
-          province: province,
-          city: city,
-          street: street,
-          postalCode: postalCode,
-          detail: detail,
+          addresses: {
+            create: {
+              latitude,
+              longitude,
+              province,
+              city,
+              detail,
+              street,
+              postalCode,
+              primaryAddress: main && {
+                connectOrCreate: {
+                  where: { userId: req.session.user.id },
+                  create: { userId: req.session.user.id },
+                },
+              },
+            },
+          },
         },
+        include: { addresses: true },
       });
-      if (main) {
-        const primaryAddress = await prisma.userPrimaryAddress.findFirst({
-          where: { userId: req.session.user.id },
-        });
-        if (primaryAddress) {
-          await prisma.userPrimaryAddress.create({
-            data: { userId: req.session.user.id },
-          });
-        } else {
-          await prisma.userPrimaryAddress.update({
-            where: { userId: req.session.user.id },
-            data: { addressId: result.id },
-          });
-        }
-      }
+
+      // const result = await prisma.userAddress.create({
+      //   data: {
+      //     userId: req.session.user.id,
+      //     latitude: latitude,
+      //     longitude: longitude,
+      //     province: province,
+      //     city: city,
+      //     street: street,
+      //     postalCode: postalCode,
+      //     detail: detail,
+      //   },
+      // });
+      // if (main) {
+      //   const primaryAddress = await prisma.userPrimaryAddress.findFirst({
+      //     where: { userId: req.session.user.id },
+      //   });
+      //   if (primaryAddress) {
+      //     await prisma.userPrimaryAddress.create({
+      //       data: { userId: req.session.user.id },
+      //     });
+      //   } else {
+      //     await prisma.userPrimaryAddress.update({
+      //       where: { userId: req.session.user.id },
+      //       data: { addressId: result.id },
+      //     });
+      //   }
+      // }
       res.send({ message: "Berhasil" });
     } catch (error) {
       console.error(error);
@@ -117,45 +117,9 @@ module.exports = {
           message: "Harus login",
         });
       }
-      const { name, page = 1, size = 5, sortBy = "latest" } = req.query;
-      const skip = (page - 1) * size;
-
-      let orderBy;
-      switch (sortBy) {
-        case "latest":
-          orderBy = { updatedAt: "desc" };
-          break;
-        case "oldest":
-          orderBy = { updatedAt: "asc" };
-          break;
-        default:
-          orderBy = { updatedAt: "desc" };
-          break;
-      }
-
-      const where = {
-        AND: {
-          userId: req.session.user.id,
-        },
-      };
-
-      if (name) {
-        where.OR = [
-          { province: { contains: name } },
-          { city: { contains: name } },
-          { street: { contains: name } },
-          { detail: { contains: name } },
-          { postalCode: { contains: name } },
-        ];
-      }
-
       const addresses = await prisma.userAddress.findMany({
-        where,
-        skip: parseInt(skip),
-        take: parseInt(size),
-        orderBy: orderBy,
+        where: { userId: req.session.user.id },
       });
-      // req.session.user.id
       const primaryAddress = await prisma.userPrimaryAddress.findFirst({
         where: { userId: req.session.user.id },
       });
@@ -196,16 +160,6 @@ module.exports = {
         postalCode,
         main,
       } = req.body;
-
-      const address = await prisma.userAddress.findFirst({
-        where: { id: parseInt(req.params.id) },
-      });
-
-      if (address.userId !== req.session.user.id) {
-        return res.status(400).json({
-          message: "Anda tidak memiliki otoritas untuk mengupdate data ini",
-        });
-      }
 
       const result = await prisma.userAddress.update({
         where: { id: parseInt(req.params.id) },
@@ -252,6 +206,7 @@ module.exports = {
       });
     }
   },
+
   getAddress: async (req, res) => {
     try {
       if (!req.session.user) {
@@ -259,17 +214,6 @@ module.exports = {
           message: "Harus login",
         });
       }
-
-      const address = await prisma.userAddress.findFirst({
-        where: { id: parseInt(req.params.id) },
-      });
-
-      if (address.userId !== req.session.user.id) {
-        return res.status(400).json({
-          message: "Anda tidak memiliki otoritas untuk mengakses data ini",
-        });
-      }
-
       const result = await prisma.userAddress.findFirst({
         where: { id: parseInt(req.params.id) },
         select: {
@@ -305,17 +249,6 @@ module.exports = {
           message: "Harus login",
         });
       }
-
-      const address = await prisma.userAddress.findFirst({
-        where: { id: parseInt(req.params.id) },
-      });
-
-      if (address.userId !== req.session.user.id) {
-        return res.status(400).json({
-          message: "Anda tidak memiliki otoritas untuk menghapus data ini",
-        });
-      }
-
       const primaryAddress = await prisma.userPrimaryAddress.findFirst({
         where: { addressId: parseInt(req.params.id) },
       });
@@ -335,41 +268,6 @@ module.exports = {
       console.error(error);
       res.status(400).json({
         message: error,
-      });
-    }
-  },
-  getTotalPage: async (req, res) => {
-    try {
-      if (!req.session.user) {
-        return res.status(400).json({
-          message: "Harus login",
-        });
-      }
-      const { name, size = 5 } = req.query;
-
-      const where = {
-        AND: {
-          userId: req.session.user.id,
-        },
-      };
-      if (name) {
-        where.OR = [
-          { province: { contains: name } },
-          { city: { contains: name } },
-          { street: { contains: name } },
-          { detail: { contains: name } },
-          { postalCode: { contains: name } },
-        ];
-      }
-      const totalProduct = await prisma.userAddress.count({
-        where,
-      });
-      const totalPage = Math.ceil(totalProduct / size);
-      res.send({ totalPage });
-    } catch (error) {
-      console.error(error);
-      res.status(400).json({
-        error,
       });
     }
   },

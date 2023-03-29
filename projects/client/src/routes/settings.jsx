@@ -6,7 +6,6 @@ import {
   TabPanels,
   Tabs,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
 import ProfilePanel from "../components/ProfilePanel";
 
 // /** @type {import("react-router-dom").LoaderFunction} */
@@ -35,20 +34,13 @@ import ProfilePanel from "../components/ProfilePanel";
 // };
 
 const SettingsPage = () => {
-  const navigate = useNavigate();
   return (
     <>
       <Heading>Pengaturan</Heading>
       <Tabs isFitted>
         <TabList>
           <Tab>Profil</Tab>
-          <Tab
-            onClick={() => {
-              navigate("/settings/address");
-            }}
-          >
-            Alamat
-          </Tab>
+          <Tab>Alamat</Tab>
         </TabList>
         <TabPanels>
           <ProfilePanel />
