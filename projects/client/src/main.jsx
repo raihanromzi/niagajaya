@@ -4,7 +4,6 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AdminLayout from "./components/AdminLayout";
 import RootLayout from "./components/RootLayout";
-import AddressPage from "./routes/AddressPage";
 import AdminProductCategoriesPage, {
   ProductCategoriesLoader,
   ProductCategoriesAction,
@@ -34,7 +33,10 @@ import WarehouseCreatePage from "./routes/warehouseCreate";
 import ProductsPage from "./routes/products";
 import NoAuthorityPage from "./routes/noAuthority";
 import ProductDetailPage from "./routes/productDetail";
-
+import SettingAddressPage from "./routes/settingAddress";
+import AddressCreatePage from "./routes/addressCreate";
+import AddressUpdatePage from "./routes/addressUpdate";
+import PageProtected from "./routes/protected";
 
 const router = createBrowserRouter([
   {
@@ -64,10 +66,6 @@ const router = createBrowserRouter([
         Component: LoginPage,
       },
       {
-        path: "address",
-        Component: AddressPage,
-      },
-      {
         path: "reset-password/email",
         Component: ResetPasswordEmail,
       },
@@ -94,6 +92,30 @@ const router = createBrowserRouter([
       {
         path: "no-authority",
         Component: NoAuthorityPage,
+      },
+      {
+        path: "settings/address",
+        Component: () => (
+          <PageProtected needLogin={true}>
+            <SettingAddressPage />
+          </PageProtected>
+        ),
+      },
+      {
+        path: "settings/address/create",
+        Component: () => (
+          <PageProtected needLogin={true}>
+            <AddressCreatePage />
+          </PageProtected>
+        ),
+      },
+      {
+        path: "settings/address/edit/:id",
+        Component: () => (
+          <PageProtected needLogin={true}>
+            <AddressUpdatePage />
+          </PageProtected>
+        ),
       },
     ],
   },
