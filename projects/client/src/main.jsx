@@ -5,28 +5,28 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AdminLayout from "./components/AdminLayout";
 import RootLayout from "./components/RootLayout";
 import AddressPage from "./routes/AddressPage";
-import ProductCategoriesPage from "./routes/admin/productCategories";
-import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
-// import IndexPage from "./routes/index";
-import AdminProductCategoriesPage, { ProductCategoriesLoader, ProductCategoriesAction } from "./routes/admin/productCategories/index";
-import CreateProductCategoryPage, { CreateProductCategoryAction } from "./routes/admin/productCategories/add";
+import AdminProductCategoriesPage, {
+  ProductCategoriesLoader,
+  ProductCategoriesAction,
+} from "./routes/admin/productCategories";
+import CreateProductCategoryPage, {
+  CreateProductCategoryAction,
+} from "./routes/admin/productCategories/add";
 import AdminProductsPage from "./routes/admin/products";
+import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
+import IndexPage from "./routes/index";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
 import ResetPasswordEmail from "./routes/setPasswordEmail";
 import SettingsPage from "./routes/settings";
 
+import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import AuthProvider from "./hoc/authProvider";
-import AdminLoginPage from "./routes/admin/AdminLoginPage";
+import rootReducer from "./redux/store";
 
 import "leaflet/dist/leaflet.css";
-
-// import ProductsPage from "./routes/products";
-import { store } from "./redux/store";
-import AdminList from "./components/AdminList";
-import AdminManagement from "./routes/admin/AdminManagement";
 
 import WarehousePage from "./routes/warehouse";
 import WarehouseUpdatePage from "./routes/warehouseUpdate";
@@ -35,10 +35,13 @@ import ProductsPage from "./routes/products";
 import NoAuthorityPage from "./routes/noAuthority";
 import ProductDetailPage from "./routes/productDetail";
 
+
 const router = createBrowserRouter([
   {
     path: "/",
+    Component: RootLayout,
     children: [
+      { index: true, Component: IndexPage },
       { path: "register", Component: RegisterPage, action: registerAction },
       {
         path: "set-password/:token",
@@ -61,16 +64,12 @@ const router = createBrowserRouter([
         Component: LoginPage,
       },
       {
-        path: "/admin/login",
-        Component: AdminLoginPage,
-      },
-      {
         path: "address",
         Component: AddressPage,
       },
       {
         path: "reset-password/email",
-        component: ResetPasswordEmail,
+        Component: ResetPasswordEmail,
       },
       {
         path: "warehouses",
@@ -119,10 +118,11 @@ const router = createBrowserRouter([
         ],
       },
       { path: "products", Component: AdminProductsPage },
-      { path: "management", Component: AdminManagement },
     ],
   },
 ]);
+
+const store = configureStore({ reducer: rootReducer });
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

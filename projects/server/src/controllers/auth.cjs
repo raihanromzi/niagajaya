@@ -127,7 +127,6 @@ module.exports = {
       validationResult(req).throw();
 
       const code = randomUUID();
-
       await prisma.user.update({
         // untuk mengecek apakah user telah verifikasi atau belum.
         where: { id: req.user.id },
