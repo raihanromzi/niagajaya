@@ -7,7 +7,12 @@ const session = require("express-session");
 
 const port = +(process.env.PORT || 8000);
 const app = express();
+// const redisStore = new RedisStore({
+//   client: redis,
+//   disableTouch: true,
+// });
 
+// app.set("trust proxy", 1)
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -16,9 +21,10 @@ app.use(
 );
 app.use(
   session({
+    // store: redisStore,
     resave: false,
     saveUninitialized: false,
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SECRET_KEY_SESSION,
     cookie: {
       maxAge: 31536000000, // 365 days
       httpOnly: true,
@@ -38,16 +44,6 @@ app.use("/warehouses", routes.warehousesRoute);
 app.use("/products", routes.productRoute);
 app.use("/categories", routes.categoryRoute);
 
-// Admin
-app.use("/api", routes.adminAuthRoute);
-app.use("/api", routes.userRoute);
-
-const authRoutes = require("./routes/auth.cjs");
-const usersRoutes = require("./routes/users.cjs");
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/users", usersRoutes);
-app.use("/products", routes.productRoute);
-app.use("/categories", routes.categoryRoute);
 app.use("/api/v1/auth", require("./routes/auth.cjs"));
 app.use("/api/v1/users", require("./routes/users.cjs"));
 app.use(

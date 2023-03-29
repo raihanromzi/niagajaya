@@ -5,7 +5,7 @@
   "license": "ISC",
   "private": true,
   "scripts": {
-    "dev": "nodemon index.cjs",
+    "dev": "nodemon",
     "serve": "node ."
   },
   "dependencies": {

@@ -97,10 +97,14 @@ const WarehousePage = () => {
     let queryParams = "";
     const filteredParams = { name, sortBy, page, size };
     Object.keys(filteredParams)
-      .filter((key) => filteredParams[key] !== undefined && filteredParams[key] !== "")
+      .filter(
+        (key) => filteredParams[key] !== undefined && filteredParams[key] !== ""
+      )
       .forEach((key, index) => {
         const prefix = index === 0 ? "?" : "&";
-        queryParams += `${prefix}${key}=${encodeURIComponent(filteredParams[key])}`;
+        queryParams += `${prefix}${key}=${encodeURIComponent(
+          filteredParams[key]
+        )}`;
       });
     navigate(`/warehouses${queryParams}`);
   }
@@ -168,13 +172,18 @@ const WarehousePage = () => {
         let queryParams = "";
         const filteredParams = { name, sortBy, page, size };
         Object.keys(filteredParams)
-          .filter((key) => filteredParams[key] !== undefined && filteredParams[key] !== "")
+          .filter(
+            (key) =>
+              filteredParams[key] !== undefined && filteredParams[key] !== ""
+          )
           .forEach((key, index) => {
             if (key === "name") {
               setFilterValue("Nama");
             }
             const prefix = index === 0 ? "?" : "&";
-            queryParams += `${prefix}${key}=${encodeURIComponent(filteredParams[key])}`;
+            queryParams += `${prefix}${key}=${encodeURIComponent(
+              filteredParams[key]
+            )}`;
           });
         const res = await axiosInstance.get(`/warehouses${queryParams}`, {
           withCredentials: true,
