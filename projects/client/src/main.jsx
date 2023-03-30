@@ -37,6 +37,7 @@ import SettingAddressPage from "./routes/settingAddress";
 import AddressCreatePage from "./routes/addressCreate";
 import AddressUpdatePage from "./routes/addressUpdate";
 import PageProtected from "./routes/protected";
+import CartPage from "./routes/cart";
 
 const router = createBrowserRouter([
   {
@@ -114,6 +115,14 @@ const router = createBrowserRouter([
         Component: () => (
           <PageProtected needLogin={true}>
             <AddressUpdatePage />
+          </PageProtected>
+        ),
+      },
+      {
+        path: "cart",
+        Component: () => (
+          <PageProtected needLogin={true}>
+            <CartPage />
           </PageProtected>
         ),
       },

@@ -110,4 +110,37 @@ module.exports = {
       });
     }
   },
+  getSomeProducts: async (req, res) => {
+    try {
+      const { productIds } = req.body;
+      const products = await prisma.product.findMany({
+        where: {
+          id: { in: productIds },
+        },
+        include: {
+          stocks: true,
+        },
+      });
+
+      const productsWithTotalQuantity = products.map((product) => {
+        const totalQuantity = product.stocks.reduce(
+          (acc, stock) => acc + stock.quantity,
+          0
+        );
+        delete product.categoryId;
+        delete product.stocks;
+
+        return {
+          ...product,
+          totalQuantity,
+        };
+      });
+      res.send(productsWithTotalQuantity);
+    } catch (error) {
+      console.error(error);
+      res.status(400).json({
+        error,
+      });
+    }
+  },
 };
