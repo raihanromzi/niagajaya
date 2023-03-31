@@ -36,7 +36,8 @@ const ProfilePanel = () => {
         );
         setData(res.data);
       } catch (err) {
-        navigate("/login");
+        // navigate("/login");
+        navigate("/");
       }
     })();
   }, [userId, navigate, response]);

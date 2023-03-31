@@ -11,10 +11,12 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import useLocalStorageState from "use-local-storage-state";
 
 const ProductCardUser = ({ product }) => {
+  const userSelector = useSelector((state) => state.auth);
   const [cart, setCart] = useLocalStorageState("cart");
   const toast = useToast();
 
@@ -25,7 +27,18 @@ const ProductCardUser = ({ product }) => {
   };
 
   const handleCartClick = () => {
-    addItemToCart(product);
+    if (userSelector.id) {
+      addItemToCart(product);
+    } else {
+      toast({
+        position: "bottom-left",
+        title: "Anda belum terverfikasi",
+        description: "Silahkan login agar dapat menggunakan fitur tersebut",
+        status: "info",
+        duration: 8000,
+        isClosable: true,
+      });
+    }
   };
 
   const addItemToCart = (product) => {

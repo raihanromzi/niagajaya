@@ -18,6 +18,7 @@ import {
   RadioGroup,
   Tag,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import ProductCardUser from "../components/ProductCardUser";
@@ -25,10 +26,13 @@ import { FaPlus } from "react-icons/fa";
 import { axiosInstance } from "../config/config";
 import PaginationProductUser from "../components/PaginationProductUser";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const ProductsPage = () => {
+  const userSelector = useSelector((state) => state.auth);
   const location = useLocation();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [filterValue, setFilterValue] = useState("");
@@ -89,6 +93,18 @@ const ProductsPage = () => {
   }
 
   useEffect(() => {
+    if (!userSelector.id) {
+      toast({
+        position: "bottom-left",
+        title: "Anda belum terverfikasi",
+        description:
+          "Silahkan login agar dapat mengakses fitur-fitur yang disediakan",
+        status: "info",
+        duration: 8000,
+        isClosable: true,
+      });
+    }
+
     fetchCategories();
   }, []);
 
@@ -115,7 +131,7 @@ const ProductsPage = () => {
       setTempSortBy(sortBy);
     }
     setSize(size);
-    async function fetchProducts() {
+    async function fetchProducts(page, name, categoryId, sortBy, size) {
       try {
         let queryParams = "";
         const filteredParams = { name, categoryId, sortBy, page, size };
@@ -141,7 +157,12 @@ const ProductsPage = () => {
         console.error(error);
       }
     }
-    fetchProducts();
+
+    if (userSelector.id) {
+      fetchProducts(page, name, categoryId, sortBy, size);
+    } else {
+      fetchProducts(page);
+    }
   }, [location]);
 
   useEffect(() => {
@@ -186,13 +207,43 @@ const ProductsPage = () => {
     return <Tag>{sort?.label}</Tag>;
   }
 
+  const showCommonToast = () => {
+    toast({
+      position: "bottom-left",
+      title: "Anda belum terverfikasi",
+      description: "Silahkan login agar dapat menggunakan fitur tersebut",
+      status: "info",
+      duration: 8000,
+      isClosable: true,
+    });
+  };
+
   return (
     <>
       <Box mb={3}>
         <HStack>
           <ButtonGroup size="sm" isAttached variant="outline">
-            <Button onClick={onOpen}>Tambah Filter</Button>
-            <IconButton onClick={onOpen} icon={<FaPlus />} />
+            <Button
+              onClick={() => {
+                if (userSelector.id) {
+                  onOpen();
+                } else {
+                  showCommonToast();
+                }
+              }}
+            >
+              Tambah Filter
+            </Button>
+            <IconButton
+              onClick={() => {
+                if (userSelector.id) {
+                  onOpen();
+                } else {
+                  showCommonToast();
+                }
+              }}
+              icon={<FaPlus />}
+            />
           </ButtonGroup>
           <Modal
             isCentered

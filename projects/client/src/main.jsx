@@ -53,7 +53,12 @@ const router = createBrowserRouter([
       },
       {
         path: "settings",
-        Component: SettingsPage,
+        Component: () => (
+          <PageProtected needLogin={true}>
+            <SettingsPage />
+          </PageProtected>
+        ),
+        // Component: SettingsPage,
         // loader: settingsLoader,
         // action: settingsAction,
       },

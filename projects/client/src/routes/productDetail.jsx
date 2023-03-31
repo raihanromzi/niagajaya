@@ -14,8 +14,11 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { axiosInstance } from "../config/config";
 import useLocalStorageState from "use-local-storage-state";
+import { useSelector } from "react-redux";
 
 const ProductDetailPage = () => {
+  const userSelector = useSelector((state) => state.auth);
+
   const routeParams = useParams();
   const [cart, setCart] = useLocalStorageState("cart");
   const [productIndex, setProductIndex] = useState(null);
@@ -36,7 +39,18 @@ const ProductDetailPage = () => {
   }
 
   const handleCartClick = () => {
-    addItemToCart(product);
+    if (userSelector.id) {
+      addItemToCart(product);
+    } else {
+      toast({
+        position: "bottom-left",
+        title: "Anda belum terverfikasi",
+        description: "Silahkan login agar dapat menggunakan fitur tersebut",
+        status: "info",
+        duration: 8000,
+        isClosable: true,
+      });
+    }
   };
 
   const addItemToCart = (product) => {
@@ -104,6 +118,17 @@ const ProductDetailPage = () => {
   };
 
   useEffect(() => {
+    if (!userSelector.id) {
+      toast({
+        position: "bottom-left",
+        title: "Anda belum terverfikasi",
+        description:
+          "Silahkan login agar dapat mengakses fitur-fitur yang disediakan",
+        status: "info",
+        duration: 8000,
+        isClosable: true,
+      });
+    }
     fetchDetailProduct(routeParams.id);
   }, []);
 
@@ -201,7 +226,6 @@ const ProductDetailPage = () => {
                 </Text>
               )}
             </HStack>
-
             <Button
               bgColor="#009262"
               color="#FCFCFC"

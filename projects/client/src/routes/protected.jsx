@@ -16,7 +16,9 @@ function PageProtected({
   useEffect(() => {
     if (needLogin && !userSelector?.id) {
       localStorage.setItem("lastPath", location.pathname);
-      return navigate("/login", { replace: true });
+      return navigate("/", {
+        replace: true,
+      });
     }
     if (guestOnly && userSelector?.id) {
       return navigate("/", { replace: true });
