@@ -50,7 +50,7 @@ export const ProductCategoriesLoader = async ({ request }) => {
   try {
     const query = new URL(request.url).searchParams.toString();
     const res = await axios.get(
-      `http://localhost:8000/api/v1/product-categories?${query}`,
+      `http://localhost:8000/api/v1/product-categories?${query}&take=10`,
       { withCredentials: true }
     );
     return res.data;
@@ -211,7 +211,7 @@ const ProductCategoriesPage = () => {
           icon={<FaChevronRight />}
           aria-label="next 10 rows"
           size="sm"
-          isDisabled={data?.pages.length === +searchParams.get("page") + 1}
+          isDisabled={data?.pages.length <= +searchParams.get("page") + 1}
           onClick={() => {
             setSearchParams((val) => {
               val.set("page", `${+val.get("page") + 1}`);

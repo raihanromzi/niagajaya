@@ -5,13 +5,20 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AdminLayout from "./components/AdminLayout";
 import RootLayout from "./components/RootLayout";
 import AdminProductCategoriesPage, {
-  ProductCategoriesLoader,
   ProductCategoriesAction,
+  ProductCategoriesLoader,
 } from "./routes/admin/productCategories";
 import CreateProductCategoryPage, {
   CreateProductCategoryAction,
 } from "./routes/admin/productCategories/add";
-import AdminProductsPage from "./routes/admin/products";
+import AdminProductsPage, {
+  ProductsAction,
+  ProductsLoader,
+} from "./routes/admin/products";
+import CreateProductPage, {
+  CreateProductLoader,
+  CreateProductAction,
+} from "./routes/admin/products/add";
 import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
 import IndexPage from "./routes/index";
 import LoginPage from "./routes/LoginPage";
@@ -27,12 +34,12 @@ import rootReducer from "./redux/store";
 
 import "leaflet/dist/leaflet.css";
 
-import WarehousePage from "./routes/warehouse";
-import WarehouseUpdatePage from "./routes/warehouseUpdate";
-import WarehouseCreatePage from "./routes/warehouseCreate";
-import ProductsPage from "./routes/products";
 import NoAuthorityPage from "./routes/noAuthority";
 import ProductDetailPage from "./routes/productDetail";
+import ProductsPage from "./routes/products";
+import WarehousePage from "./routes/warehouse";
+import WarehouseCreatePage from "./routes/warehouseCreate";
+import WarehouseUpdatePage from "./routes/warehouseUpdate";
 import SettingAddressPage from "./routes/settingAddress";
 import AddressCreatePage from "./routes/addressCreate";
 import AddressUpdatePage from "./routes/addressUpdate";
@@ -153,7 +160,23 @@ const router = createBrowserRouter([
           },
         ],
       },
-      { path: "products", Component: AdminProductsPage },
+      {
+        path: "products",
+        children: [
+          {
+            index: true,
+            Component: AdminProductsPage,
+            loader: ProductsLoader,
+            action: ProductsAction,
+          },
+          {
+            path: "add",
+            Component: CreateProductPage,
+            loader: CreateProductLoader,
+            action: CreateProductAction,
+          },
+        ],
+      },
     ],
   },
 ]);
