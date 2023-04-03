@@ -4,41 +4,54 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AdminLayout from "./components/AdminLayout";
 import RootLayout from "./components/RootLayout";
-import AddressPage from "./routes/AddressPage";
-import ProductCategoriesPage from "./routes/admin/productCategories";
+import AdminProductCategoriesPage, {
+  ProductCategoriesAction,
+  ProductCategoriesLoader,
+} from "./routes/admin/productCategories";
+import CreateProductCategoryPage, {
+  CreateProductCategoryAction,
+} from "./routes/admin/productCategories/add";
+import AdminProductsPage, {
+  ProductsAction,
+  ProductsLoader,
+} from "./routes/admin/products";
+import CreateProductPage, {
+  CreateProductLoader,
+  CreateProductAction,
+} from "./routes/admin/products/add";
 import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
-// import IndexPage from "./routes/index";
-import AdminProductCategoriesPage, { ProductCategoriesLoader, ProductCategoriesAction } from "./routes/admin/productCategories/index";
-import CreateProductCategoryPage, { CreateProductCategoryAction } from "./routes/admin/productCategories/add";
-import AdminProductsPage from "./routes/admin/products";
+import IndexPage from "./routes/index";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
 import ResetPasswordEmail from "./routes/setPasswordEmail";
 import SettingsPage from "./routes/settings";
 
+import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import AuthProvider from "./hoc/authProvider";
-import AdminLoginPage from "./routes/admin/AdminLoginPage";
+import rootReducer from "./redux/store";
 
 import "leaflet/dist/leaflet.css";
 
-// import ProductsPage from "./routes/products";
-import { store } from "./redux/store";
-import AdminList from "./components/AdminList";
-import AdminManagement from "./routes/admin/AdminManagement";
-
-import WarehousePage from "./routes/warehouse";
-import WarehouseUpdatePage from "./routes/warehouseUpdate";
-import WarehouseCreatePage from "./routes/warehouseCreate";
-import ProductsPage from "./routes/products";
 import NoAuthorityPage from "./routes/noAuthority";
 import ProductDetailPage from "./routes/productDetail";
+import ProductsPage from "./routes/products";
+import WarehousePage from "./routes/warehouse";
+import WarehouseCreatePage from "./routes/warehouseCreate";
+import WarehouseUpdatePage from "./routes/warehouseUpdate";
+import SettingAddressPage from "./routes/settingAddress";
+import AddressCreatePage from "./routes/addressCreate";
+import AddressUpdatePage from "./routes/addressUpdate";
+import PageProtected from "./routes/protected";
+import CartPage from "./routes/cart";
 
 const router = createBrowserRouter([
   {
     path: "/",
+    Component: RootLayout,
     children: [
+      { index: true, Component: IndexPage },
       { path: "register", Component: RegisterPage, action: registerAction },
       {
         path: "set-password/:token",
@@ -47,7 +60,12 @@ const router = createBrowserRouter([
       },
       {
         path: "settings",
-        Component: SettingsPage,
+        Component: () => (
+          <PageProtected needLogin={true}>
+            <SettingsPage />
+          </PageProtected>
+        ),
+        // Component: SettingsPage,
         // loader: settingsLoader,
         // action: settingsAction,
       },
@@ -61,16 +79,8 @@ const router = createBrowserRouter([
         Component: LoginPage,
       },
       {
-        path: "/admin/login",
-        Component: AdminLoginPage,
-      },
-      {
-        path: "address",
-        Component: AddressPage,
-      },
-      {
         path: "reset-password/email",
-        component: ResetPasswordEmail,
+        Component: ResetPasswordEmail,
       },
       {
         path: "warehouses",
@@ -96,6 +106,38 @@ const router = createBrowserRouter([
         path: "no-authority",
         Component: NoAuthorityPage,
       },
+      {
+        path: "settings/address",
+        Component: () => (
+          <PageProtected needLogin={true}>
+            <SettingAddressPage />
+          </PageProtected>
+        ),
+      },
+      {
+        path: "settings/address/create",
+        Component: () => (
+          <PageProtected needLogin={true}>
+            <AddressCreatePage />
+          </PageProtected>
+        ),
+      },
+      {
+        path: "settings/address/edit/:id",
+        Component: () => (
+          <PageProtected needLogin={true}>
+            <AddressUpdatePage />
+          </PageProtected>
+        ),
+      },
+      {
+        path: "cart",
+        Component: () => (
+          <PageProtected needLogin={true}>
+            <CartPage />
+          </PageProtected>
+        ),
+      },
     ],
   },
   {
@@ -118,11 +160,28 @@ const router = createBrowserRouter([
           },
         ],
       },
-      { path: "products", Component: AdminProductsPage },
-      { path: "management", Component: AdminManagement },
+      {
+        path: "products",
+        children: [
+          {
+            index: true,
+            Component: AdminProductsPage,
+            loader: ProductsLoader,
+            action: ProductsAction,
+          },
+          {
+            path: "add",
+            Component: CreateProductPage,
+            loader: CreateProductLoader,
+            action: CreateProductAction,
+          },
+        ],
+      },
     ],
   },
 ]);
+
+const store = configureStore({ reducer: rootReducer });
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

@@ -13,7 +13,7 @@ import FormGrid from "../../../components/FormGrid";
 /** @type {import("react-router-dom").ActionFunction} */
 export const CreateProductCategoryAction = async ({ request }) => {
   try {
-    const res = await axios.post(
+    await axios.post(
       `http://localhost:8000/api/v1/product-categories`,
       Object.fromEntries(await request.formData()),
       { withCredentials: true }
@@ -37,11 +37,10 @@ const CreateProductCategoryPage = () => {
           borderRadius="4px"
           px={5}
           py={8}
-          mb={10}
         >
           <FormGrid actionData={actionData} />
         </Box>
-        <Flex justifyContent="flex-end">
+        <Flex justifyContent="flex-end" my={10}>
           <Button
             as={RouterLink}
             to=".."

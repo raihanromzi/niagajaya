@@ -2,9 +2,11 @@
 CREATE TABLE `User` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `email` VARCHAR(255) NOT NULL,
-    `hashedPassword` VARCHAR(191) NULL,
+    `password` VARCHAR(255) NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
     `imageUrl` VARCHAR(191) NULL,
     `role` ENUM('USER', 'ADMIN', 'MANAGER') NOT NULL,
+    `setPasswordCode` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `deletedAt` DATETIME(3) NULL,
@@ -14,14 +16,11 @@ CREATE TABLE `User` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `UserName` (
+CREATE TABLE `Session` (
     `userId` INTEGER NOT NULL,
-    `name` VARCHAR(255) NOT NULL,
-    `usageCount` INTEGER NOT NULL DEFAULT 1,
-    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updatedAt` DATETIME(3) NOT NULL,
+    `code` VARCHAR(191) NOT NULL,
 
-    PRIMARY KEY (`userId`, `name`)
+    PRIMARY KEY (`userId`, `code`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -29,6 +28,8 @@ CREATE TABLE `UserAddress` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userId` INTEGER NOT NULL,
     `coordinate` POINT NOT NULL,
+    `latitude` DECIMAL(65, 30) NOT NULL,
+    `longitude` DECIMAL(65, 30) NOT NULL,
     `province` VARCHAR(255) NOT NULL,
     `city` VARCHAR(255) NOT NULL,
     `district` VARCHAR(255) NOT NULL,
@@ -54,7 +55,8 @@ CREATE TABLE `Warehouse` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `managerId` INTEGER NOT NULL,
     `name` VARCHAR(255) NOT NULL,
-    `coordinate` POINT NOT NULL,
+    `latitude` DECIMAL(65, 30) NOT NULL,
+    `longitude` DECIMAL(65, 30) NOT NULL,
     `province` VARCHAR(255) NOT NULL,
     `city` VARCHAR(255) NOT NULL,
     `district` VARCHAR(255) NOT NULL,
@@ -141,7 +143,7 @@ CREATE TABLE `OrderDetail` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `UserName` ADD CONSTRAINT `UserName_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Session` ADD CONSTRAINT `Session_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `UserAddress` ADD CONSTRAINT `UserAddress_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

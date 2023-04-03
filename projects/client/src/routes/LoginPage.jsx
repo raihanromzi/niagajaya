@@ -1,4 +1,21 @@
-import { Alert, AlertIcon, Box, Button, Center, Flex, FormControl, FormHelperText, Heading, IconButton, Image, Input, InputGroup, InputRightElement, Link, VStack } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  Center,
+  Flex,
+  FormControl,
+  FormHelperText,
+  Heading,
+  IconButton,
+  Image,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Link,
+  VStack,
+} from "@chakra-ui/react";
 import { useFormik } from "formik";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -24,7 +41,9 @@ const LoginPage = () => {
       password: "",
     },
     validationSchema: Yup.object().shape({
-      email: Yup.string().required("Email tidak boleh kosong").email("Email tidak sesuai format"),
+      email: Yup.string()
+        .required("Email tidak boleh kosong")
+        .email("Email tidak sesuai format"),
       password: Yup.string().required("Password tidak boleh kosong"),
     }),
     onSubmit: () => {
@@ -52,77 +71,102 @@ const LoginPage = () => {
   });
 
   return (
-    <PageProtected guestOnly={true}>
-      <Flex mx="auto" maxW="5xl" boxShadow={{ lg: "0 8px 16px rgba(171, 190, 209, 0.4)" }} borderRadius="10px" justifyContent="space-evenly" flexDir={{ base: "column-reverse", lg: "row" }}>
-        <Center>
-          <Image src={paperBagImg} alt="eco bag with food" />
-        </Center>
-        <Center flexDir="column">
-          <Heading fontSize="3xl" mb={5}>
-            Masuk ke akun Anda
-          </Heading>
-          <Box border="solid #EBEBEB 1px" borderRadius="10px" p={5} w={96}>
-            <VStack spacing={5}>
-              <FormControl>
-                {status ? (
-                  <Alert status="error" zIndex={2} variant="top-accent" fontSize={"md"} mb={"1"}>
-                    <AlertIcon />
-                    {msg}
-                  </Alert>
-                ) : null}
-                <Input type="email" name="email" bgColor="#F1FBF8" placeholder="Email" onChange={(e) => formik.setFieldValue("email", e.target.value)} />
-                <FormHelperText w={"full"} textAlign={"start"}>
-                  {formik.errors.email}
-                </FormHelperText>
-              </FormControl>
-              <FormControl>
-                <InputGroup>
-                  <Input type={hide ? "password" : "text"} name="password" placeholder="Password" bgColor="#F1FBF8" onChange={(e) => formik.setFieldValue("password", e.target.value)} />
-                  <InputRightElement w={10}>
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      icon={!hide ? <FaEye /> : <FaEyeSlash />}
-                      variant="ghost"
-                      size="sm"
-                      tabIndex={-1}
-                      onClick={() => {
-                        setHide(!hide);
-                      }}
-                    />
-                  </InputRightElement>
-                </InputGroup>
+    <Flex
+      mx="auto"
+      maxW="5xl"
+      boxShadow={{ lg: "0 8px 16px rgba(171, 190, 209, 0.4)" }}
+      borderRadius="10px"
+      justifyContent="space-evenly"
+      flexDir={{ base: "column-reverse", lg: "row" }}
+    >
+      <Center>
+        <Image src={paperBagImg} alt="eco bag with food" />
+      </Center>
+      <Center flexDir="column">
+        <Heading fontSize="3xl" mb={5}>
+          Masuk ke akun Anda
+        </Heading>
+        <Box border="solid #EBEBEB 1px" borderRadius="10px" p={5} w={96}>
+          <VStack spacing={5}>
+            <FormControl>
+              {status ? (
+                <Alert
+                  status="error"
+                  zIndex={2}
+                  variant="top-accent"
+                  fontSize={"md"}
+                  mb={"1"}
+                >
+                  <AlertIcon />
+                  {msg}
+                </Alert>
+              ) : null}
+              <Input
+                type="email"
+                name="email"
+                bgColor="#F1FBF8"
+                placeholder="Email"
+                onChange={(e) => formik.setFieldValue("email", e.target.value)}
+              />
+              <FormHelperText w={"full"} textAlign={"start"}>
+                {formik.errors.email}
+              </FormHelperText>
+            </FormControl>
+            <FormControl>
+              <InputGroup>
+                <Input
+                  type={hide ? "password" : "text"}
+                  name="password"
+                  placeholder="Password"
+                  bgColor="#F1FBF8"
+                  onChange={(e) =>
+                    formik.setFieldValue("password", e.target.value)
+                  }
+                />
+                <InputRightElement w={10}>
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    icon={!hide ? <FaEye /> : <FaEyeSlash />}
+                    variant="ghost"
+                    size="sm"
+                    tabIndex={-1}
+                    onClick={() => {
+                      setHide(!hide);
+                    }}
+                  />
+                </InputRightElement>
+              </InputGroup>
 
-                <FormHelperText w={"full"} textAlign={"start"}>
-                  {formik.errors.password}
-                </FormHelperText>
-              </FormControl>
-              <Link
-                w={"full"}
-                fontSize={"sm"}
-                textAlign={"right"}
-                textColor={"gray.500"}
-                onClick={() => {
-                  navigate("/reset-password/email", { replace: true });
-                }}
-              >
-                Lupa Password?
-              </Link>
-              <Button
-                bgColor="#009262"
-                color="#FCFCFC"
-                w="full"
-                onClick={formik.handleSubmit}
-                _hover={{
-                  backgroundColor: "#00b377",
-                }}
-              >
-                Masuk
-              </Button>
-            </VStack>
-          </Box>
-        </Center>
-      </Flex>
-    </PageProtected>
+              <FormHelperText w={"full"} textAlign={"start"}>
+                {formik.errors.password}
+              </FormHelperText>
+            </FormControl>
+            <Link
+              w={"full"}
+              fontSize={"sm"}
+              textAlign={"right"}
+              textColor={"gray.500"}
+              onClick={() => {
+                navigate("/reset-password/email", { replace: true });
+              }}
+            >
+              Lupa Password?
+            </Link>
+            <Button
+              bgColor="#009262"
+              color="#FCFCFC"
+              w="full"
+              onClick={formik.handleSubmit}
+              _hover={{
+                backgroundColor: "#00b377",
+              }}
+            >
+              Masuk
+            </Button>
+          </VStack>
+        </Box>
+      </Center>
+    </Flex>
   );
 };
 
