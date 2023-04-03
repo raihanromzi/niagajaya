@@ -10,9 +10,6 @@ function AdminList() {
   const { data, isError, isLoading } = useGetAllAdminQuery();
   const [deleteAdmin] = useDeleteAdminMutation();
 
-  // const [pagination, setPagination] = useState(0);
-  // const [pages, setPages] = useState("");
-
   const deleteWarning = async (admin) => {
     try {
       Swal.fire({

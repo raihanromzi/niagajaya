@@ -8,8 +8,6 @@ function PageProtected({ children, needLogin = false, guestOnly = false, adminOn
 
   const userSelector = useSelector((state) => state.auth);
 
-  console.log(location.pathname);
-
   useEffect(() => {
     if (needLogin && !userSelector?.id) {
       localStorage.setItem("lastPath", location.pathname);

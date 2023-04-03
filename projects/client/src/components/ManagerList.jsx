@@ -5,8 +5,6 @@ import { Spinner, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Flex, Box, Ce
 function ManagerList() {
   const { data, isError, isLoading } = useGetAllManagerQuery();
 
-  console.log(data);
-
   const tableHead = [
     { name: "Id", origin: "id", width: "5em" },
     { name: "Email", origin: "email", width: "60em" },

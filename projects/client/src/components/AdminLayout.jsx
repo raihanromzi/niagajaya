@@ -1,36 +1,18 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Divider,
-  Flex,
-  Heading,
-  Icon,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Avatar, Box, Button, Divider, Flex, Heading, Icon, Text, VStack } from "@chakra-ui/react";
 import { FaHome } from "react-icons/fa";
 import { Link as RouterLink, NavLink, Outlet } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 const AdminLayout = () => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth);
+
   return (
     <Flex bgColor="#F5F7FA" h="100vh">
-      <Flex
-        flexDir="column"
-        justifyContent="space-between"
-        p={4}
-        bgColor="#FCFCFC"
-        borderRight="solid 1px #E7E7E7"
-        w={60}
-      >
+      <Flex flexDir="column" justifyContent="space-between" p={4} bgColor="#FCFCFC" borderRight="solid 1px #E7E7E7" w={60}>
         <VStack spacing={5} color="#717171">
-          <Heading
-            as={RouterLink}
-            to="/admin"
-            fontSize="xl"
-            color="#009262"
-            py={10}
-          >
+          <Heading as={RouterLink} to="/admin" fontSize="xl" color="#009262" py={10}>
             Niagajaya
           </Heading>
           <Heading w="full" fontSize="sm" fontWeight="medium">
