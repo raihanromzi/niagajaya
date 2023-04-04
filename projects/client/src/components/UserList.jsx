@@ -2,7 +2,21 @@ import React, { useState, useEffect } from "react";
 import { useGetAllUserQuery } from "../redux/store";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-import { Spinner, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Flex, Box, Center, Input, InputGroup, InputRightElement, IconButton, Skeleton, Stack, Text } from "@chakra-ui/react";
+import {
+  Spinner,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  Box,
+  Center,
+  IconButton,
+  Skeleton,
+  Text,
+} from "@chakra-ui/react";
 
 function UserList() {
   const [page, setPage] = useState(1);
@@ -30,12 +44,16 @@ function UserList() {
   } else {
     contentUser = data.data.map((user, index) => {
       return (
-        <Tbody key={index} height={10} bgColor="white" _hover={{ bg: "#EEEEEE" }}>
+        <Tbody
+          key={index}
+          height={10}
+          bgColor="white"
+          _hover={{ bg: "#EEEEEE" }}>
           <Tr>
-            <Td textAlign={"center"}>{user.id}</Td>
-            <Td textAlign={"center"}>{user.email}</Td>
-            <Td textAlign={"center"}>{user.names[0]?.name}</Td>
-            <Td textAlign={"center"}>{user.role}</Td>
+            <Td textAlign="center">{user.id}</Td>
+            <Td textAlign="center">{user.email}</Td>
+            <Td textAlign="center">{user.names[0]?.name}</Td>
+            <Td textAlign="center">{user.role}</Td>
           </Tr>
         </Tbody>
       );
@@ -50,7 +68,13 @@ function UserList() {
             <Tr>
               {tableHead.map((item, index) => {
                 return (
-                  <Th height={9} key={index} bg={"#009262"} textAlign={"center"} color="#FCFCFC" width={item.width}>
+                  <Th
+                    height={9}
+                    key={index}
+                    bg={"#009262"}
+                    textAlign={"center"}
+                    color="#FCFCFC"
+                    width={item.width}>
                     {item.name}
                   </Th>
                 );

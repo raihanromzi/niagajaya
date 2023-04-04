@@ -4,10 +4,21 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AdminLayout from "./components/AdminLayout";
 import RootLayout from "./components/RootLayout";
-import AdminProductCategoriesPage, { ProductCategoriesAction, ProductCategoriesLoader } from "./routes/admin/productCategories";
-import CreateProductCategoryPage, { CreateProductCategoryAction } from "./routes/admin/productCategories/add";
-import AdminProductsPage, { ProductsAction, ProductsLoader } from "./routes/admin/products";
-import CreateProductPage, { CreateProductLoader, CreateProductAction } from "./routes/admin/products/add";
+import AdminProductCategoriesPage, {
+  ProductCategoriesAction,
+  ProductCategoriesLoader,
+} from "./routes/admin/productCategories";
+import CreateProductCategoryPage, {
+  CreateProductCategoryAction,
+} from "./routes/admin/productCategories/add";
+import AdminProductsPage, {
+  ProductsAction,
+  ProductsLoader,
+} from "./routes/admin/products";
+import CreateProductPage, {
+  CreateProductLoader,
+  CreateProductAction,
+} from "./routes/admin/products/add";
 import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
 import IndexPage from "./routes/index";
 import LoginPage from "./routes/LoginPage";

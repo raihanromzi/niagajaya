@@ -1,15 +1,15 @@
-const prisma = require("../../../utils/client.cjs");
-const response = require("../../../utils/responses");
-const bcrypt = require("bcrypt");
+const prisma = require('../../../utils/client.cjs')
+const response = require('../../../utils/responses')
+const bcrypt = require('bcrypt')
 
 const authAdminController = {
   login: async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { email, password } = req.body
 
       // Check Email
       const user = await prisma.user.findFirst({
-        where: { email, OR: [{ role: "ADMIN" }, { role: "MANAGER" }] },
+        where: { email, OR: [{ role: 'ADMIN' }, { role: 'MANAGER' }] },
         select: {
           id: true,
           email: true,
@@ -18,27 +18,38 @@ const authAdminController = {
           imageUrl: true,
           token: true,
         },
-      });
+      })
       if (!user) {
-        res.status(400).send(response.responseError(400, "BAD REQUEST", { message: "Email Not Found!" }));
-        return;
+        res.status(400).send(
+          response.responseError(400, 'BAD REQUEST', {
+            message: 'Email Not Found!',
+          })
+        )
+        return
       }
 
       // Compare Password
-      const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
+      const isPasswordValid = await bcrypt.compare(
+        password,
+        user.hashedPassword
+      )
       if (!isPasswordValid) {
-        res.status(400).send(response.responseError(400, "BAD REQUEST", { message: "Email and Password Does Not Match!" }));
-        return;
+        res.status(400).send(
+          response.responseError(400, 'BAD REQUEST', {
+            message: 'Email and Password Does Not Match!',
+          })
+        )
+        return
       }
 
       // Create Session
-      const userx = { id: user.id };
-      req.session.user = userx;
+      const userx = { id: user.id }
+      req.session.user = userx
 
       res.status(200).send(
         response.responseSuccess(
           200,
-          "SUCCESS",
+          'SUCCESS',
           {},
           {
             id: user.id,
@@ -47,15 +58,15 @@ const authAdminController = {
             imageUrl: user.imageUrl,
           }
         )
-      );
-      return;
+      )
+      return
     } catch (e) {
-      console.log(e);
-      res.status(500).send(response.responseError(500, "SERVER_ERROR", `${e}`));
+      console.log(e)
+      res.status(500).send(response.responseError(500, 'SERVER_ERROR', `${e}`))
     }
   },
-};
+}
 
 module.exports = {
   authAdminController,
-};
+}

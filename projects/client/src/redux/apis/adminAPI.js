@@ -10,25 +10,31 @@ const adminAPI = createApi({
       getAllAdmin: builder.query({
         query: (page, limit) => {
           return {
-            url: `/admin?role=Admin&page=${page ? page : 1}&limit=${limit ? limit : 5}`,
+            url: `/admin?role=Admin&page=${page ? page : 1}&limit=${
+              limit ? limit : 5
+            }`,
             method: "GET",
           };
         },
         providesTags: ["Admin"],
       }),
       getAllManager: builder.query({
-        query: () => {
+        query: (page, limit) => {
           return {
-            url: "/admin?role=Manager",
+            url: `/admin?role=Manager&page=${page ? page : 1}&limit=${
+              limit ? limit : 5
+            }`,
             method: "GET",
           };
         },
         providesTags: ["Manager"],
       }),
       getAllUser: builder.query({
-        query: () => {
+        query: (page, limit) => {
           return {
-            url: "/admin?role=User",
+            url: `/admin?role=User&page=${page ? page : 1}&limit=${
+              limit ? limit : 5
+            }`,
             method: "GET",
           };
         },
@@ -75,5 +81,12 @@ const adminAPI = createApi({
   },
 });
 
-export const { useGetAllAdminQuery, useGetAllManagerQuery, useGetAllUserQuery, useCrateAdminMutation, useUpdateAdminMutation, useDeleteAdminMutation } = adminAPI;
+export const {
+  useGetAllAdminQuery,
+  useGetAllManagerQuery,
+  useGetAllUserQuery,
+  useCrateAdminMutation,
+  useUpdateAdminMutation,
+  useDeleteAdminMutation,
+} = adminAPI;
 export { adminAPI };

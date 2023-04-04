@@ -1,4 +1,4 @@
-const cleanObject = require("./cleanObject");
+const cleanObject = require('./cleanObject')
 
 const responseSuccess = (code, status, pagination, data) =>
   cleanObject({
@@ -6,13 +6,13 @@ const responseSuccess = (code, status, pagination, data) =>
     status,
     pagination,
     data,
-  });
+  })
 
 const responseError = (code, status, error) =>
   cleanObject({
     code,
     status,
     errors: error,
-  });
+  })
 
-module.exports = { responseSuccess, responseError };
+module.exports = { responseSuccess, responseError }

@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useGetAllManagerQuery } from "../redux/store";
-import { Spinner, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Flex, Box, Center, Input, InputGroup, InputRightElement, IconButton, Skeleton, Stack, Text } from "@chakra-ui/react";
+import {
+  Spinner,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  Box,
+  Center,
+  IconButton,
+  Skeleton,
+  Text,
+} from "@chakra-ui/react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 function ManagerList() {
@@ -13,11 +27,26 @@ function ManagerList() {
   }, [data]);
 
   const tableHead = [
-    { name: "Id", width: "5em" },
-    { name: "Email", width: "60em" },
-    { name: "Name", width: "40em" },
-    { name: "Role", width: "20em" },
-    { name: "Warehouse", width: "20em" },
+    {
+      name: "Id",
+      width: "5em",
+    },
+    {
+      name: "Email",
+      width: "60em",
+    },
+    {
+      name: "Name",
+      width: "40em",
+    },
+    {
+      name: "Role",
+      width: "20em",
+    },
+    {
+      name: "Warehouse",
+      width: "20em",
+    },
   ];
 
   let contentManager;
@@ -29,13 +58,21 @@ function ManagerList() {
   } else {
     contentManager = data.data.map((manager, index) => {
       return (
-        <Tbody height={10} bgColor="white" _hover={{ bg: "#EEEEEE" }}>
-          <Tr key={index}>
+        <Tbody
+          key={index}
+          height={10}
+          bgColor="white"
+          _hover={{
+            bg: "#EEEEEE",
+          }}>
+          <Tr>
             <Td textAlign={"center"}>{manager.id}</Td>
             <Td textAlign={"center"}>{manager.email}</Td>
             <Td textAlign={"center"}>{manager.names[0]?.name}</Td>
             <Td textAlign={"center"}>{manager.role}</Td>
-            <Td textAlign={"center"}>{manager.warehouse?.name || "Belum ada"}</Td>
+            <Td textAlign={"center"}>
+              {manager.warehouse?.name || "Belum ada"}
+            </Td>
           </Tr>
         </Tbody>
       );
@@ -50,14 +87,17 @@ function ManagerList() {
             <Tr>
               {tableHead.map((item, index) => {
                 return (
-                  <Th height={9} key={index} bg={"#009262"} textAlign={"center"} color="#FCFCFC" width={item.width}>
+                  <Th
+                    height={9}
+                    key={index}
+                    bg={"#009262"}
+                    textAlign={"center"}
+                    color="#FCFCFC"
+                    width={item.width}>
                     {item.name}
                   </Th>
                 );
               })}
-              {/* <Th bg={"#00ADB5"} textAlign={"center"} color={"white"} width={"200px"} borderY={"none"}>
-                Action
-              </Th> */}
             </Tr>
           </Thead>
           {data ? (

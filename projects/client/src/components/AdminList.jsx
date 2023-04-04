@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useGetAllAdminQuery, useDeleteAdminMutation } from "../redux/store";
-import { Spinner, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Flex, Box, Center, Input, InputGroup, InputRightElement, IconButton, Skeleton, Stack, Text } from "@chakra-ui/react";
+import {
+  Spinner,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  Flex,
+  Box,
+  Center,
+  IconButton,
+  Skeleton,
+  Text,
+} from "@chakra-ui/react";
 import Swal from "sweetalert2";
 import { FaTrash, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { EditAdmin } from "./EditAdmin";
@@ -28,7 +43,11 @@ function AdminList() {
       }).then((result) => {
         if (result.isConfirmed) {
           deleteAdmin(admin.id);
-          Swal.fire("Deleted!", `${admin.names[0].name} has been deleted`, "success");
+          Swal.fire(
+            "Deleted!",
+            `${admin.names[0].name} has been deleted`,
+            "success",
+          );
         }
       });
     } catch (err) {
@@ -56,14 +75,21 @@ function AdminList() {
   } else {
     contentAdmin = data.data.map((admin, index) => {
       return (
-        <Tbody key={index} height={10} bgColor="white" _hover={{ bg: "#EEEEEE" }}>
+        <Tbody
+          key={index}
+          height={10}
+          bgColor="white"
+          _hover={{ bg: "#EEEEEE" }}>
           <Tr>
             <Td textAlign={"center"}>{admin.id}</Td>
             <Td textAlign={"center"}>{admin.email}</Td>
             <Td textAlign={"center"}>{admin.names[0].name}</Td>
             <Td textAlign={"center"}>{admin.role}</Td>
             <Td>
-              <Flex gap={"20px"} justifyContent={"center"} alignItems={"center"}>
+              <Flex
+                gap={"20px"}
+                justifyContent={"center"}
+                alignItems={"center"}>
                 <EditAdmin admin={admin} />
                 <IconButton
                   onClick={() => {
@@ -93,12 +119,22 @@ function AdminList() {
             <Tr>
               {tableHead.map((item, index) => {
                 return (
-                  <Th height={9} key={index} bg={"#009262"} textAlign={"center"} color="#FCFCFC" width={item.width}>
+                  <Th
+                    height={9}
+                    key={index}
+                    bg={"#009262"}
+                    textAlign={"center"}
+                    color="#FCFCFC"
+                    width={item.width}>
                     {item.name}
                   </Th>
                 );
               })}
-              <Th bg={"#009262"} textAlign={"center"} color={"white"} width={"200px"}>
+              <Th
+                bg={"#009262"}
+                textAlign={"center"}
+                color={"white"}
+                width={"200px"}>
                 Action
               </Th>
             </Tr>

@@ -26,21 +26,8 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
-import {
-  FaChevronLeft,
-  FaChevronRight,
-  FaPen,
-  FaPlus,
-  FaSearch,
-} from "react-icons/fa";
-import {
-  Form,
-  Link as RouterLink,
-  useActionData,
-  useLoaderData,
-  useNavigation,
-  useSearchParams,
-} from "react-router-dom";
+import { FaChevronLeft, FaChevronRight, FaPen, FaPlus, FaSearch } from "react-icons/fa";
+import { Form, Link as RouterLink, useActionData, useLoaderData, useNavigation, useSearchParams } from "react-router-dom";
 import AdminProductsLayout from "../../../components/AdminProductsLayout";
 import FormGrid from "../../../components/FormGrid";
 import SortButton from "../../../components/SortButton";
@@ -49,10 +36,7 @@ import SortButton from "../../../components/SortButton";
 export const ProductCategoriesLoader = async ({ request }) => {
   try {
     const query = new URL(request.url).searchParams.toString();
-    const res = await axios.get(
-      `http://localhost:8000/api/v1/product-categories?${query}&take=10`,
-      { withCredentials: true }
-    );
+    const res = await axios.get(`http://localhost:8000/api/v1/product-categories?${query}&take=10`, { withCredentials: true });
     return res.data;
   } catch (err) {
     return err.response.data;
@@ -67,11 +51,7 @@ export const ProductCategoriesAction = async ({ request }) => {
     const newName = name !== formData.get("defaultName") && { name };
     const status = formData.get("status");
     const newStatus = status !== formData.get("defaultStatus") && { status };
-    const res = await axios.put(
-      `http://localhost:8000/api/v1/product-categories/${formData.get("id")}`,
-      { ...newName, ...newStatus },
-      { withCredentials: true }
-    );
+    const res = await axios.put(`http://localhost:8000/api/v1/product-categories/${formData.get("id")}`, { ...newName, ...newStatus }, { withCredentials: true });
     return res.data;
   } catch (err) {
     return err.response.data;
@@ -104,14 +84,7 @@ const ProductCategoriesPage = () => {
             }}
           />
         </InputGroup>
-        <Button
-          as={RouterLink}
-          to="add"
-          leftIcon={<FaPlus />}
-          fontSize="sm"
-          ml={2}
-          size="sm"
-        >
+        <Button as={RouterLink} to="add" leftIcon={<FaPlus />} fontSize="sm" ml={2} size="sm">
           Kategori Baru
         </Button>
       </Flex>
@@ -120,27 +93,15 @@ const ProductCategoriesPage = () => {
           <Thead bgColor="#009262">
             <Tr>
               <Th color="#FCFCFC" textAlign="center">
-                <SortButton
-                  sortState={[sort, setSort]}
-                  setSearchParams={setSearchParams}
-                  column="name"
-                />
+                <SortButton sortState={[sort, setSort]} setSearchParams={setSearchParams} column="name" />
                 Nama
               </Th>
               <Th color="#FCFCFC" textAlign="center">
-                <SortButton
-                  sortState={[sort, setSort]}
-                  setSearchParams={setSearchParams}
-                  column="products"
-                />
+                <SortButton sortState={[sort, setSort]} setSearchParams={setSearchParams} column="products" />
                 Produk
               </Th>
               <Th color="#FCFCFC" textAlign="center">
-                <SortButton
-                  sortState={[sort, setSort]}
-                  setSearchParams={setSearchParams}
-                  column="status"
-                />
+                <SortButton sortState={[sort, setSort]} setSearchParams={setSearchParams} column="status" />
                 Status
               </Th>
               <Th color="#FCFCFC" textAlign="center">
@@ -152,15 +113,9 @@ const ProductCategoriesPage = () => {
             {data?.productCategories?.map((productCategory, idx) => (
               <Tr key={idx}>
                 <Td textAlign="center">{productCategory.name}</Td>
-                <Td textAlign="center">
-                  {productCategory._count.products || "--"}
-                </Td>
+                <Td textAlign="center">{productCategory._count.products || "--"}</Td>
                 <Td textAlign="center" color="#FCFCFC">
-                  {productCategory.deletedAt ? (
-                    <Text bgColor="#88939E">Arsip</Text>
-                  ) : (
-                    <Text bgColor="#009262">Terbit</Text>
-                  )}
+                  {productCategory.deletedAt ? <Text bgColor="#88939E">Arsip</Text> : <Text bgColor="#009262">Terbit</Text>}
                 </Td>
                 <Td textAlign="center">
                   <IconButton
@@ -227,43 +182,16 @@ const ProductCategoriesPage = () => {
           <ModalBody>
             <Box as={Form} id="edit-form" method="put">
               <FormGrid actionData={actionData} entries={entries} />
-              <Input
-                name="id"
-                defaultValue={entries?.id}
-                display="none"
-                isReadOnly
-              />
-              <Input
-                name="defaultName"
-                defaultValue={entries?.name}
-                display="none"
-                isReadOnly
-              />
-              <Input
-                name="defaultStatus"
-                defaultValue={entries?.deletedAt ? "archived" : "published"}
-                display="none"
-                isReadOnly
-              />
+              <Input name="id" defaultValue={entries?.id} display="none" isReadOnly />
+              <Input name="defaultName" defaultValue={entries?.name} display="none" isReadOnly />
+              <Input name="defaultStatus" defaultValue={entries?.deletedAt ? "archived" : "published"} display="none" isReadOnly />
             </Box>
           </ModalBody>
           <ModalFooter>
-            <Button
-              variant="outline"
-              color="#009262"
-              borderColor="#009262"
-              mr={5}
-              onClick={onClose}
-            >
+            <Button variant="outline" color="#009262" borderColor="#009262" mr={5} onClick={onClose}>
               Batal
             </Button>
-            <Button
-              type="submit"
-              form="edit-form"
-              isLoading={navigation.state === "loading"}
-              bgColor="#009262"
-              color="white"
-            >
+            <Button type="submit" form="edit-form" isLoading={navigation.state === "loading"} bgColor="#009262" color="white">
               Simpan Perubahan
             </Button>
           </ModalFooter>
