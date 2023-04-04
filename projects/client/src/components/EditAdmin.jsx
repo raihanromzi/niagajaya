@@ -3,15 +3,15 @@ import { Formik, ErrorMessage, Form, Field } from "formik";
 import * as Yup from "yup";
 import { Box, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, useDisclosure, FormControl, FormLabel, Input, IconButton, Center } from "@chakra-ui/react";
 import Swal from "sweetalert2";
-import { BsFillGearFill } from "react-icons/bs";
 import { RxCheck, RxCross1 } from "react-icons/rx";
+import { FaPen } from "react-icons/fa";
 
 export const EditAdmin = ({ admin, getUsers }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <Box>
-      <IconButton icon={<BsFillGearFill />} bg={"none"} onClick={onOpen} />
+      <IconButton icon={<FaPen />} aria-label="edit product category" size="sm" onClick={onOpen} />
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>

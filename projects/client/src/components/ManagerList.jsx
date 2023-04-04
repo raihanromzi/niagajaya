@@ -6,11 +6,11 @@ function ManagerList() {
   const { data, isError, isLoading } = useGetAllManagerQuery();
 
   const tableHead = [
-    { name: "Id", origin: "id", width: "5em" },
-    { name: "Email", origin: "email", width: "60em" },
-    { name: "Name", origin: "name", width: "40em" },
-    { name: "Role", origin: "role", width: "20em" },
-    { name: "Warehouse", origin: "warehouse", width: "20em" },
+    { name: "Id", width: "5em" },
+    { name: "Email", width: "60em" },
+    { name: "Name", width: "40em" },
+    { name: "Role", width: "20em" },
+    { name: "Warehouse", width: "20em" },
   ];
 
   let contentManager;
@@ -22,8 +22,8 @@ function ManagerList() {
   } else {
     contentManager = data.data.map((manager, index) => {
       return (
-        <Tbody key={index} bg={"#EEEEEE"} _hover={{ bg: "#d6d6d6" }}>
-          <Tr>
+        <Tbody height={10} bgColor="white" _hover={{ bg: "#EEEEEE" }}>
+          <Tr key={index}>
             <Td textAlign={"center"}>{manager.id}</Td>
             <Td textAlign={"center"}>{manager.email}</Td>
             <Td textAlign={"center"}>{manager.names[0]?.name}</Td>
@@ -37,18 +37,14 @@ function ManagerList() {
 
   return (
     <Box>
-      <TableContainer borderRadius={"4px"}>
-        <Table>
+      <TableContainer mb={5} mt={0} ml={-4}>
+        <Table border="solid 1px #EBEBEB" size="sm">
           <Thead>
             <Tr>
               {tableHead.map((item, index) => {
                 return (
-                  <Th key={index} bg={"#00ADB5"} textAlign={"center"} color={"white"} width={item.width} borderY={"none"}>
-                    <Center>
-                      <Flex gap={"5px"}>
-                        <Center>{item.name}</Center>
-                      </Flex>
-                    </Center>
+                  <Th height={9} key={index} bg={"#009262"} textAlign={"center"} color="#FCFCFC" width={item.width}>
+                    {item.name}
                   </Th>
                 );
               })}
@@ -66,10 +62,14 @@ function ManagerList() {
                   return (
                     <Td key={index}>
                       <Skeleton h={"10px"} />
+                      <Skeleton h={"10px"} />
+                      <Skeleton h={"10px"} />
                     </Td>
                   );
                 })}
                 <Td>
+                  <Skeleton h={"10px"} />
+                  <Skeleton h={"10px"} />
                   <Skeleton h={"10px"} />
                 </Td>
               </Tr>

@@ -3,15 +3,15 @@ import * as Yup from "yup";
 import { useCrateAdminMutation } from "../redux/store";
 import { Button, Box, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, useDisclosure, FormControl, FormLabel, Input, IconButton, Center } from "@chakra-ui/react";
 import Swal from "sweetalert2";
-import { GrAdd } from "react-icons/gr";
 import { RxCheck, RxCross1 } from "react-icons/rx";
+import { FaPlus } from "react-icons/fa";
 
 export const AddAdmin = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <Box>
-      <Button leftIcon={<GrAdd />} colorScheme="teal" variant="outline" onClick={onOpen}>
+      <Button onClick={onOpen} to="add" leftIcon={<FaPlus />} fontSize="sm" ml={2} size="sm">
         Add Admin
       </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
