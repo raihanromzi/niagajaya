@@ -8,9 +8,9 @@ const adminAPI = createApi({
   endpoints(builder) {
     return {
       getAllAdmin: builder.query({
-        query: () => {
+        query: (page, limit) => {
           return {
-            url: "/admin?role=Admin",
+            url: `/admin?role=Admin&page=${page ? page : 1}&limit=${limit ? limit : 5}`,
             method: "GET",
           };
         },

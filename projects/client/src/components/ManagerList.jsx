@@ -1,9 +1,16 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useGetAllManagerQuery } from "../redux/store";
 import { Spinner, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Flex, Box, Center, Input, InputGroup, InputRightElement, IconButton, Skeleton, Stack, Text } from "@chakra-ui/react";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 function ManagerList() {
-  const { data, isError, isLoading } = useGetAllManagerQuery();
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const { data, isError, isLoading } = useGetAllManagerQuery(page);
+
+  useEffect(() => {
+    setTotalPages(data?.pagination?.total_page);
+  }, [data]);
 
   const tableHead = [
     { name: "Id", width: "5em" },
@@ -78,31 +85,31 @@ function ManagerList() {
         </Table>
       </TableContainer>
       {/* Pagination */}
-      {/* <Center paddingY={"10px"}>
-        {pagination <= 0 ? (
-          <IconButton icon={<SlArrowLeft />} disabled />
+      <Center paddingY={"10px"}>
+        {page <= 1 ? (
+          <IconButton icon={<FaChevronLeft />} disabled />
         ) : (
           <IconButton
             onClick={() => {
-              setPagination(pagination - 1);
+              setPage(page - 1);
             }}
-            icon={<SlArrowLeft />}
+            icon={<FaChevronLeft />}
           />
         )}
         <Text paddingX={"10px"}>
-          {pagination + 1} of {pages}
+          {page} of {totalPages ? 0 : 1}
         </Text>
-        {pagination < pages - 1 ? (
+        {page < totalPages ? (
           <IconButton
-            icon={<SlArrowRight />}
+            icon={<FaChevronRight />}
             onClick={() => {
-              setPagination(pagination + 1);
+              setPage(page + 1);
             }}
           />
         ) : (
-          <IconButton icon={<SlArrowRight />} disabled />
+          <IconButton icon={<FaChevronRight />} disabled />
         )}
-      </Center> */}
+      </Center>
     </Box>
   );
 }

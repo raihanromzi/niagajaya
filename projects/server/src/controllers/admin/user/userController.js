@@ -36,7 +36,6 @@ const getAllUsers = async (req, res) => {
       orderBy,
       where: {
         role: role.toUpperCase(),
-        OR: [{ email: { contains: name } }, { names: { some: { name: { contains: name } } } }],
       },
       select: {
         id: true,
@@ -63,6 +62,7 @@ const getAllUsers = async (req, res) => {
     });
     const totalPage = Math.ceil(resultCount / limit);
 
+    console.log(users);
     return res.status(200).send(response.responseSuccess(200, "SUCCESS", { current_page: page, total_page: totalPage, totalData: resultCount }, users));
   } catch (e) {
     // console.log(e);

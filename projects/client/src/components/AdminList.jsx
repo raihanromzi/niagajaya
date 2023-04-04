@@ -1,14 +1,20 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useGetAllAdminQuery, useDeleteAdminMutation } from "../redux/store";
 import { Spinner, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Flex, Box, Center, Input, InputGroup, InputRightElement, IconButton, Skeleton, Stack, Text } from "@chakra-ui/react";
 import Swal from "sweetalert2";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { EditAdmin } from "./EditAdmin";
 import { AddAdmin } from "./AddAdmin";
 
 function AdminList() {
-  const { data, isError, isLoading } = useGetAllAdminQuery();
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const { data, isError, isLoading } = useGetAllAdminQuery(page);
   const [deleteAdmin] = useDeleteAdminMutation();
+
+  useEffect(() => {
+    setTotalPages(data?.pagination?.total_page);
+  }, [data]);
 
   const deleteWarning = async (admin) => {
     try {
@@ -50,8 +56,8 @@ function AdminList() {
   } else {
     contentAdmin = data.data.map((admin, index) => {
       return (
-        <Tbody height={10} bgColor="white" _hover={{ bg: "#EEEEEE" }}>
-          <Tr key={index}>
+        <Tbody key={index} height={10} bgColor="white" _hover={{ bg: "#EEEEEE" }}>
+          <Tr>
             <Td textAlign={"center"}>{admin.id}</Td>
             <Td textAlign={"center"}>{admin.email}</Td>
             <Td textAlign={"center"}>{admin.names[0].name}</Td>
@@ -122,31 +128,31 @@ function AdminList() {
         </Table>
       </TableContainer>
       {/* Pagination */}
-      {/* <Center paddingY={"10px"}>
-        {pagination <= 0 ? (
-          <IconButton icon={<SlArrowLeft />} disabled />
+      <Center paddingY={"10px"}>
+        {page <= 1 ? (
+          <IconButton icon={<FaChevronLeft />} disabled />
         ) : (
           <IconButton
             onClick={() => {
-              setPagination(pagination - 1);
+              setPage(page - 1);
             }}
-            icon={<SlArrowLeft />}
+            icon={<FaChevronLeft />}
           />
         )}
         <Text paddingX={"10px"}>
-          {pagination + 1} of {pages}
+          {page} of {totalPages}
         </Text>
-        {pagination < pages - 1 ? (
+        {page < totalPages ? (
           <IconButton
-            icon={<SlArrowRight />}
+            icon={<FaChevronRight />}
             onClick={() => {
-              setPagination(pagination + 1);
+              setPage(page + 1);
             }}
           />
         ) : (
-          <IconButton icon={<SlArrowRight />} disabled />
+          <IconButton icon={<FaChevronRight />} disabled />
         )}
-      </Center> */}
+      </Center>
     </Box>
   );
 }
