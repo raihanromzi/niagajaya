@@ -31,8 +31,11 @@ const AdminLoginPage = () => {
         .post("/api/admin/login", formik.values, { withCredentials: true })
         .then((res) => {
           if (res.status === 200) {
+            console.log("====================================");
+            console.log(res);
+            console.log("====================================");
             dispatch({
-              type: user_types.ADMIN_LOGIN,
+              type: user_types.USER_LOGIN,
               payload: res.data.data,
             });
             const lastPath = localStorage.getItem("lastPath");

@@ -9,6 +9,12 @@ function PageProtected({ children, needLogin = false, guestOnly = false, adminOn
   const userSelector = useSelector((state) => state.auth);
 
   useEffect(() => {
+    if (needLogin && adminOnly && !userSelector?.id) {
+      localStorage.setItem("lastPath", location.pathname);
+      return navigate("/admin/login", {
+        replace: true,
+      });
+    }
     if (needLogin && !userSelector?.id) {
       localStorage.setItem("lastPath", location.pathname);
       return navigate("/", {

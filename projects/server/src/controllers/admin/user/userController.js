@@ -7,7 +7,7 @@ const getAllUsers = async (req, res) => {
   try {
     const { role } = req.query;
     let { page = 1, limit = 10 } = req.query;
-    let skip = (page - 1) * limit;
+    const skip = (page - 1) * limit;
 
     if (!req.session.id) {
       return res.status(400).send(response.responseError(401, "UNAUTHORIZED", "NEED TO LOGIN"));
@@ -49,7 +49,7 @@ const getAllUsers = async (req, res) => {
 
     return res.status(200).send(response.responseSuccess(200, "SUCCESS", { current_page: page, total_page: totalPage, totalData: resultCount }, users));
   } catch (e) {
-    console.log(e);
+    // console.log(e);
     return res.status(500).send(response.responseError(500, "SERVER_ERROR", { message: e }));
   }
 };
@@ -66,7 +66,7 @@ const createAdmin = async (req, res) => {
 
     const users = await prisma.user.findMany({
       where: {
-        email: email,
+        email,
       },
     });
 
@@ -80,7 +80,7 @@ const createAdmin = async (req, res) => {
 
     res.status(201).send(response.responseSuccess(201, "CREATED", { email: newAdmin.email, name: newAdmin.name, role: newAdmin.role, image: newAdmin.imageUrl }));
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(500).send(response.responseError(500, "SERVER_ERROR", "PLEASE TRY AGAIN"));
     return;
   }
@@ -121,7 +121,7 @@ const updateAdmin = async (req, res) => {
     res.status(200).send(response.responseSuccess(200, "SUCCESS", { email: updatedAdmin.email, role: updatedAdmin.role, image: updatedAdmin.imageUrl }));
     return;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(500).send(response.responseError(500, "SERVER_ERROR", "PLEASE TRY AGAIN"));
     return;
   }
@@ -149,7 +149,7 @@ const deleteAdmin = async (req, res) => {
       return;
     }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(500).send(response.responseError(500, "SERVER_ERROR", "PLEASE TRY AGAIN"));
     return;
   }

@@ -4,21 +4,10 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AdminLayout from "./components/AdminLayout";
 import RootLayout from "./components/RootLayout";
-import AdminProductCategoriesPage, {
-  ProductCategoriesAction,
-  ProductCategoriesLoader,
-} from "./routes/admin/productCategories";
-import CreateProductCategoryPage, {
-  CreateProductCategoryAction,
-} from "./routes/admin/productCategories/add";
-import AdminProductsPage, {
-  ProductsAction,
-  ProductsLoader,
-} from "./routes/admin/products";
-import CreateProductPage, {
-  CreateProductLoader,
-  CreateProductAction,
-} from "./routes/admin/products/add";
+import AdminProductCategoriesPage, { ProductCategoriesAction, ProductCategoriesLoader } from "./routes/admin/productCategories";
+import CreateProductCategoryPage, { CreateProductCategoryAction } from "./routes/admin/productCategories/add";
+import AdminProductsPage, { ProductsAction, ProductsLoader } from "./routes/admin/products";
+import CreateProductPage, { CreateProductLoader, CreateProductAction } from "./routes/admin/products/add";
 import ChangeEmailPage, { changeEmailAction } from "./routes/changeEmail";
 import IndexPage from "./routes/index";
 import LoginPage from "./routes/LoginPage";
@@ -31,6 +20,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import AuthProvider from "./hoc/authProvider";
 import rootReducer from "./redux/store";
+import { adminAPI } from "./redux/apis/adminAPI";
 
 import "leaflet/dist/leaflet.css";
 
@@ -45,6 +35,8 @@ import AddressCreatePage from "./routes/addressCreate";
 import AddressUpdatePage from "./routes/addressUpdate";
 import PageProtected from "./routes/protected";
 import CartPage from "./routes/cart";
+import AdminLoginPage from "./routes/admin/AdminLoginPage";
+import AdminManagement from "./routes/admin/AdminManagement";
 
 const router = createBrowserRouter([
   {
@@ -77,6 +69,10 @@ const router = createBrowserRouter([
       {
         path: "login",
         Component: LoginPage,
+      },
+      {
+        path: "/admin/login",
+        Component: AdminLoginPage,
       },
       {
         path: "reset-password/email",
@@ -144,6 +140,7 @@ const router = createBrowserRouter([
     path: "admin",
     Component: AdminLayout,
     children: [
+      { path: "management", Component: AdminManagement },
       {
         path: "product-categories",
         children: [
@@ -181,7 +178,12 @@ const router = createBrowserRouter([
   },
 ]);
 
-const store = configureStore({ reducer: rootReducer });
+const store = configureStore({
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) => {
+    return getDefaultMiddleware().concat(adminAPI.middleware);
+  },
+});
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

@@ -46,11 +46,10 @@ app.use("/categories", routes.categoryRoute);
 
 app.use("/api/v1/auth", require("./routes/auth.cjs"));
 app.use("/api/v1/users", require("./routes/users.cjs"));
-app.use(
-  "/api/v1/product-categories",
-  require("./routes/productCategories.cjs")
-);
+app.use("/api/v1/product-categories", require("./routes/productCategories.cjs"));
 app.use("/api/v1/products", require("./routes/products.cjs"));
+app.use("/api", routes.adminAuthRoute);
+app.use("/api", routes.userRouter);
 
 app.listen(port, () => {
   console.log(`APP RUNNING at ${port} ✅`);
