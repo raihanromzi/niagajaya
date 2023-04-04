@@ -17,9 +17,8 @@ function AdminList() {
         text: "You won't be able to revert this!",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
+        confirmButtonColor: "#009262",
+        confirmButtonText: "Ya Hapus",
       }).then((result) => {
         if (result.isConfirmed) {
           deleteAdmin(admin.id);
