@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const getAllUsers = async (req, res) => {
   try {
     const { role } = req.query;
-    let { page = 1, limit = 10 } = req.query;
+    let { name, sortBy, page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
 
     if (!req.session.id) {
@@ -17,11 +17,26 @@ const getAllUsers = async (req, res) => {
       return res.status(400).send(response.responseError(400, "BAD_REQUEST", "ADD ROLE QUERY"));
     }
 
+    let orderBy;
+    switch (sortBy) {
+      case "latest":
+        orderBy = { updatedAt: "desc" };
+        break;
+      case "oldest":
+        orderBy = { updatedAt: "asc" };
+        break;
+      default:
+        orderBy = { updatedAt: "desc" };
+        break;
+    }
+
     const users = await prisma.user.findMany({
       take: parseInt(limit),
       skip,
+      orderBy,
       where: {
         role: role.toUpperCase(),
+        OR: [{ email: { contains: name } }, { names: { some: { name: { contains: name } } } }],
       },
       select: {
         id: true,
@@ -43,6 +58,7 @@ const getAllUsers = async (req, res) => {
     const resultCount = await prisma.user.count({
       where: {
         role: role.toUpperCase(),
+        OR: [{ email: { contains: name } }, { names: { some: { name: { contains: name } } } }],
       },
     });
     const totalPage = Math.ceil(resultCount / limit);
