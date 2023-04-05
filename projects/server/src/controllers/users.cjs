@@ -17,6 +17,8 @@ module.exports = {
           imageUrl: true,
           email: true,
           names: { orderBy: { updatedAt: "desc" }, take: 1 },
+          addresses: true,
+          primaryAddress: { select: { addressId: true } },
         },
       });
       if (user) {

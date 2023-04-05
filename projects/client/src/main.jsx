@@ -26,6 +26,7 @@ import RegisterPage, { registerAction } from "./routes/register";
 import SetPasswordPage, { setPasswordAction } from "./routes/setPassword";
 import ResetPasswordEmail from "./routes/setPasswordEmail";
 import SettingsPage from "./routes/settings";
+import CheckoutPage from "./routes/checkout";
 
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
@@ -138,6 +139,7 @@ const router = createBrowserRouter([
           </PageProtected>
         ),
       },
+      { path: "checkout", Component: CheckoutPage },
     ],
   },
   {

@@ -182,6 +182,7 @@ model Order {
   status            OrderStatus
   userAddressFull   String
   shipmentMethod    ShipmentMethod
+  shipmentPrice     Int
   paymentImageUrl   String?
 
   createdAt         DateTime          @default(now())

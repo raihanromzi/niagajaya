@@ -60,7 +60,7 @@ export const ProductsLoader = async ({ request }) => {
   try {
     const query = new URL(request.url).searchParams.toString();
     const res = await axios.get(
-      `http://localhost:8000/api/v1/products?${query}`,
+      `http://localhost:8000/api/v1/products?${query}&take=10`,
       { withCredentials: true }
     );
     return res.data;

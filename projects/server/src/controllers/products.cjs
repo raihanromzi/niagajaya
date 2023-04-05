@@ -6,28 +6,50 @@ const prisma = require("../utils/client.cjs");
 module.exports = {
   getProducts: async (req, res) => {
     try {
-      const { search = "", column, method, page = 0 } = { ...req.query };
+      const {
+        search = "",
+        column,
+        method,
+        take,
+        page = 0,
+        cart,
+      } = { ...req.query };
 
       const filter = { where: { name: { contains: search } } };
 
       const products = await prisma.product.findMany({
-        include: { category: { select: { name: true } } },
+        ...(take && { include: { category: { select: { name: true } } } }),
         ...filter,
+        ...(cart && {
+          where: { OR: cart.split(",").map((id) => ({ id: +id })) },
+        }),
         orderBy: {
           ...(column === "name" && { name: method }),
           ...(column === "category" && { categoryId: method }),
           ...(column === "status" && { deletedAt: method }),
         },
-        take: 10,
+        ...(!take && {
+          select: {
+            id: true,
+            name: true,
+            imageUrl: true,
+            priceRupiahPerUnit: true,
+          },
+        }),
+        ...(take && { take: +take }),
         skip: +page * 10,
       });
-
-      const count = await prisma.product.count({ ...filter });
 
       res.json({
         success: true,
         products,
-        pages: [...new Array(Math.ceil(count / 10)).keys()],
+        ...(take && {
+          pages: [
+            ...new Array(
+              Math.ceil((await prisma.product.count({ ...filter })) / 10)
+            ).keys(),
+          ],
+        }),
       });
     } catch (err) {
       res.status(400).json({ success: false, errors: { unknown: err } });

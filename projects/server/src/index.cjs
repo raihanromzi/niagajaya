@@ -33,9 +33,10 @@ app.use(
     },
   })
 );
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static("./public", { index: false }));
+app
+  .use(express.json())
+  .use(express.urlencoded({ extended: true }))
+  .use(express.static("./public", { index: false }));
 
 const routes = require("./routes/index.cjs");
 app.use("/auth", routes.authRoute);
@@ -44,13 +45,13 @@ app.use("/warehouses", routes.warehousesRoute);
 app.use("/products", routes.productRoute);
 app.use("/categories", routes.categoryRoute);
 
-app.use("/api/v1/auth", require("./routes/auth.cjs"));
-app.use("/api/v1/users", require("./routes/users.cjs"));
-app.use(
-  "/api/v1/product-categories",
-  require("./routes/productCategories.cjs")
-);
-app.use("/api/v1/products", require("./routes/products.cjs"));
+app
+  .use("/api/v1/auth", require("./routes/auth.cjs"))
+  .use("/api/v1/users", require("./routes/users.cjs"))
+  .use("/api/v1/product-categories", require("./routes/productCategories.cjs"))
+  .use("/api/v1/products", require("./routes/products.cjs"))
+  .use("/api/v1/orders", require("./routes/orders.cjs"))
+  .use("/api/v1/checkout", require("./routes/checkout.cjs"));
 
 app.listen(port, () => {
   console.log(`APP RUNNING at ${port} ✅`);
