@@ -8,35 +8,32 @@ const adminAPI = createApi({
   endpoints(builder) {
     return {
       getAllAdmin: builder.query({
-        query: (page, limit) => {
-          return {
-            url: `/admin?role=Admin&page=${page ? page : 1}&limit=${
-              limit ? limit : 5
-            }`,
-            method: "GET",
-          };
+        async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+          return await fetchWithBQ(
+            `/admin?role=Admin&page=${_arg.page ? _arg.page : 1}&limit=${
+              _arg.limit ? _arg.limit : 5
+            }&name=${_arg.search[0] ? _arg.search[0] : ""}`,
+          );
         },
-        providesTags: ["Admin"],
       }),
+
       getAllManager: builder.query({
-        query: (page, limit) => {
-          return {
-            url: `/admin?role=Manager&page=${page ? page : 1}&limit=${
-              limit ? limit : 5
-            }`,
-            method: "GET",
-          };
+        async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+          return await fetchWithBQ(
+            `/admin?role=Manager&page=${_arg.page ? _arg.page : 1}&limit=${
+              _arg.limit ? _arg.limit : 5
+            }&name=${_arg.search[0] ? _arg.search[0] : ""}`,
+          );
         },
         providesTags: ["Manager"],
       }),
       getAllUser: builder.query({
-        query: (page, limit) => {
-          return {
-            url: `/admin?role=User&page=${page ? page : 1}&limit=${
-              limit ? limit : 5
-            }`,
-            method: "GET",
-          };
+        async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+          return await fetchWithBQ(
+            `/admin?role=User&page=${_arg.page ? _arg.page : 1}&limit=${
+              _arg.limit ? _arg.limit : 5
+            }&name=${_arg.search[0] ? _arg.search[0] : ""}`,
+          );
         },
         providesTags: ["User"],
       }),

@@ -15,16 +15,32 @@ import {
   IconButton,
   Skeleton,
   Text,
+  InputLeftElement,
+  Input,
+  InputGroup,
+  Icon,
 } from "@chakra-ui/react";
 import Swal from "sweetalert2";
-import { FaTrash, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import {
+  FaTrash,
+  FaChevronLeft,
+  FaChevronRight,
+  FaSearch,
+} from "react-icons/fa";
 import { EditAdmin } from "./EditAdmin";
 import { AddAdmin } from "./AddAdmin";
+import { useSearchParams } from "react-router-dom";
 
 function AdminList() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const { data, isError, isLoading } = useGetAllAdminQuery(page);
+  const [limit, setLimit] = useState(5);
+  const { data, isError, isLoading } = useGetAllAdminQuery({
+    page,
+    limit,
+    search: searchParams.getAll("name"),
+  });
   const [deleteAdmin] = useDeleteAdminMutation();
 
   useEffect(() => {
@@ -112,6 +128,20 @@ function AdminList() {
     <Box>
       <TableContainer mb={5} mt={-12} ml={-4}>
         <Flex justifyContent={"flex-end"} mb={4}>
+          <InputGroup w={48} size="sm">
+            <InputLeftElement pointerEvents="none">
+              <Icon as={FaSearch} />
+            </InputLeftElement>
+            <Input
+              placeholder="Cari"
+              onBlur={(e) => {
+                setSearchParams((val) => {
+                  val.set("name", e.target.value);
+                  return val;
+                });
+              }}
+            />
+          </InputGroup>
           <AddAdmin />
         </Flex>
         <Table border="solid 1px #EBEBEB" size="sm">
@@ -176,7 +206,7 @@ function AdminList() {
           />
         )}
         <Text paddingX={"10px"}>
-          {page} of {totalPages}
+          {page} of {totalPages ? totalPages : 1}
         </Text>
         {page < totalPages ? (
           <IconButton

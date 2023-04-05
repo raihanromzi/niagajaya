@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useGetAllUserQuery } from "../redux/store";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaSearch } from "react-icons/fa";
+import { useSearchParams } from "react-router-dom";
 
 import {
   Spinner,
@@ -16,13 +17,24 @@ import {
   IconButton,
   Skeleton,
   Text,
+  Flex,
+  InputGroup,
+  InputLeftElement,
+  Icon,
+  Input,
 } from "@chakra-ui/react";
 
 function UserList() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [limit, setLimit] = useState(5);
 
-  const { data, isError, isLoading } = useGetAllUserQuery(page);
+  const { data, isError, isLoading } = useGetAllUserQuery({
+    page,
+    limit,
+    search: searchParams.getAll("name"),
+  });
 
   useEffect(() => {
     setTotalPages(data?.pagination?.total_page);
@@ -62,7 +74,23 @@ function UserList() {
 
   return (
     <Box>
-      <TableContainer mb={5} mt={0} ml={-4}>
+      <TableContainer mb={5} mt={-12} ml={-4}>
+        <Flex justifyContent={"flex-end"} mb={4}>
+          <InputGroup w={48} size="sm">
+            <InputLeftElement pointerEvents="none">
+              <Icon as={FaSearch} />
+            </InputLeftElement>
+            <Input
+              placeholder="Cari"
+              onBlur={(e) => {
+                setSearchParams((val) => {
+                  val.set("name", e.target.value);
+                  return val;
+                });
+              }}
+            />
+          </InputGroup>
+        </Flex>
         <Table border="solid 1px #EBEBEB" size="sm">
           <Thead>
             <Tr>
@@ -118,7 +146,7 @@ function UserList() {
           />
         )}
         <Text paddingX={"10px"}>
-          {page} of {totalPages ? 0 : 1}
+          {page} of {totalPages ? totalPages : 0}
         </Text>
         {page < totalPages ? (
           <IconButton
