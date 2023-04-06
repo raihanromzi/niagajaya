@@ -5,7 +5,7 @@ const CategoryCardUser = ({ category, hue, saturation, lightness }) => {
   const navigate = useNavigate();
   const color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 
-  const clickHandler = async () => {
+  const clickHandler = () => {
     navigate(`/products?categoryId=${category.id}`);
   };
 
@@ -18,10 +18,6 @@ const CategoryCardUser = ({ category, hue, saturation, lightness }) => {
       boxShadow="md"
       p={4}
       onClick={clickHandler}
-      //   _hover={{
-      //     backgroundColor: "#009262",
-      //     textColor: "white",
-      //   }}
     >
       <Flex h="100%" alignItems="center" justifyContent="center">
         <Center>
