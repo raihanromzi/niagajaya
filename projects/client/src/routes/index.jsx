@@ -1,6 +1,7 @@
 import { useToast } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import Carousel from "../components/Carousel";
 
 const IndexPage = () => {
   const userSelector = useSelector((state) => state.auth);
@@ -19,7 +20,7 @@ const IndexPage = () => {
   }, []);
   return (
     <>
-      <></>
+      <Carousel />
     </>
   );
 };
