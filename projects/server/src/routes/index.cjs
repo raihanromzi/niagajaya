@@ -5,6 +5,7 @@ const productRoute = require('./product.cjs')
 const categoryRoute = require('./category.cjs')
 const userRouter = require('./admin/userRouter')
 const adminAuthRoute = require('./admin/authRouter')
+const stockRoute = require('./stockRoute')
 
 module.exports = {
   authRoute,
@@ -14,4 +15,5 @@ module.exports = {
   categoryRoute,
   userRouter,
   adminAuthRoute,
+  stockRoute,
 }

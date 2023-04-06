@@ -48,6 +48,9 @@ import PageProtected from "./routes/protected";
 import CartPage from "./routes/cart";
 import AdminLoginPage from "./routes/admin/AdminLoginPage";
 import AdminManagement from "./routes/admin/AdminManagement";
+import StockManagement from "./routes/admin/stockManagement/StockManagement";
+import { warehousesApi } from "./redux/apis/warehousesAPI";
+import StockDetail from "./routes/admin/stockManagement/StockDetail";
 
 const router = createBrowserRouter([
   {
@@ -185,6 +188,8 @@ const router = createBrowserRouter([
           },
         ],
       },
+      { path: "stock-management", Component: StockManagement },
+      { path: "stock-management/warehouse/:id", Component: StockDetail },
     ],
   },
 ]);
@@ -192,7 +197,9 @@ const router = createBrowserRouter([
 const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) => {
-    return getDefaultMiddleware().concat(adminAPI.middleware);
+    return getDefaultMiddleware()
+      .concat(adminAPI.middleware)
+      .concat(warehousesApi.middleware);
   },
 });
 
@@ -205,5 +212,5 @@ createRoot(document.getElementById("root")).render(
         </AuthProvider>
       </ChakraProvider>
     </Provider>
-  </StrictMode>
+  </StrictMode>,
 );

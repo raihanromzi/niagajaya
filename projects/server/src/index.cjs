@@ -14,24 +14,24 @@ const app = express()
 
 // app.set("trust proxy", 1)
 app.use(
-    cors({
-        origin: 'http://localhost:5173',
-        credentials: true,
-    })
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
 )
 app.use(
-    session({
-        // store: redisStore,
-        resave: false,
-        saveUninitialized: false,
-        secret: process.env.SECRET_KEY_SESSION,
-        cookie: {
-            maxAge: 31536000000, // 365 days
-            httpOnly: true,
-            sameSite: 'lax',
-            secure: 'auto',
-        },
-    })
+  session({
+    // store: redisStore,
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.SECRET_KEY_SESSION,
+    cookie: {
+      maxAge: 31536000000, // 365 days
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: 'auto',
+    },
+  })
 )
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -50,7 +50,8 @@ app.use('/api/v1/product-categories', require('./routes/productCategories.cjs'))
 app.use('/api/v1/products', require('./routes/products.cjs'))
 app.use('/api', routes.adminAuthRoute)
 app.use('/api', routes.userRouter)
+app.use('/api', routes.stockRoute)
 
 app.listen(port, () => {
-    console.log(`APP RUNNING at ${port} ✅`)
+  console.log(`APP RUNNING at ${port} ✅`)
 })

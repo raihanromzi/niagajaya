@@ -15,6 +15,7 @@ const adminAPI = createApi({
             }&name=${_arg.search[0] ? _arg.search[0] : ""}`,
           );
         },
+        providesTags: ["Admin"],
       }),
 
       getAllManager: builder.query({

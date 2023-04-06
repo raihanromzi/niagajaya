@@ -31,7 +31,6 @@ function ManagerList() {
   const [totalPages, setTotalPages] = useState(1);
   const { data, isError, isLoading } = useGetAllManagerQuery({
     page,
-    limit,
     search: searchParams.getAll("name"),
   });
 
@@ -67,7 +66,7 @@ function ManagerList() {
   if (isLoading) {
     contentManager = <Spinner />;
   } else if (isError) {
-    contentManager = <div>Error loading albums.</div>;
+    contentManager = <div>Error loading Content.</div>;
   } else {
     contentManager = data.data.map((manager, index) => {
       return (
