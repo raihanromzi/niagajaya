@@ -46,6 +46,7 @@ import AddressCreatePage from "./routes/addressCreate";
 import AddressUpdatePage from "./routes/addressUpdate";
 import PageProtected from "./routes/protected";
 import CartPage from "./routes/cart";
+import AdminOrdersPage from "./routes/admin/orders";
 
 const router = createBrowserRouter([
   {
@@ -176,6 +177,19 @@ const router = createBrowserRouter([
             Component: CreateProductPage,
             loader: CreateProductLoader,
             action: CreateProductAction,
+          },
+        ],
+      },
+      {
+        path: "orders",
+        children: [
+          {
+            index: true,
+            Component: () => (
+              <PageProtected needLogin={true} exceptUser={true}>
+                <AdminOrdersPage />
+              </PageProtected>
+            ),
           },
         ],
       },

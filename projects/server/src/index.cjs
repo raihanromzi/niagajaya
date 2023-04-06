@@ -44,6 +44,7 @@ app.use("/address", routes.addressRoute);
 app.use("/warehouses", routes.warehousesRoute);
 app.use("/products", routes.productRoute);
 app.use("/categories", routes.categoryRoute);
+app.use("/orders", routes.orderRoute);
 
 app
   .use("/api/v1/auth", require("./routes/auth.cjs"))
