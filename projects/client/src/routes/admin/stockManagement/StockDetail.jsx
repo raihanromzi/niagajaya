@@ -1,16 +1,24 @@
 import React, { useState } from "react";
+import * as Yup from "yup";
+import { Formik, ErrorMessage, Form, Field } from "formik";
 import { useParams, useSearchParams } from "react-router-dom";
 import PageProtected from "../../protected";
 import AdminProductsLayout from "../../../components/AdminProductsLayout";
 import { useGetAllStockProductAndWarehouseInfoByWarehouseIdQuery } from "../../../redux/store";
 import {
   FaTrash,
+  FaPen,
+  FaImage,
   FaChevronLeft,
   FaChevronRight,
   FaSearch,
 } from "react-icons/fa";
+import { RxCheck, RxCross1 } from "react-icons/rx";
+
 import {
   Spinner,
+  FormControl,
+  FormLabel,
   Table,
   Thead,
   Tbody,
@@ -28,6 +36,12 @@ import {
   Input,
   InputGroup,
   Icon,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
 } from "@chakra-ui/react";
 
 function StockDetail() {
@@ -40,9 +54,7 @@ function StockDetail() {
     useGetAllStockProductAndWarehouseInfoByWarehouseIdQuery({
       warehouseId: parseInt(id),
     });
-  console.log("====================================");
-  console.log(data);
-  console.log("====================================");
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const tableHead = [
     { name: "Foto Produk", width: "10em" },
@@ -67,21 +79,42 @@ function StockDetail() {
           _hover={{ bg: "#EEEEEE" }}>
           <Tr>
             <Td textAlign={"center"}>
-              {
+              {data.product.imageURL ? (
                 <img
-                  src={
-                    data.product.imageURL
-                      ? data.product.imageURL
-                      : "http://cdn.shopify.com/s/files/1/0451/1101/7626/products/carrotseeds.jpg?v=1604032858"
-                  }
+                  src={data.product.imageURL}
                   alt={`Foto ${data.product.name}`}
                 />
-              }
+              ) : (
+                <Icon
+                  as={FaImage}
+                  boxSize={10}
+                  color="rgba(113, 113, 113, 0.5)"
+                />
+              )}
             </Td>
             <Td textAlign={"center"}>{data.product.name}</Td>
             <Td textAlign={"center"}>{data.product.category.name}</Td>
             <Td textAlign={"center"}>{data.product.priceRupiahPerUnit}</Td>
             <Td textAlign={"center"}>{data.quantity}</Td>
+            <Td>
+              <Flex justifyContent={"center"} alignItems={"center"} gap={2}>
+                <IconButton
+                  icon={<FaPen />}
+                  aria-label="edit stock"
+                  size="sm"
+                  onClick={onOpen}
+                />
+                <IconButton
+                  // onClick={() => {
+                  //   deleteWarning(admin);
+                  // }}
+                  bg={"none"}
+                  color={"#ff4d4d"}
+                  icon={<FaTrash />}
+                  size="sm"
+                />
+              </Flex>
+            </Td>
           </Tr>
         </Tbody>
       );
@@ -90,8 +123,7 @@ function StockDetail() {
 
   return (
     <PageProtected needLogin={true}>
-      <AdminProductsLayout heading={`Warehouse with id ${id}`}>
-        <h1>Warehouse with id {id}</h1>
+      <AdminProductsLayout heading={"Manage Stock"}>
         <Box>
           <TableContainer mb={5}>
             <Flex justifyContent={"flex-end"} mb={4}>
@@ -144,14 +176,10 @@ function StockDetail() {
                       return (
                         <Td key={index}>
                           <Skeleton h={"10px"} />
-                          <Skeleton h={"10px"} />
-                          <Skeleton h={"10px"} />
                         </Td>
                       );
                     })}
                     <Td>
-                      <Skeleton h={"10px"} />
-                      <Skeleton h={"10px"} />
                       <Skeleton h={"10px"} />
                     </Td>
                   </Tr>
@@ -160,7 +188,7 @@ function StockDetail() {
             </Table>
           </TableContainer>
           {/* Pagination */}
-          {/* <Center paddingY={"10px"}>
+          <Center paddingY={"10px"}>
             {page <= 1 ? (
               <IconButton icon={<FaChevronLeft />} disabled />
             ) : (
@@ -184,11 +212,106 @@ function StockDetail() {
             ) : (
               <IconButton icon={<FaChevronRight />} disabled />
             )}
-          </Center> */}
+          </Center>
         </Box>
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader textAlign={"center"}>Add Admin</ModalHeader>
+            <ModalBody>
+              <AddForm close={onClose} />
+            </ModalBody>
+          </ModalContent>
+        </Modal>
       </AdminProductsLayout>
     </PageProtected>
   );
 }
+
+const AddForm = ({ close }) => {
+  const validation = Yup.object().shape({
+    email: Yup.string().email("Email Invalid").required("Cannot be Empty"),
+    name: Yup.string().required("Cannot be Empty"),
+    password: Yup.string().required("Cannot be Empty"),
+  });
+
+  const addAdmin = async (value) => {
+    try {
+      createAdmin(value)
+        .unwrap()
+        .then(() => {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: `New Admin Added`,
+          });
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.data.errors,
+          });
+        });
+      close();
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.data.errors,
+      });
+    }
+  };
+
+  return (
+    <Box>
+      <Formik
+        initialValues={{
+          email: "",
+          name: "",
+          password: "",
+        }}
+        validationSchema={validation}
+        onSubmit={(value) => {
+          addAdmin(value);
+        }}>
+        <Form>
+          <FormControl>
+            <FormLabel>Email</FormLabel>
+            <Input as={Field} type="email" name={"email"} />
+            <ErrorMessage
+              style={{ color: "red" }}
+              component="div"
+              name="email"
+            />
+            <FormLabel>Name</FormLabel>
+            <Input as={Field} name={"name"} />
+            <FormLabel>Password</FormLabel>
+            <Input as={Field} name={"password"} />
+            <ErrorMessage
+              style={{ color: "red" }}
+              component="div"
+              name="name"
+            />
+            <Center paddingTop={"10px"} gap={"10px"}>
+              <IconButton
+                icon={<RxCheck />}
+                fontSize={"3xl"}
+                color={"green"}
+                type={"submit"}
+              />
+              <IconButton
+                icon={<RxCross1 />}
+                fontSize={"xl"}
+                color={"red"}
+                onClick={close}
+              />
+            </Center>
+          </FormControl>
+        </Form>
+      </Formik>
+    </Box>
+  );
+};
 
 export default StockDetail;
