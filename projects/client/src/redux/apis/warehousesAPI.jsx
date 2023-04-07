@@ -20,10 +20,31 @@ const warehousesApi = createApi({
       getAllStockProductAndWarehouseInfoByWarehouseId: builder.query({
         async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
           return await fetchWithBQ(
-            `/admin/stock/warehouses/${_arg.warehouseId}`,
+            `/admin/stock/warehouses/${_arg.warehouseId}?manager=${_arg.user.id}`,
           );
         },
-        providesTags: ["StockProductAndWarehouseInfoByWarehouseId"],
+        providesTags: ["Products"],
+      }),
+      updateStockProduct: builder.mutation({
+        async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+          return await fetchWithBQ(
+            `/admin/stock/warehouses/${_arg.warehouseId}/products/${_arg.productId}`,
+            {
+              method: "PUT",
+              body: JSON.stringify(_arg.quantity),
+            },
+          );
+        },
+      }),
+      deleteStockProduct: builder.mutation({
+        query: (data) => {
+          console.log(data);
+          return {
+            url: `/admin/stock/warehouses/${data.warehouseId}/products/${data.productId}`,
+            method: "DELETE",
+          };
+        },
+        invalidatesTags: ["Products"],
       }),
     };
   },
@@ -32,5 +53,7 @@ const warehousesApi = createApi({
 export const {
   useGetAllWarehousesQuery,
   useGetAllStockProductAndWarehouseInfoByWarehouseIdQuery,
+  useUpdateStockProductMutation,
+  useDeleteStockProductMutation,
 } = warehousesApi;
 export { warehousesApi };

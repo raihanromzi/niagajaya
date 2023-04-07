@@ -4,7 +4,10 @@ import { Formik, ErrorMessage, Form, Field } from "formik";
 import { useParams, useSearchParams } from "react-router-dom";
 import PageProtected from "../../protected";
 import AdminProductsLayout from "../../../components/AdminProductsLayout";
-import { useGetAllStockProductAndWarehouseInfoByWarehouseIdQuery } from "../../../redux/store";
+import {
+  useGetAllStockProductAndWarehouseInfoByWarehouseIdQuery,
+  useDeleteStockProductMutation,
+} from "../../../redux/store";
 import {
   FaTrash,
   FaPen,
@@ -14,7 +17,8 @@ import {
   FaSearch,
 } from "react-icons/fa";
 import { RxCheck, RxCross1 } from "react-icons/rx";
-
+import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
 import {
   Spinner,
   FormControl,
@@ -50,11 +54,42 @@ function StockDetail() {
   const [totalPages, setTotalPages] = useState(0);
   const [limit, setLimit] = useState(5);
   const { id } = useParams();
+  const user = useSelector((state) => state.auth);
+
   const { data, isError, isLoading } =
     useGetAllStockProductAndWarehouseInfoByWarehouseIdQuery({
       warehouseId: parseInt(id),
+      user,
     });
+  const [deleteStockProduct] = useDeleteStockProductMutation();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const deleteWarning = async (productId) => {
+    try {
+      Swal.fire({
+        title: "Are you sure want to Empty Stock?",
+        text: "Stock will be empty!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#009262",
+        confirmButtonText: "Ya Hapus",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          deleteStockProduct({
+            warehouseId: parseInt(id),
+            productId: parseInt(productId),
+          });
+          Swal.fire("Deleted!", `Product stock has been empty.`, "success");
+        }
+      });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.data.errors,
+      });
+    }
+  };
 
   const tableHead = [
     { name: "Foto Produk", width: "10em" },
@@ -68,7 +103,7 @@ function StockDetail() {
   if (isLoading) {
     contentProduct = <Spinner />;
   } else if (isError) {
-    contentProduct = <div>Error loading albums.</div>;
+    contentProduct = <div>Error loading Stock.</div>;
   } else {
     contentProduct = data.data.map((data, index) => {
       return (
@@ -105,9 +140,9 @@ function StockDetail() {
                   onClick={onOpen}
                 />
                 <IconButton
-                  // onClick={() => {
-                  //   deleteWarning(admin);
-                  // }}
+                  onClick={() => {
+                    deleteWarning(data.productId);
+                  }}
                   bg={"none"}
                   color={"#ff4d4d"}
                   icon={<FaTrash />}
