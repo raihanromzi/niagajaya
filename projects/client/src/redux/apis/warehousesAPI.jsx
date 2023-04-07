@@ -11,7 +11,7 @@ const warehousesApi = createApi({
         async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
           return await fetchWithBQ(
             `/admin/stock/warehouses?page=${_arg.page ? _arg.page : 1}&size=${
-              _arg.size ? _arg.size : 5
+              _arg.size ? _arg.size : 10
             }&manager=${_arg.user.role === "ADMIN" ? "" : _arg.user.id}`,
           );
         },

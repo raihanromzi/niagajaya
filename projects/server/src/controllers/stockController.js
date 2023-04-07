@@ -80,7 +80,7 @@ const getStockByWarehouse = async (req, res) => {
     const warehouseId = parseInt(req.params.id)
     const search = req.query.search
     const page = parseInt(req.query.page) || 1
-    const size = parseInt(req.query.size) || 5
+    const size = parseInt(req.query.size) || 10
     const skip = (page - 1) * size
     const take = size
 
@@ -121,9 +121,6 @@ const getStockByWarehouse = async (req, res) => {
         },
       },
     })
-    console.log('====================================')
-    console.log(stocks)
-    console.log('====================================')
 
     const count = await prisma.stock.count({ where })
     const totalPages = Math.ceil(count / size)
