@@ -26,15 +26,16 @@ const warehousesApi = createApi({
         providesTags: ["Products"],
       }),
       updateStockProduct: builder.mutation({
-        async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
-          return await fetchWithBQ(
-            `/admin/stock/warehouses/${_arg.warehouseId}/products/${_arg.productId}`,
-            {
-              method: "PUT",
-              body: JSON.stringify(_arg.quantity),
+        query: (data) => {
+          return {
+            url: `/admin/stock/warehouses/${data.warehouseId}/products/${data.productId}`,
+            method: "PUT",
+            body: {
+              quantity: data.quantity,
             },
-          );
+          };
         },
+        invalidatesTags: ["Products"],
       }),
       deleteStockProduct: builder.mutation({
         query: (data) => {

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import * as Yup from "yup";
-import { Formik, ErrorMessage, Form, Field } from "formik";
+
 import { useParams, useSearchParams } from "react-router-dom";
 import PageProtected from "../../protected";
 import AdminProductsLayout from "../../../components/AdminProductsLayout";
@@ -21,8 +20,6 @@ import Swal from "sweetalert2";
 import { useSelector } from "react-redux";
 import {
   Spinner,
-  FormControl,
-  FormLabel,
   Table,
   Thead,
   Tbody,
@@ -41,12 +38,8 @@ import {
   InputGroup,
   Icon,
   useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
 } from "@chakra-ui/react";
+import { EditStock } from "./EditStock";
 
 function StockDetail() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -62,7 +55,6 @@ function StockDetail() {
       user,
     });
   const [deleteStockProduct] = useDeleteStockProductMutation();
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const deleteWarning = async (productId) => {
     try {
@@ -133,12 +125,7 @@ function StockDetail() {
             <Td textAlign={"center"}>{data.quantity}</Td>
             <Td>
               <Flex justifyContent={"center"} alignItems={"center"} gap={2}>
-                <IconButton
-                  icon={<FaPen />}
-                  aria-label="edit stock"
-                  size="sm"
-                  onClick={onOpen}
-                />
+                <EditStock product={data} />
                 <IconButton
                   onClick={() => {
                     deleteWarning(data.productId);
@@ -249,104 +236,9 @@ function StockDetail() {
             )}
           </Center>
         </Box>
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader textAlign={"center"}>Add Admin</ModalHeader>
-            <ModalBody>
-              <AddForm close={onClose} />
-            </ModalBody>
-          </ModalContent>
-        </Modal>
       </AdminProductsLayout>
     </PageProtected>
   );
 }
-
-const AddForm = ({ close }) => {
-  const validation = Yup.object().shape({
-    email: Yup.string().email("Email Invalid").required("Cannot be Empty"),
-    name: Yup.string().required("Cannot be Empty"),
-    password: Yup.string().required("Cannot be Empty"),
-  });
-
-  const addAdmin = async (value) => {
-    try {
-      createAdmin(value)
-        .unwrap()
-        .then(() => {
-          Swal.fire({
-            icon: "success",
-            title: "Success",
-            text: `New Admin Added`,
-          });
-        })
-        .catch((error) => {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: error.data.errors,
-          });
-        });
-      close();
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.data.errors,
-      });
-    }
-  };
-
-  return (
-    <Box>
-      <Formik
-        initialValues={{
-          email: "",
-          name: "",
-          password: "",
-        }}
-        validationSchema={validation}
-        onSubmit={(value) => {
-          addAdmin(value);
-        }}>
-        <Form>
-          <FormControl>
-            <FormLabel>Email</FormLabel>
-            <Input as={Field} type="email" name={"email"} />
-            <ErrorMessage
-              style={{ color: "red" }}
-              component="div"
-              name="email"
-            />
-            <FormLabel>Name</FormLabel>
-            <Input as={Field} name={"name"} />
-            <FormLabel>Password</FormLabel>
-            <Input as={Field} name={"password"} />
-            <ErrorMessage
-              style={{ color: "red" }}
-              component="div"
-              name="name"
-            />
-            <Center paddingTop={"10px"} gap={"10px"}>
-              <IconButton
-                icon={<RxCheck />}
-                fontSize={"3xl"}
-                color={"green"}
-                type={"submit"}
-              />
-              <IconButton
-                icon={<RxCross1 />}
-                fontSize={"xl"}
-                color={"red"}
-                onClick={close}
-              />
-            </Center>
-          </FormControl>
-        </Form>
-      </Formik>
-    </Box>
-  );
-};
 
 export default StockDetail;

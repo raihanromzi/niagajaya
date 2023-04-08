@@ -1,6 +1,8 @@
-import { useUpdateAdminMutation } from "../redux/store";
+import { useUpdateStockProductMutation } from "../../../redux/store";
 import { Formik, ErrorMessage, Form, Field } from "formik";
 import * as Yup from "yup";
+import { useParams } from "react-router-dom";
+
 import {
   Flex,
   Button,
@@ -20,23 +22,23 @@ import {
 import Swal from "sweetalert2";
 import { FaPen } from "react-icons/fa";
 
-export const EditAdmin = ({ admin }) => {
+export const EditStock = ({ product }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <Box>
       <IconButton
         icon={<FaPen />}
-        aria-label="edit product category"
+        aria-label="edit stock product"
         size="sm"
         onClick={onOpen}
       />
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader textAlign={"center"}>Edit Admin</ModalHeader>
+          <ModalHeader textAlign={"center"}>Edit Stock</ModalHeader>
           <ModalBody>
-            <EditForm admin={admin} close={onClose} />
+            <EditForm product={product} close={onClose} />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -44,27 +46,32 @@ export const EditAdmin = ({ admin }) => {
   );
 };
 
-const EditForm = ({ close, admin }) => {
-  const [updateAdmin, { isLoading, error }] = useUpdateAdminMutation();
+const EditForm = ({ close, product }) => {
+  const [updateStockProduct, { isLoading, error }] =
+    useUpdateStockProductMutation();
+  const { id } = useParams();
 
   const validation = Yup.object().shape({
-    email: Yup.string().email("Email Invalid").required("Cannot be Empty"),
-    newName: Yup.string().required("Cannot be Empty"),
+    quantity: Yup.number().required("Cannot be Empty"),
   });
 
   if (isLoading) {
     Swal.showLoading();
   }
 
-  const editUser = async (value) => {
+  const editStock = async (value) => {
     try {
-      updateAdmin(value)
+      updateStockProduct({
+        productId: product.productId,
+        warehouseId: id,
+        quantity: value.quantity,
+      })
         .unwrap()
         .then(() => {
           Swal.fire({
             icon: "success",
             title: "Success",
-            text: `Admin Edited`,
+            text: `Stock Edited`,
             confirmButtonColor: "#009262",
           });
         })
@@ -89,37 +96,24 @@ const EditForm = ({ close, admin }) => {
     <Box>
       <Formik
         initialValues={{
-          email: admin.email,
-          name: admin.names[0].name,
-          newName: "",
+          quantity: product.quantity,
         }}
         validationSchema={validation}
         onSubmit={(value) => {
-          value.id = admin.id;
-          value.name = admin.names[0].name;
-          editUser(value);
+          editStock(value);
         }}>
         {(props) => {
           return (
             <Form>
               <FormControl>
                 <Flex justifyContent={"flex-start"} flexDir="column" gap={2}>
-                  <FormLabel>Email</FormLabel>
-                  <Input as={Field} type="email" name={"email"} />
+                  <FormLabel>Quantity</FormLabel>
+                  <Input as={Field} type="number" name={"quantity"} />
                   <ErrorMessage
                     style={{ color: "red" }}
                     component="div"
-                    name="email"
+                    name="quantity"
                   />
-                  <FormLabel>Name</FormLabel>
-                  <Input disabled as={Field} name={"name"} />
-                  <ErrorMessage
-                    style={{ color: "red" }}
-                    component="div"
-                    name="name"
-                  />
-                  <FormLabel>New Name</FormLabel>
-                  <Input as={Field} name={"newName"} />
                 </Flex>
                 <ErrorMessage
                   style={{ color: "red" }}

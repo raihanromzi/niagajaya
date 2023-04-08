@@ -87,6 +87,13 @@ const getStockByWarehouse = async (req, res) => {
     const skip = (page - 1) * size
     const take = size
 
+    const checkIsAdmin = await prisma.user.findFirst({
+      where: {
+        id: parseInt(managerId),
+        role: 'ADMIN',
+      },
+    })
+
     const checkWarehouseAdmin = await prisma.warehouse.findFirst({
       where: {
         id: warehouseId,
@@ -94,7 +101,7 @@ const getStockByWarehouse = async (req, res) => {
       },
     })
 
-    if (!checkWarehouseAdmin) {
+    if (!checkWarehouseAdmin && !checkIsAdmin) {
       return res
         .status(400)
         .send(response.responseError(400, 'BAD_REQUEST', 'NOT AUTHORIZED'))
