@@ -48,9 +48,9 @@ import PageProtected from "./routes/protected";
 import CartPage from "./routes/cart";
 import AdminLoginPage from "./routes/admin/AdminLoginPage";
 import AdminManagement from "./routes/admin/AdminManagement";
-import StockManagement from "./routes/admin/stockManagement/StockManagement";
+import WarehousesList from "./routes/admin/stockManagement/WarehousesList";
 import { warehousesApi } from "./redux/apis/warehousesAPI";
-import StockDetail from "./routes/admin/stockManagement/StockDetail";
+import StockManagement from "./routes/admin/stockManagement/StockManagement";
 
 const router = createBrowserRouter([
   {
@@ -188,8 +188,8 @@ const router = createBrowserRouter([
           },
         ],
       },
-      { path: "stock-management", Component: StockManagement },
-      { path: "stock-management/warehouse/:id", Component: StockDetail },
+      { path: "stock-management", Component: WarehousesList },
+      { path: "stock-management/warehouse/:id", Component: StockManagement },
     ],
   },
 ]);

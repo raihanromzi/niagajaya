@@ -100,7 +100,7 @@ const EditForm = ({ close, product }) => {
         }}
         validationSchema={validation}
         onSubmit={(value) => {
-          editStock(value);
+          value.quantity !== product.quantity ? editStock(value) : close();
         }}>
         {(props) => {
           return (

@@ -95,6 +95,7 @@ model Warehouse {
   exports StockMutation[] @relation(name: "Out")
   imports StockMutation[] @relation(name: "In")
   orders  Order[]
+  Journal Journal[]
 }
 
 model Product {
@@ -206,22 +207,26 @@ model OrderDetail {
 }
 
 model Type_Journal {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   name      String
   type      Boolean
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  journals  Journal[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  journals Journal[]
 }
 
 model Journal {
-  id           Int          @id @default(autoincrement())
-  stock_before Int
-  stock_after  Int
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id           Int      @id @default(autoincrement())
+  warehouseId  Int
   productId    Int
   typeId       Int
+  stock_before Int
+  stock_after  Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  Warehouse    Warehouse    @relation(fields: [warehouseId], references: [id])
   Product      Product      @relation(fields: [productId], references: [id])
   Type_Journal Type_Journal @relation(fields: [typeId], references: [id])
 

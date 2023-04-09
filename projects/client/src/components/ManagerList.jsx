@@ -93,7 +93,7 @@ function ManagerList() {
 
   return (
     <Box>
-      <TableContainer mb={5} mt={-12} ml={-4}>
+      <TableContainer mb={5}>
         <Flex justifyContent={"flex-end"} mb={4}>
           <InputGroup w={48} size="sm">
             <InputLeftElement pointerEvents="none">

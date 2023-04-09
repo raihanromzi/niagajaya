@@ -257,7 +257,7 @@ const updateStockProduct = async (req, res) => {
     const stockBefore = findProduct.quantity
     const stockAfter = findUpdatedProduct.quantity
 
-    // Untuk ngecek nambah beneran apa ngga
+    // Untuk ngecek nambah atau ngurang
     const addOrAdd = (stockBefore, stockAfter) => {
       const count = Math.max(stockBefore, stockAfter)
       if (count === stockBefore) {
@@ -278,6 +278,7 @@ const updateStockProduct = async (req, res) => {
       data: {
         typeId: newJournal.id,
         productId: parseInt(productId),
+        warehouseId: parseInt(warehouseId),
         stock_before: stockBefore,
         stock_after: stockAfter,
       },
@@ -424,6 +425,7 @@ const deleteStockProduct = async (req, res) => {
       data: {
         typeId: newJournal.id,
         productId: parseInt(productId),
+        warehouseId: parseInt(warehouseId),
         stock_before: stockBefore,
         stock_after: stockAfter,
       },
@@ -460,9 +462,145 @@ const deleteStockProduct = async (req, res) => {
   }
 }
 
+const showAllStockHistory = async (req, res) => {
+  try {
+    if (!req.session.id) {
+      res
+        .status(400)
+        .send(response.responseError(401, 'UNAUTHORIZED', 'NEED TO LOGIN'))
+      return
+    }
+    const { warehouseId, productId } = req.params
+    const managerId = req.query.manager
+
+    const search = req.query.search
+    const page = parseInt(req.query.page) || 1
+    const size = parseInt(req.query.size) || 10
+    const skip = (page - 1) * size
+    const take = size
+
+    const checkIsAdmin = await prisma.user.findFirst({
+      where: {
+        id: parseInt(managerId),
+        role: 'ADMIN',
+      },
+    })
+
+    const checkWarehouseAdmin = await prisma.warehouse.findFirst({
+      where: {
+        id: parseInt(warehouseId),
+        managerId: parseInt(managerId),
+      },
+    })
+
+    if (!checkWarehouseAdmin && !checkIsAdmin) {
+      return res
+        .status(400)
+        .send(response.responseError(400, 'BAD_REQUEST', 'NOT AUTHORIZED'))
+    }
+
+    const getAllStockChange = await prisma.journal.findMany({
+      where: {
+        warehouseId: parseInt(warehouseId),
+        productId: parseInt(productId),
+      },
+      select: {
+        id: true,
+        warehouseId: true,
+        stock_before: true,
+        stock_after: true,
+        Type_Journal: {
+          select: {
+            id: true,
+            name: true,
+            type: true,
+          },
+        },
+        Product: {
+          select: {
+            id: true,
+            name: true,
+            imageUrl: true,
+          },
+        },
+        Warehouse: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    })
+
+    const getLastStock = await prisma.stock.findFirst({
+      where: {
+        warehouseId: parseInt(warehouseId),
+        productId: parseInt(productId),
+      },
+      select: {
+        quantity: true,
+      },
+    })
+
+    if (getAllStockChange.length === 0) {
+      return res
+        .status(400)
+        .send(response.responseError(400, 'BAD_REQUEST', 'NOT FOUND'))
+    }
+
+    const result = []
+    let totalOut = 0
+    let totalIn = 0
+
+    for (let i = 0; i < getAllStockChange.length; i++) {
+      result.push({
+        id: getAllStockChange[i].id,
+        warehouseId: getAllStockChange[i].warehouseId,
+        warehouseName: getAllStockChange[i].Warehouse.name,
+        productId: getAllStockChange[i].Product.id,
+        productName: getAllStockChange[i].Product.name,
+        imageUrl: getAllStockChange[i].Product.imageUrl,
+        stockBefore: getAllStockChange[i].stock_before,
+        stockAfter: getAllStockChange[i].stock_after,
+        typeName: getAllStockChange[i].Type_Journal.name,
+        status: getAllStockChange[i].Type_Journal.type ? 'IN' : 'OUT',
+      })
+      // if type true = total_out = 0, else if stock_before = stock_after = 0, else total_out = stock_before - stock_after
+      getAllStockChange[i].Type_Journal.type
+        ? 0
+        : getAllStockChange[i].stock_before === getAllStockChange[i].stock_after
+        ? 0
+        : (totalOut +=
+            getAllStockChange[i].stock_before -
+            getAllStockChange[i].stock_after),
+        // if type true = total_in = stock_after - stock_before, else if stock_before = stock_after = 0, else total_in = 0
+        getAllStockChange[i].Type_Journal.type
+          ? (totalIn +=
+              getAllStockChange[i].stock_after -
+              getAllStockChange[i].stock_before)
+          : 0
+    }
+
+    result.unshift({
+      total_out: totalOut,
+      total_in: totalIn,
+      last_stock: getLastStock.quantity,
+    })
+
+    return res
+      .status(200)
+      .send(response.responseSuccess(200, 'SUCCESS', {}, result))
+  } catch (error) {
+    console.error(error)
+    return res
+      .status(500)
+      .send(response.responseError(500, 'SERVER_ERROR', { message: error }))
+  }
+}
+
 module.exports = {
   getWarehouses,
   getStockByWarehouse,
   updateStockProduct,
   deleteStockProduct,
+  showAllStockHistory,
 }
