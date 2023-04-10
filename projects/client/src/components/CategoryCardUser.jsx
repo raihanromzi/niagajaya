@@ -11,8 +11,8 @@ const CategoryCardUser = ({ category, hue, saturation, lightness }) => {
 
   return (
     <Button
-      w="200px"
-      h="200px"
+      w={{ base: "full", md: "200px" }}
+      h={{ base: "50px", md: "200px" }}
       bgColor={color}
       borderRadius="md"
       boxShadow="md"
@@ -21,7 +21,10 @@ const CategoryCardUser = ({ category, hue, saturation, lightness }) => {
     >
       <Flex h="100%" alignItems="center" justifyContent="center">
         <Center>
-          <Text fontWeight="bold" fontSize="xl">
+          <Text
+            fontWeight={{ base: "semibold", md: "bold" }}
+            fontSize={{ base: "md", md: "xl" }}
+          >
             {category.name}
           </Text>
         </Center>
