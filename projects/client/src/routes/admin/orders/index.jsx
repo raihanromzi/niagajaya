@@ -59,7 +59,6 @@ const AdminOrdersPage = () => {
   const [modalImage, setModalImage] = useState("");
 
   const handleOpenModal = (imageUrl) => {
-    console.log("kebuka");
     setIsOpen(true);
     setModalImage(imageUrl);
   };
@@ -274,7 +273,6 @@ const AdminOrdersPage = () => {
         const res = await axiosInstance.get(`/orders${queryParams}`, {
           withCredentials: true,
         });
-        console.log(res.data);
         setOrders(res.data);
       } catch (error) {
         console.error(error);
