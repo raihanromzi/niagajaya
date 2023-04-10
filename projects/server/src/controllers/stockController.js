@@ -538,21 +538,27 @@ const showAllStockHistory = async (req, res) => {
       },
       select: {
         quantity: true,
+        product: {
+          select: {
+            id: true,
+            name: true,
+            imageUrl: true,
+          },
+        },
       },
     })
 
-    if (getAllStockChange.length === 0) {
-      return res
-        .status(400)
-        .send(response.responseError(400, 'BAD_REQUEST', 'NOT FOUND'))
+    if (!getLastStock) {
+      return res.status(400).send(response.responseError(404, 'NOT_FOUND'))
     }
 
-    const result = []
+    const changes = []
+    const result = {}
     let totalOut = 0
     let totalIn = 0
 
     for (let i = 0; i < getAllStockChange.length; i++) {
-      result.push({
+      changes.push({
         id: getAllStockChange[i].id,
         warehouseId: getAllStockChange[i].warehouseId,
         warehouseName: getAllStockChange[i].Warehouse.name,
@@ -562,7 +568,7 @@ const showAllStockHistory = async (req, res) => {
         stockBefore: getAllStockChange[i].stock_before,
         stockAfter: getAllStockChange[i].stock_after,
         typeName: getAllStockChange[i].Type_Journal.name,
-        status: getAllStockChange[i].Type_Journal.type ? 'IN' : 'OUT',
+        type: getAllStockChange[i].Type_Journal.type ? 'IN' : 'OUT',
       })
       // if type true = total_out = 0, else if stock_before = stock_after = 0, else total_out = stock_before - stock_after
       getAllStockChange[i].Type_Journal.type
@@ -580,11 +586,15 @@ const showAllStockHistory = async (req, res) => {
           : 0
     }
 
-    result.unshift({
+    result.product_info = {
+      productId: getLastStock.product.id,
+      productName: getLastStock.product.name,
+      imageUrl: getLastStock.product.imageUrl,
       total_out: totalOut,
       total_in: totalIn,
       last_stock: getLastStock.quantity,
-    })
+    }
+    result.changes = changes
 
     return res
       .status(200)
