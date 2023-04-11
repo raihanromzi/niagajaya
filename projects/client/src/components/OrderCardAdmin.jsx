@@ -17,6 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { MdKeyboardArrowDown, MdReceipt } from "react-icons/md";
+import { axiosInstance } from "../config/config";
 
 const OrderCard = ({ order, onOpenModal }) => {
   const [isOrderSummaryExpanded, setIsOrderSummaryExpanded] = useState(false);
@@ -28,6 +29,17 @@ const OrderCard = ({ order, onOpenModal }) => {
 
   const handleToggleListProducts = () => {
     setIsListProductsExpanded(!isListProductsExpanded);
+  };
+
+  const cancelHandler = async () => {
+    try {
+      const res = await axiosInstance.post(`/orders/v3/${order.id}`, null, {
+        withCredentials: true,
+      });
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -194,6 +206,7 @@ const OrderCard = ({ order, onOpenModal }) => {
                 border={"2px"}
                 borderColor={"#009262"}
                 bgColor={"white"}
+                onClick={cancelHandler}
               >
                 Batalkan Pesanan
               </Button>
