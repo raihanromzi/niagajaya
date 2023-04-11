@@ -4,8 +4,6 @@ const prisma = require("../utils/client.cjs");
 module.exports = {
   getOrders: async (req, res) => {
     try {
-      console.log("req.session.user");
-      console.log(req.session.user);
       if (!req.session.user) {
         return res.status(400).json({
           message: "Harus login",
@@ -16,7 +14,7 @@ module.exports = {
         warehouseName,
         productName,
         page = 1,
-        size = 1,
+        size = 4,
         sortBy = "latest",
         status = "UNSETTLED",
       } = req.query;
@@ -132,7 +130,7 @@ module.exports = {
         warehouseName,
         productName,
         status = "UNSETTLED",
-        size = 1,
+        size = 4,
       } = req.query;
 
       const where = {};
@@ -186,7 +184,6 @@ module.exports = {
   cancelOrder: async (req, res) => {
     try {
       if (!req.session.user) {
-        console.log(req.session.user);
         return res.status(400).json({
           message: "Harus login",
         });
@@ -226,7 +223,7 @@ module.exports = {
         order.status === "REQUESTED" ||
         order.status === "PREPARING"
       ) {
-        prisma.order.update({
+        await prisma.order.update({
           where: { id: parseInt(req.params.id) },
           data: {
             status: "CANCELLED",
