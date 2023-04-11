@@ -185,8 +185,6 @@ module.exports = {
   },
   cancelOrder: async (req, res) => {
     try {
-      console.log("req.session.user2");
-      console.log(req.session.user);
       if (!req.session.user) {
         console.log(req.session.user);
         return res.status(400).json({
@@ -228,38 +226,12 @@ module.exports = {
         order.status === "REQUESTED" ||
         order.status === "PREPARING"
       ) {
-        const orderDetails = await prisma.orderDetail.findMany({
-          where: {
-            orderId: order.id,
+        prisma.order.update({
+          where: { id: parseInt(req.params.id) },
+          data: {
+            status: "CANCELLED",
           },
         });
-        const productsToUpdateStock = [];
-        orderDetails.forEach((orderDetail) => {
-          const productId = orderDetail.productId;
-          const quantity = orderDetail.quantity;
-          productsToUpdateStock.push({ productId, quantity });
-        });
-        await prisma.$transaction([
-          prisma.order.update({
-            where: { id: parseInt(req.params.id) },
-            data: {
-              status: "CANCELLED",
-            },
-          }),
-          ...productsToUpdateStock.map((product) =>
-            prisma.stock.updateMany({
-              where: {
-                productId: product.productId,
-                warehouseId: order.warehouseId,
-              },
-              data: {
-                quantity: {
-                  increment: product.quantity,
-                },
-              },
-            })
-          ),
-        ]);
       } else {
         return res.status(400).json({
           message: "Anda tidak dapat membatalkan pesanan",
