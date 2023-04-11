@@ -4,6 +4,8 @@ const prisma = require("../utils/client.cjs");
 module.exports = {
   getOrders: async (req, res) => {
     try {
+      console.log("req.session.user");
+      console.log(req.session.user);
       if (!req.session.user) {
         return res.status(400).json({
           message: "Harus login",
@@ -174,6 +176,96 @@ module.exports = {
       });
       const totalPage = Math.ceil(totalOrder / size);
       res.send({ totalPage });
+    } catch (error) {
+      console.error(error);
+      res.status(400).json({
+        message: error,
+      });
+    }
+  },
+  cancelOrder: async (req, res) => {
+    try {
+      console.log("req.session.user2");
+      console.log(req.session.user);
+      if (!req.session.user) {
+        console.log(req.session.user);
+        return res.status(400).json({
+          message: "Harus login",
+        });
+      }
+
+      const user = await prisma.user.findFirst({
+        where: { id: req.session.user.id },
+      });
+
+      if (user.role === "USER") {
+        return res.status(400).json({
+          message: "Anda tidak memiliki otoritas untuk mengubah data ini",
+        });
+      }
+
+      const order = await prisma.order.findFirst({
+        where: {
+          id: parseInt(req.params.id),
+        },
+      });
+
+      if (user.role === "MANAGER") {
+        const warehouse = await prisma.warehouse.findFirst({
+          where: {
+            id: order.warehouseId,
+          },
+        });
+        if (warehouse.managerId !== user.id) {
+          return res.status(400).json({
+            message: "Anda tidak memiliki otoritas untuk mengubah data ini",
+          });
+        }
+      }
+
+      if (
+        order.status === "UNSETTLED" ||
+        order.status === "REQUESTED" ||
+        order.status === "PREPARING"
+      ) {
+        const orderDetails = await prisma.orderDetail.findMany({
+          where: {
+            orderId: order.id,
+          },
+        });
+        const productsToUpdateStock = [];
+        orderDetails.forEach((orderDetail) => {
+          const productId = orderDetail.productId;
+          const quantity = orderDetail.quantity;
+          productsToUpdateStock.push({ productId, quantity });
+        });
+        await prisma.$transaction([
+          prisma.order.update({
+            where: { id: parseInt(req.params.id) },
+            data: {
+              status: "CANCELLED",
+            },
+          }),
+          ...productsToUpdateStock.map((product) =>
+            prisma.stock.updateMany({
+              where: {
+                productId: product.productId,
+                warehouseId: order.warehouseId,
+              },
+              data: {
+                quantity: {
+                  increment: product.quantity,
+                },
+              },
+            })
+          ),
+        ]);
+      } else {
+        return res.status(400).json({
+          message: "Anda tidak dapat membatalkan pesanan",
+        });
+      }
+      res.send("Order Canceled");
     } catch (error) {
       console.error(error);
       res.status(400).json({
