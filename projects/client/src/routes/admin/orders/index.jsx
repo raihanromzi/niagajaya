@@ -1,4 +1,11 @@
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogCloseButton,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   Box,
   Button,
   ButtonGroup,
@@ -21,9 +28,10 @@ import {
   RadioGroup,
   Tag,
   useDisclosure,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { MdSearch } from "react-icons/md";
 import { useSelector } from "react-redux";
@@ -35,11 +43,18 @@ import { axiosInstance } from "../../../config/config";
 const AdminOrdersPage = () => {
   const userSelector = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  const cancelRef = useRef();
+  const toast = useToast();
   const location = useLocation();
   const {
     isOpen: isOpenDialogFilter,
     onOpen: onOpenDialogFilter,
     onClose: onCloseDialogFilter,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenDialogCancel,
+    onOpen: onOpenDialogCancel,
+    onClose: onCloseDialogCancel,
   } = useDisclosure();
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -55,19 +70,10 @@ const AdminOrdersPage = () => {
   const [tempStatus, setTempStatus] = useState();
   const [size, setSize] = useState();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenProof, setIsOpenProof] = useState(false);
+
   const [modalImage, setModalImage] = useState("");
-
-  const handleOpenModal = (imageUrl) => {
-    console.log("kebuka");
-    setIsOpen(true);
-    setModalImage(imageUrl);
-  };
-
-  const handleCloseModal = () => {
-    setIsOpen(false);
-    setModalImage("");
-  };
+  const [selectedOrder, setSelectedOrder] = useState();
 
   const sortOptions = [
     {
@@ -107,6 +113,56 @@ const AdminOrdersPage = () => {
     },
   ];
 
+  const handleOpenProofModal = (imageUrl) => {
+    setIsOpenProof(true);
+    setModalImage(imageUrl);
+  };
+
+  const handleCloseProofModal = () => {
+    setIsOpenProof(false);
+    setModalImage("");
+  };
+
+  const cancelHandler = async () => {
+    try {
+      const res = await axiosInstance.post(
+        `/orders/v3/${selectedOrder}`,
+        null,
+        {
+          withCredentials: true,
+        }
+      );
+      setSelectedOrder(null);
+      onCloseDialogCancel();
+      applyFilter({
+        warehouseName,
+        productName,
+        page: 1,
+        status,
+        sortBy,
+        size,
+      });
+      toast({
+        position: "bottom-right",
+        title: "Pembatalan Pesanan",
+        description: "Pesanan berhasil dibatalkan",
+        status: "success",
+        duration: 8000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        position: "bottom-right",
+        title: "Pembatalan Pesanan",
+        description: "Pesanan gagal dibatalkan",
+        status: "error",
+        duration: 8000,
+        isClosable: true,
+      });
+    }
+  };
+
   function applyFilter({
     warehouseName,
     productName,
@@ -117,8 +173,8 @@ const AdminOrdersPage = () => {
   }) {
     let queryParams = "";
     const filteredParams = {
-      warehouseName,
       productName,
+      warehouseName,
       status,
       sortBy,
       page,
@@ -129,13 +185,6 @@ const AdminOrdersPage = () => {
         (key) => filteredParams[key] !== undefined && filteredParams[key] !== ""
       )
       .forEach((key, index) => {
-        if (key === "warehouseName") {
-          setProductName("");
-        } else if (key === "productName") {
-        } else {
-          setProductName("");
-          setWarehouseName("");
-        }
         const prefix = index === 0 ? "?" : "&";
         queryParams += `${prefix}${key}=${encodeURIComponent(
           filteredParams[key]
@@ -152,8 +201,10 @@ const AdminOrdersPage = () => {
   useEffect(() => {
     if (filterValue === "Produk") {
       setTempWarehouseName("");
+      setTempProductName(productName);
     } else if (filterValue === "Warehouse") {
       setTempProductName("");
+      setTempWarehouseName(warehouseName);
     } else {
       setTempProductName("");
       setTempWarehouseName("");
@@ -176,7 +227,6 @@ const AdminOrdersPage = () => {
             } else if (key === "productName") {
               setFilterValue("Produk");
             }
-
             const prefix = index === 0 ? "?" : "&";
             queryParams += `${prefix}${key}=${encodeURIComponent(
               filteredParams[key]
@@ -260,10 +310,10 @@ const AdminOrdersPage = () => {
               filteredParams[key] !== undefined && filteredParams[key] !== ""
           )
           .forEach((key, index) => {
-            if (key === "warehouseName") {
-              setFilterValue("Warehouse");
-            } else if (key === "productName") {
+            if (key === "productName") {
               setFilterValue("Produk");
+            } else if (key === "warehouseName") {
+              setFilterValue("Warehouse");
             }
             const prefix = index === 0 ? "?" : "&";
             queryParams += `${prefix}${key}=${encodeURIComponent(
@@ -274,7 +324,6 @@ const AdminOrdersPage = () => {
         const res = await axiosInstance.get(`/orders${queryParams}`, {
           withCredentials: true,
         });
-        console.log(res.data);
         setOrders(res.data);
       } catch (error) {
         console.error(error);
@@ -286,7 +335,7 @@ const AdminOrdersPage = () => {
   function TagWarehouseName() {
     return (
       <Tag>
-        Nilai Pencarian -{`>`} {warehouseName}
+        Nama Warehouse -{`>`} {warehouseName}
       </Tag>
     );
   }
@@ -294,7 +343,7 @@ const AdminOrdersPage = () => {
   function TagProductName() {
     return (
       <Tag>
-        Nilai Pencarian -{`>`} {productName}
+        Nama Produk -{`>`} {productName}
       </Tag>
     );
   }
@@ -315,7 +364,7 @@ const AdminOrdersPage = () => {
 
   return (
     <Box px={8} flex={1} overflowY="auto">
-      <Heading py={7}>Pesananan</Heading>
+      <Heading py={7}>Pesanan</Heading>
       <Box mb={3} w={"full"}>
         <HStack>
           <ButtonGroup size="sm" isAttached variant="outline" bg={"white"}>
@@ -328,7 +377,7 @@ const AdminOrdersPage = () => {
             onClose={() => {
               if (warehouseName) {
                 setTempWarehouseName(warehouseName);
-              } else {
+              } else if (productName) {
                 setTempProductName(productName);
               }
               setTempStatus(status);
@@ -444,6 +493,11 @@ const AdminOrdersPage = () => {
                   fontWeight={"semibold"}
                   bgColor={"#009262"}
                   onClick={() => {
+                    if (tempWarehouseName === "") {
+                      setWarehouseName("");
+                    } else if (tempProductName === "") {
+                      setProductName("");
+                    }
                     applyFilter({
                       page: 1,
                       warehouseName: tempWarehouseName ?? "",
@@ -462,8 +516,11 @@ const AdminOrdersPage = () => {
           </Modal>
           {sortBy ? <TagSorting /> : null}
           {status ? <TagStatus /> : null}
-          {warehouseName ? <TagWarehouseName /> : null}
-          {productName ? <TagProductName /> : null}
+          {warehouseName ? (
+            <TagWarehouseName />
+          ) : productName ? (
+            <TagProductName />
+          ) : null}
         </HStack>
       </Box>
       {orders.length ? (
@@ -473,7 +530,13 @@ const AdminOrdersPage = () => {
               <OrderCard
                 key={order.id}
                 order={order}
-                onOpenModal={() => handleOpenModal(order.paymentImageUrl)}
+                onOpenProofModal={() =>
+                  handleOpenProofModal(order.paymentImageUrl)
+                }
+                onOpenDialogCancel={() => {
+                  onOpenDialogCancel();
+                  setSelectedOrder(order.id);
+                }}
               />
             );
           })}
@@ -490,7 +553,7 @@ const AdminOrdersPage = () => {
           onPageChange={handlePageChange}
         />
       </Center>
-      <Modal isOpen={isOpen} onClose={handleCloseModal}>
+      <Modal isOpen={isOpenProof} onClose={handleCloseProofModal}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Bukti Pembayaran</ModalHeader>
@@ -506,6 +569,40 @@ const AdminOrdersPage = () => {
           </ModalBody>
         </ModalContent>
       </Modal>
+      <AlertDialog
+        motionPreset="slideInBottom"
+        leastDestructiveRef={cancelRef}
+        onClose={onCloseDialogCancel}
+        isOpen={isOpenDialogCancel}
+        isCentered
+      >
+        <AlertDialogOverlay />
+        <AlertDialogContent>
+          <AlertDialogHeader>Batalkan Pesanan</AlertDialogHeader>
+          <AlertDialogCloseButton />
+          <AlertDialogBody>
+            Apakah Anda yakin ingin membatalkan pesanan?
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <Button
+              variant={"outline"}
+              colorScheme={"teal"}
+              ref={cancelRef}
+              onClick={onCloseDialogCancel}
+            >
+              Nanti Saja
+            </Button>
+            <Button
+              ml={3}
+              bgColor={"#009262"}
+              textColor={"white"}
+              onClick={cancelHandler}
+            >
+              Ya, Batalkan
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Box>
   );
 };

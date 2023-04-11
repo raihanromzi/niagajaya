@@ -17,9 +17,8 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { MdKeyboardArrowDown, MdReceipt } from "react-icons/md";
-import { axiosInstance } from "../config/config";
 
-const OrderCard = ({ order, onOpenModal }) => {
+const OrderCard = ({ order, onOpenProofModal, onOpenDialogCancel }) => {
   const [isOrderSummaryExpanded, setIsOrderSummaryExpanded] = useState(false);
   const [isListProductsExpanded, setIsListProductsExpanded] = useState(false);
 
@@ -29,17 +28,6 @@ const OrderCard = ({ order, onOpenModal }) => {
 
   const handleToggleListProducts = () => {
     setIsListProductsExpanded(!isListProductsExpanded);
-  };
-
-  const cancelHandler = async () => {
-    try {
-      const res = await axiosInstance.post(`/orders/v3/${order.id}`, null, {
-        withCredentials: true,
-      });
-      console.log(res.data);
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   return (
@@ -173,55 +161,63 @@ const OrderCard = ({ order, onOpenModal }) => {
         <HStack w={"full"} justifyContent={"space-between"} paddingY={"1.5"}>
           <Button
             leftIcon={<MdReceipt />}
-            onClick={onOpenModal}
+            onClick={onOpenProofModal}
             isDisabled={order.paymentImageUrl === null}
           >
             Lihat Bukti Pembayaran
           </Button>
-          {order.status === "REQUESTED" ? (
-            <ButtonGroup spacing="4">
+
+          <ButtonGroup spacing="4">
+            {order.status === "UNSETTLED" ||
+            order.status === "REQUESTED" ||
+            order.status === "PREPARING" ? (
               <Button
                 textColor={"#009262"}
                 border={"2px"}
                 borderColor={"#009262"}
                 bgColor={"white"}
-              >
-                Tolak Pembayaran
-              </Button>
-              <Button
-                textColor={"white"}
-                fontWeight={"bold"}
-                bgColor={"#009262"}
-                _hover={{
-                  backgroundColor: "#00b377",
-                }}
-              >
-                Konfirmasi Pembayaran
-              </Button>
-            </ButtonGroup>
-          ) : order.status === "PREPARING" ? (
-            <ButtonGroup spacing="4">
-              <Button
-                textColor={"#009262"}
-                border={"2px"}
-                borderColor={"#009262"}
-                bgColor={"white"}
-                onClick={cancelHandler}
+                onClick={onOpenDialogCancel}
               >
                 Batalkan Pesanan
               </Button>
-              <Button
-                textColor={"white"}
-                fontWeight={"bold"}
-                bgColor={"#009262"}
-                _hover={{
-                  backgroundColor: "#00b377",
-                }}
-              >
-                Terima Pesanan
-              </Button>
-            </ButtonGroup>
-          ) : null}
+            ) : null}
+
+            {order.status === "REQUESTED" ? (
+              <ButtonGroup spacing="4">
+                <Button
+                  textColor={"#009262"}
+                  border={"2px"}
+                  borderColor={"#009262"}
+                  bgColor={"white"}
+                >
+                  Tolak Pembayaran
+                </Button>
+                <Button
+                  textColor={"white"}
+                  fontWeight={"bold"}
+                  bgColor={"#009262"}
+                  _hover={{
+                    backgroundColor: "#00b377",
+                  }}
+                >
+                  Konfirmasi Pembayaran
+                </Button>
+              </ButtonGroup>
+            ) : order.status === "PREPARING" ? (
+              <ButtonGroup spacing="4">
+                <Button
+                  textColor={"white"}
+                  fontWeight={"bold"}
+                  bgColor={"#009262"}
+                  _hover={{
+                    backgroundColor: "#00b377",
+                  }}
+                >
+                  Kirim Pesanan
+                </Button>
+              </ButtonGroup>
+            ) : null}
+          </ButtonGroup>
         </HStack>
       </Box>
     </Box>
