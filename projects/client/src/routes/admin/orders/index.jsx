@@ -206,14 +206,6 @@ const AdminOrdersPage = () => {
       setTempProductName(productName);
     }
 
-    if (status === undefined) {
-      setSortBy("latest");
-      setTempSortBy("latest");
-    } else {
-      setSortBy(sortBy);
-      setTempSortBy(sortBy);
-    }
-
     setCurrentPage(page);
 
     if (sortBy === undefined) {
