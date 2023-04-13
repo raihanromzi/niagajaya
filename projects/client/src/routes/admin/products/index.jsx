@@ -54,6 +54,7 @@ import {
 import AdminProductsLayout from "../../../components/AdminProductsLayout";
 import FormGrid from "../../../components/FormGrid";
 import SortButton from "../../../components/SortButton";
+import PaginationNav from "../../../components/PaginationNav";
 
 /** @type {import("react-router-dom").LoaderFunction} */
 export const ProductsLoader = async ({ request }) => {
@@ -245,48 +246,10 @@ const ProductsPage = () => {
           </Tbody>
         </Table>
       </TableContainer>
-      <Flex justifyContent="space-between">
-        <IconButton
-          icon={<FaChevronLeft />}
-          aria-label="previous 10 rows"
-          size="sm"
-          isDisabled={!+searchParams.get("page")}
-          onClick={() => {
-            setSearchParams((val) => {
-              val.set("page", `${+val.get("page") - 1}`);
-              return val;
-            });
-          }}
-        />
-        <ButtonGroup>
-          {data?.pages?.map((value) => (
-            <Button
-              key={value}
-              size="sm"
-              onClick={() => {
-                setSearchParams((val) => {
-                  val.set("page", `${value}`);
-                  return val;
-                });
-              }}
-            >
-              {value + 1}
-            </Button>
-          ))}
-        </ButtonGroup>
-        <IconButton
-          icon={<FaChevronRight />}
-          aria-label="next 10 rows"
-          size="sm"
-          isDisabled={data?.pages.length <= +searchParams.get("page") + 1}
-          onClick={() => {
-            setSearchParams((val) => {
-              val.set("page", `${+val.get("page") + 1}`);
-              return val;
-            });
-          }}
-        />
-      </Flex>
+      <PaginationNav
+        searchParamsState={[searchParams, setSearchParams]}
+        pages={data?.pages}
+      />
       <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
         <ModalOverlay />
         <ModalContent>
