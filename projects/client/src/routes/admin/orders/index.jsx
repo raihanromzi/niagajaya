@@ -59,7 +59,6 @@ const AdminOrdersPage = () => {
   const [modalImage, setModalImage] = useState("");
 
   const handleOpenModal = (imageUrl) => {
-    console.log("kebuka");
     setIsOpen(true);
     setModalImage(imageUrl);
   };
@@ -207,14 +206,6 @@ const AdminOrdersPage = () => {
       setTempProductName(productName);
     }
 
-    if (status === undefined) {
-      setSortBy("latest");
-      setTempSortBy("latest");
-    } else {
-      setSortBy(sortBy);
-      setTempSortBy(sortBy);
-    }
-
     setCurrentPage(page);
 
     if (sortBy === undefined) {
@@ -274,7 +265,6 @@ const AdminOrdersPage = () => {
         const res = await axiosInstance.get(`/orders${queryParams}`, {
           withCredentials: true,
         });
-        console.log(res.data);
         setOrders(res.data);
       } catch (error) {
         console.error(error);
