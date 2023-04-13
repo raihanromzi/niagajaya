@@ -53,7 +53,14 @@ const router = createBrowserRouter([
     path: "/",
     Component: RootLayout,
     children: [
-      { index: true, Component: IndexPage },
+      {
+        index: true,
+        Component: () => (
+          <PageProtected>
+            <IndexPage />
+          </PageProtected>
+        ),
+      },
       { path: "register", Component: RegisterPage, action: registerAction },
       {
         path: "set-password/:token",
