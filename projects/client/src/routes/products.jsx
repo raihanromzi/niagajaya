@@ -85,7 +85,7 @@ const ProductsPage = () => {
 
   async function fetchCategories() {
     try {
-      const res = await axiosInstance.get(`/categories`, {
+      const res = await axiosInstance.get(`/categories?size=9999`, {
         withCredentials: true,
       });
       setCategories(res.data);
@@ -131,7 +131,7 @@ const ProductsPage = () => {
       setTempSortBy(sortBy);
     }
     setSize(size);
-    async function fetchProducts(page, name, categoryId, sortBy, size) {
+    async function fetchProducts({ page, name, categoryId, sortBy, size }) {
       try {
         let queryParams = "";
         const filteredParams = { name, categoryId, sortBy, page, size };
@@ -159,9 +159,9 @@ const ProductsPage = () => {
     }
 
     if (userSelector.id) {
-      fetchProducts(page, name, categoryId, sortBy, size);
+      fetchProducts({ page, name, categoryId, sortBy, size });
     } else {
-      fetchProducts(page);
+      fetchProducts({ page, categoryId });
     }
   }, [location]);
 

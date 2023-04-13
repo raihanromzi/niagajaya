@@ -69,9 +69,7 @@ const AdminOrdersPage = () => {
   const [status, setStatus] = useState();
   const [tempStatus, setTempStatus] = useState();
   const [size, setSize] = useState();
-
   const [isOpenProof, setIsOpenProof] = useState(false);
-
   const [modalImage, setModalImage] = useState("");
   const [selectedOrder, setSelectedOrder] = useState();
 
@@ -255,14 +253,6 @@ const AdminOrdersPage = () => {
     } else if (productName !== undefined) {
       setProductName(productName);
       setTempProductName(productName);
-    }
-
-    if (status === undefined) {
-      setSortBy("latest");
-      setTempSortBy("latest");
-    } else {
-      setSortBy(sortBy);
-      setTempSortBy(sortBy);
     }
 
     setCurrentPage(page);
