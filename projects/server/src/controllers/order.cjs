@@ -14,7 +14,7 @@ module.exports = {
         warehouseName,
         productName,
         page = 1,
-        size = 1,
+        size = 4,
         sortBy = "latest",
         status = "UNSETTLED",
       } = req.query;
@@ -130,7 +130,7 @@ module.exports = {
         warehouseName,
         productName,
         status = "UNSETTLED",
-        size = 1,
+        size = 4,
       } = req.query;
 
       const where = {};
@@ -174,6 +174,67 @@ module.exports = {
       });
       const totalPage = Math.ceil(totalOrder / size);
       res.send({ totalPage });
+    } catch (error) {
+      console.error(error);
+      res.status(400).json({
+        message: error,
+      });
+    }
+  },
+  cancelOrder: async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(400).json({
+          message: "Harus login",
+        });
+      }
+
+      const user = await prisma.user.findFirst({
+        where: { id: req.session.user.id },
+      });
+
+      if (user.role === "USER") {
+        return res.status(400).json({
+          message: "Anda tidak memiliki otoritas untuk mengubah data ini",
+        });
+      }
+
+      const order = await prisma.order.findFirst({
+        where: {
+          id: parseInt(req.params.id),
+        },
+      });
+
+      if (user.role === "MANAGER") {
+        const warehouse = await prisma.warehouse.findFirst({
+          where: {
+            id: order.warehouseId,
+          },
+        });
+        if (warehouse.managerId !== user.id) {
+          return res.status(400).json({
+            message: "Anda tidak memiliki otoritas untuk mengubah data ini",
+          });
+        }
+      }
+
+      if (
+        order.status === "UNSETTLED" ||
+        order.status === "REQUESTED" ||
+        order.status === "PREPARING"
+      ) {
+        await prisma.order.update({
+          where: { id: parseInt(req.params.id) },
+          data: {
+            status: "CANCELLED",
+          },
+        });
+      } else {
+        return res.status(400).json({
+          message: "Anda tidak dapat membatalkan pesanan",
+        });
+      }
+      res.send("Order Canceled");
     } catch (error) {
       console.error(error);
       res.status(400).json({
