@@ -1,13 +1,16 @@
 import {
   Alert,
   AlertIcon,
+  Box,
   Button,
+  Center,
   FormControl,
   FormHelperText,
   Heading,
   HStack,
   Input,
   Select,
+  Text,
   Textarea,
   VStack,
 } from "@chakra-ui/react";
@@ -18,8 +21,7 @@ import { MdLocationOn } from "react-icons/md";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
-import { axiosInstance } from "../config/config";
-import PageProtected from "./protected";
+import { axiosInstance } from "../../../config/config";
 
 const WarehouseUpdatePage = () => {
   const navigate = useNavigate();
@@ -35,6 +37,9 @@ const WarehouseUpdatePage = () => {
   const [showMap, setShowMap] = useState(false);
   const [msg, setMsg] = useState("");
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(true);
 
   const formik = useFormik({
     initialValues: {
@@ -227,7 +232,10 @@ const WarehouseUpdatePage = () => {
         formik.setFieldValue("detail", res.data.detail);
         formik.setFieldValue("latitude", res.data.latitude);
         formik.setFieldValue("longitude", res.data.longitude);
+        setLoading(false);
       } catch (error) {
+        setLoading(false);
+        setNotFound(true);
         console.error(error);
         setStatus("error");
         setMsg(error.message);
@@ -253,211 +261,247 @@ const WarehouseUpdatePage = () => {
       setShowMap(true);
     }
   }, [showMap]);
+
+  useEffect(() => {
+    if (
+      formik.values.name &&
+      formik.values.managerId &&
+      formik.values.province &&
+      formik.values.city &&
+      formik.values.detail &&
+      formik.values.latitude &&
+      formik.values.longitude
+    ) {
+      setIsDisabled(false);
+    } else {
+      setIsDisabled(true);
+    }
+  }, [formik.values]);
+
   return (
-    <PageProtected adminOnly={true} needLogin={true}>
-      <VStack alignItems={"start"} gap={5}>
-        <Heading w={"full"} textAlign={"center"}>
-          Mengelola Warehouse
-        </Heading>
-        <Heading size={"md"}>Edit Warehouse</Heading>{" "}
-        <FormControl>
-          <Input
-            type="text"
-            name="name"
-            bgColor="#F1FBF8"
-            placeholder="Name"
-            value={formik.values.name}
-            onChange={(e) => formik.setFieldValue("name", e.target.value)}
-          />
-          <FormHelperText w={"full"} textAlign={"start"}>
-            {formik.errors.name}
-          </FormHelperText>
-        </FormControl>
-        <FormControl>
-          <Select
-            name="manager"
-            placeholder="Pilih Manager"
-            bgColor="#F1FBF8"
-            onChange={(e) => {
-              formik.setFieldValue("managerId", e.target.value);
-            }}
-            value={formik.values.managerId ? formik.values.managerId : 0}
-          >
-            {managers.map((manager) => {
-              return (
-                <option key={manager.id} value={manager.id}>
-                  {manager.email}
-                </option>
-              );
-            })}
-          </Select>
-          <FormHelperText w={"full"} textAlign={"start"}>
-            {formik.errors.managerId}
-          </FormHelperText>
-        </FormControl>
-        <FormControl>
-          <Select
-            name="province"
-            placeholder="Pilih Provinsi"
-            bgColor="#F1FBF8"
-            value={selectedProvince ? selectedProvince : 0}
-            onChange={(e) => {
-              formik.setFieldValue("latitude", 0);
-              formik.setFieldValue("longitude", 0);
-              setShowMap(false);
-              setSelectedProvince(e.target.value);
-              formik.setFieldValue(
-                "province",
-                provinces[e.target.value - 1]?.name
-              );
-            }}
-          >
-            {provinces.map((province, index) => {
-              return (
-                <option key={province.id} value={index + 1}>
-                  {province.name}
-                </option>
-              );
-            })}
-          </Select>
-          <FormHelperText w={"full"} textAlign={"start"}>
-            {formik.errors.province}
-          </FormHelperText>
-        </FormControl>
-        <FormControl>
-          <Select
-            name="city"
-            placeholder="Pilih Kota/Kabupaten"
-            bgColor="#F1FBF8"
-            value={selectedCity ? selectedCity : 0}
-            onChange={(e) => {
-              setShowMap(false);
-              setSelectedCity(e.target.value);
-              formik.setFieldValue("latitude", 0);
-              formik.setFieldValue("longitude", 0);
-              formik.setFieldValue("city", citys[e.target.value - 1]?.name);
-            }}
-          >
-            {citys.map((city, index) => {
-              return (
-                <option key={city.id} value={index + 1}>
-                  {city.name}
-                </option>
-              );
-            })}
-          </Select>
-          <FormHelperText w={"full"} textAlign={"start"}>
-            {formik.errors.city}
-          </FormHelperText>
-        </FormControl>
-        <FormControl>
-          <Textarea
-            name="detail"
-            bgColor="#F1FBF8"
-            placeholder="Keterangan"
-            value={formik.values.detail}
-            onChange={(e) => {
-              formik.setFieldValue("detail", e.target.value);
-            }}
-          />
-          <FormHelperText w={"full"} textAlign={"start"}>
-            {formik.errors.detail}
-          </FormHelperText>
-        </FormControl>
-        {status === "error" ? (
-          <Alert
-            status="error"
-            zIndex={2}
-            variant="top-accent"
-            fontSize={"md"}
-            mb={"1"}
-          >
-            <AlertIcon />
-            {msg}
-          </Alert>
-        ) : status === "success" ? (
-          <Alert
-            status="success"
-            zIndex={2}
-            variant="top-accent"
-            fontSize={"md"}
-            mb={"1"}
-          >
-            <AlertIcon />
-            {msg}
-          </Alert>
-        ) : null}
-        <Button
-          colorScheme="teal"
-          variant="outline"
-          w={"full"}
-          leftIcon={<MdLocationOn />}
-          isDisabled={selectedCity ? false : true}
-          onClick={() => {
-            setShowMap(!showMap);
-          }}
+    <Box px={8} flex={1} overflowY="auto">
+      <Heading py={7}>Edit Warehouse</Heading>
+      {!loading ? (
+        <VStack
+          alignItems={"start"}
+          gap={5}
+          bg={"white"}
+          p={5}
+          borderWidth="1px"
+          borderRadius="lg"
         >
-          Tambah Titik Lokasi
-        </Button>
-        {showMap && formik.values.latitude && formik.values.longitude ? (
-          <MapContainer
-            center={{
-              lat: formik.values.latitude,
-              lng: formik.values.longitude,
-            }}
-            zoom={16}
-            scrollWheelZoom={false}
-            style={{ height: 400, width: "100%", zIndex: 94 }}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          <FormControl>
+            <Input
+              type="text"
+              name="name"
+              bgColor="#F1FBF8"
+              placeholder="Name"
+              value={formik.values.name}
+              onChange={(e) => formik.setFieldValue("name", e.target.value)}
             />
-            <Marker
-              draggable={true}
-              eventHandlers={eventHandlers}
-              position={{
+            <FormHelperText w={"full"} textAlign={"start"}>
+              {formik.errors.name}
+            </FormHelperText>
+          </FormControl>
+          <FormControl>
+            <Select
+              name="manager"
+              placeholder="Pilih Manager"
+              bgColor="#F1FBF8"
+              onChange={(e) => {
+                formik.setFieldValue("managerId", e.target.value);
+              }}
+              value={formik.values.managerId ? formik.values.managerId : 0}
+            >
+              {managers.map((manager) => {
+                return (
+                  <option key={manager.id} value={manager.id}>
+                    {manager.email}
+                  </option>
+                );
+              })}
+            </Select>
+            <FormHelperText w={"full"} textAlign={"start"}>
+              {formik.errors.managerId}
+            </FormHelperText>
+          </FormControl>
+          <FormControl>
+            <Select
+              name="province"
+              placeholder="Pilih Provinsi"
+              bgColor="#F1FBF8"
+              value={selectedProvince ? selectedProvince : 0}
+              onChange={(e) => {
+                formik.setFieldValue("latitude", 0);
+                formik.setFieldValue("longitude", 0);
+                setShowMap(false);
+                setSelectedProvince(e.target.value);
+                formik.setFieldValue(
+                  "province",
+                  provinces[e.target.value - 1]?.name
+                );
+              }}
+            >
+              {provinces.map((province, index) => {
+                return (
+                  <option key={province.id} value={index + 1}>
+                    {province.name}
+                  </option>
+                );
+              })}
+            </Select>
+            <FormHelperText w={"full"} textAlign={"start"}>
+              {formik.errors.province}
+            </FormHelperText>
+          </FormControl>
+          <FormControl>
+            <Select
+              name="city"
+              placeholder="Pilih Kota/Kabupaten"
+              bgColor="#F1FBF8"
+              value={selectedCity ? selectedCity : 0}
+              onChange={(e) => {
+                setShowMap(false);
+                setSelectedCity(e.target.value);
+                formik.setFieldValue("latitude", 0);
+                formik.setFieldValue("longitude", 0);
+                formik.setFieldValue("city", citys[e.target.value - 1]?.name);
+              }}
+            >
+              {citys.map((city, index) => {
+                return (
+                  <option key={city.id} value={index + 1}>
+                    {city.name}
+                  </option>
+                );
+              })}
+            </Select>
+            <FormHelperText w={"full"} textAlign={"start"}>
+              {formik.errors.city}
+            </FormHelperText>
+          </FormControl>
+          <FormControl>
+            <Textarea
+              name="detail"
+              bgColor="#F1FBF8"
+              placeholder="Keterangan"
+              value={formik.values.detail}
+              onChange={(e) => {
+                formik.setFieldValue("detail", e.target.value);
+              }}
+            />
+            <FormHelperText w={"full"} textAlign={"start"}>
+              {formik.errors.detail}
+            </FormHelperText>
+          </FormControl>
+          {status === "error" ? (
+            <Alert
+              status="error"
+              zIndex={2}
+              variant="top-accent"
+              fontSize={"md"}
+              mb={"1"}
+            >
+              <AlertIcon />
+              {msg}
+            </Alert>
+          ) : status === "success" ? (
+            <Alert
+              status="success"
+              zIndex={2}
+              variant="top-accent"
+              fontSize={"md"}
+              mb={"1"}
+            >
+              <AlertIcon />
+              {msg}
+            </Alert>
+          ) : null}
+          <Button
+            colorScheme="teal"
+            variant="outline"
+            w={"full"}
+            leftIcon={<MdLocationOn />}
+            isDisabled={selectedCity ? false : true}
+            onClick={() => {
+              setShowMap(!showMap);
+            }}
+          >
+            Tambah Titik Lokasi
+          </Button>
+          {showMap && formik.values.latitude && formik.values.longitude ? (
+            <MapContainer
+              center={{
                 lat: formik.values.latitude,
                 lng: formik.values.longitude,
               }}
-              ref={markerRef}
+              zoom={16}
+              scrollWheelZoom={false}
+              style={{ height: 400, width: "100%", zIndex: 94 }}
             >
-              <Popup minWidth={90}>
-                <span>Penunjuk dapat digeser.</span>
-              </Popup>
-            </Marker>
-          </MapContainer>
-        ) : null}
-        <HStack w={"full"}>
-          <Button
-            onClick={() => {
-              navigate("/warehouses");
-            }}
-          >
-            Kembali
-          </Button>
-          <Button
-            textColor={"white"}
-            fontWeight={"medium"}
-            bgColor={"#009262"}
-            w={"full"}
-            isDisabled={
-              formik.values.latitude && formik.values.longitude && selectedCity
-                ? false
-                : true
-            }
-            _hover={{
-              backgroundColor: "#00b377",
-            }}
-            onClick={() => {
-              formik.handleSubmit();
-            }}
-          >
-            Simpan
-          </Button>
-        </HStack>
-      </VStack>
-    </PageProtected>
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <Marker
+                draggable={true}
+                eventHandlers={eventHandlers}
+                position={{
+                  lat: formik.values.latitude,
+                  lng: formik.values.longitude,
+                }}
+                ref={markerRef}
+              >
+                <Popup minWidth={90}>
+                  <span>Penunjuk dapat digeser.</span>
+                </Popup>
+              </Marker>
+            </MapContainer>
+          ) : null}
+          <HStack w={"full"}>
+            <Button
+              onClick={() => {
+                navigate("/admin/warehouses");
+              }}
+            >
+              Kembali
+            </Button>
+            <Button
+              textColor={"white"}
+              fontWeight={"medium"}
+              bgColor={"#009262"}
+              w={"full"}
+              isDisabled={isDisabled}
+              _hover={{
+                backgroundColor: "#00b377",
+              }}
+              onClick={() => {
+                formik.handleSubmit();
+              }}
+            >
+              Simpan
+            </Button>
+          </HStack>
+        </VStack>
+      ) : (
+        <Center h={"80vh"} bg={"white"} fontWeight={"bold"}>
+          {!notFound ? (
+            <Text>Loading ...</Text>
+          ) : (
+            <VStack>
+              <Text>Warehouse tidak ditemukan</Text>
+              <Button
+                onClick={() => {
+                  navigate("/admin/warehouses");
+                }}
+              >
+                Kembali
+              </Button>
+            </VStack>
+          )}
+        </Center>
+      )}
+    </Box>
   );
 };
 

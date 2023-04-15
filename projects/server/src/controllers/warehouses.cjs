@@ -69,6 +69,11 @@ module.exports = {
   },
   getManager: async (req, res) => {
     try {
+      if (isNaN(req.params.id)) {
+        return res.status(400).json({
+          message: "Parameter harus berupa number",
+        });
+      }
       const nonAffiliated = await prisma.user.findMany({
         where: { role: "MANAGER", warehouse: null },
       });
@@ -210,7 +215,11 @@ module.exports = {
           message: "Harus login",
         });
       }
-
+      if (isNaN(req.params.id)) {
+        return res.status(400).json({
+          message: "Parameter harus berupa number",
+        });
+      }
       const user = await prisma.user.findFirst({
         where: { id: req.session.user.id },
       });

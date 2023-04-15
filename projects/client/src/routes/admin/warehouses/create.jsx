@@ -2,6 +2,7 @@ import {
   Alert,
   AlertDescription,
   AlertIcon,
+  Box,
   Button,
   FormControl,
   FormHelperText,
@@ -10,6 +11,7 @@ import {
   Input,
   Select,
   Textarea,
+  Tooltip,
   VStack,
 } from "@chakra-ui/react";
 import axios from "axios";
@@ -19,8 +21,7 @@ import { MdLocationOn } from "react-icons/md";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import { axiosInstance } from "../config/config";
-import PageProtected from "./protected";
+import { axiosInstance } from "../../../config/config";
 
 const WarehouseCreatePage = () => {
   const navigate = useNavigate();
@@ -33,13 +34,13 @@ const WarehouseCreatePage = () => {
   const [showMap, setShowMap] = useState(false);
   const [msg, setMsg] = useState("");
   const [status, setStatus] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(true);
 
   const formik = useFormik({
     initialValues: {
       name: "",
       province: "",
       city: "",
-      district: "",
       managerId: 0,
       detail: "",
       latitude: 0,
@@ -94,7 +95,7 @@ const WarehouseCreatePage = () => {
             withCredentials: true,
           }
         );
-        navigate("/warehouses");
+        navigate("/admin/warehouses");
       } catch (error) {
         setStatus(true);
         if (Array.isArray(error.response.data?.message)) {
@@ -212,13 +213,33 @@ const WarehouseCreatePage = () => {
     }
   }, [showMap]);
 
+  useEffect(() => {
+    if (
+      formik.values.name &&
+      formik.values.managerId &&
+      formik.values.province &&
+      formik.values.city &&
+      formik.values.detail &&
+      formik.values.latitude &&
+      formik.values.longitude
+    ) {
+      setIsDisabled(false);
+    } else {
+      setIsDisabled(true);
+    }
+  }, [formik.values]);
+
   return (
-    <PageProtected adminOnly={true} needLogin={true}>
-      <VStack alignItems={"start"} gap={5}>
-        <Heading w={"full"} textAlign={"center"}>
-          Mengelola Warehouse
-        </Heading>
-        <Heading size={"md"}>Tambah Warehouse</Heading>{" "}
+    <Box px={8} flex={1} overflowY="auto">
+      <Heading py={7}>Tambah Warehouse Baru</Heading>
+      <VStack
+        alignItems={"start"}
+        gap={5}
+        bg={"white"}
+        p={5}
+        borderWidth="1px"
+        borderRadius="lg"
+      >
         <FormControl>
           <Input
             type="text"
@@ -383,33 +404,34 @@ const WarehouseCreatePage = () => {
         <HStack w={"full"}>
           <Button
             onClick={() => {
-              navigate("/warehouses");
+              navigate("/admin/warehouses");
             }}
           >
             Batal
           </Button>
-          <Button
-            textColor={"white"}
-            fontWeight={"medium"}
-            bgColor={"#009262"}
-            w={"full"}
-            isDisabled={
-              formik.values.latitude && formik.values.longitude && selectedCity
-                ? false
-                : true
-            }
-            _hover={{
-              backgroundColor: "#00b377",
-            }}
-            onClick={() => {
-              formik.handleSubmit();
-            }}
+          <Tooltip
+            label="Lengkapi data warehouse terlebih dahulu"
+            isDisabled={!isDisabled}
           >
-            Simpan
-          </Button>
+            <Button
+              textColor={"white"}
+              fontWeight={"medium"}
+              bgColor={"#009262"}
+              w={"full"}
+              isDisabled={isDisabled}
+              _hover={{
+                backgroundColor: "#00b377",
+              }}
+              onClick={() => {
+                formik.handleSubmit();
+              }}
+            >
+              Simpan
+            </Button>
+          </Tooltip>
         </HStack>
       </VStack>
-    </PageProtected>
+    </Box>
   );
 };
 

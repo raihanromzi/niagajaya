@@ -39,15 +39,15 @@ import "leaflet/dist/leaflet.css";
 import NoAuthorityPage from "./routes/noAuthority";
 import ProductDetailPage from "./routes/productDetail";
 import ProductsPage from "./routes/products";
-import WarehousePage from "./routes/warehouse";
-import WarehouseCreatePage from "./routes/warehouseCreate";
-import WarehouseUpdatePage from "./routes/warehouseUpdate";
 import SettingAddressPage from "./routes/settingAddress";
 import AddressCreatePage from "./routes/addressCreate";
 import AddressUpdatePage from "./routes/addressUpdate";
 import PageProtected from "./routes/protected";
 import CartPage from "./routes/cart";
 import AdminOrdersPage from "./routes/admin/orders";
+import WarehousePage from "./routes/admin/warehouses";
+import WarehouseCreatePage from "./routes/admin/warehouses/create";
+import WarehouseUpdatePage from "./routes/admin/warehouses/update";
 
 const router = createBrowserRouter([
   {
@@ -91,18 +91,6 @@ const router = createBrowserRouter([
       {
         path: "reset-password/email",
         Component: ResetPasswordEmail,
-      },
-      {
-        path: "warehouses",
-        Component: WarehousePage,
-      },
-      {
-        path: "warehouses/edit/:id",
-        Component: WarehouseUpdatePage,
-      },
-      {
-        path: "warehouses/create",
-        Component: WarehouseCreatePage,
       },
       {
         path: "products",
@@ -197,6 +185,35 @@ const router = createBrowserRouter([
             Component: () => (
               <PageProtected needLogin={true} exceptUser={true}>
                 <AdminOrdersPage />
+              </PageProtected>
+            ),
+          },
+        ],
+      },
+      {
+        path: "warehouses",
+        children: [
+          {
+            index: true,
+            Component: () => (
+              <PageProtected needLogin={true} adminOnly={true}>
+                <WarehousePage />
+              </PageProtected>
+            ),
+          },
+          {
+            path: "create",
+            Component: () => (
+              <PageProtected needLogin={true} adminOnly={true}>
+                <WarehouseCreatePage />
+              </PageProtected>
+            ),
+          },
+          {
+            path: "update/:id",
+            Component: () => (
+              <PageProtected needLogin={true} adminOnly={true}>
+                <WarehouseUpdatePage />
               </PageProtected>
             ),
           },
