@@ -23,6 +23,8 @@ export {
   useGetAllStockProductAndWarehouseInfoByWarehouseIdQuery,
   useDeleteStockProductMutation,
   useUpdateStockProductMutation,
+  useGetAllStockHistoryQuery,
+  useGetStockSummaryQuery,
 } from "./apis/warehousesAPI";
 
 export default rootReducer;

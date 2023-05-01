@@ -19,6 +19,10 @@ import {
   Input,
   InputGroup,
   Icon,
+  RadioGroup,
+  HStack,
+  Radio,
+  Button,
 } from "@chakra-ui/react";
 import Swal from "sweetalert2";
 import {
@@ -36,16 +40,22 @@ function AdminList() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [limit, setLimit] = useState(5);
+  const [sort, setSort] = useState("latest");
   const { data, isError, isLoading } = useGetAllAdminQuery({
     page,
     limit,
     search: searchParams.getAll("name"),
+    sort,
   });
   const [deleteAdmin] = useDeleteAdminMutation();
 
   useEffect(() => {
     setTotalPages(data?.pagination?.total_page);
   }, [data]);
+
+  const clearSort = () => {
+    setSort("");
+  };
 
   const deleteWarning = async (admin) => {
     try {
@@ -128,6 +138,25 @@ function AdminList() {
     <Box>
       <TableContainer mb={5}>
         <Flex justifyContent={"flex-end"} mb={4}>
+          <InputGroup size="sm">
+            <RadioGroup value={sort}>
+              <Flex justifyContent="center" alignItems="center" height="100%">
+                <HStack spacing="24px">
+                  <Radio value="oldest" onClick={() => setSort("oldest")}>
+                    Oldest
+                  </Radio>
+                  <Radio value="latest" onClick={() => setSort("latest")}>
+                    Latest
+                  </Radio>
+                  <IconButton
+                    icon={<FaTimes />}
+                    size="sm"
+                    onClick={clearSort}
+                  />
+                </HStack>
+              </Flex>
+            </RadioGroup>
+          </InputGroup>
           <InputGroup w={48} size="sm">
             <InputLeftElement pointerEvents="none">
               <Icon as={FaSearch} />
@@ -142,6 +171,7 @@ function AdminList() {
               }}
             />
           </InputGroup>
+
           <AddAdmin />
         </Flex>
         <Table border="solid 1px #EBEBEB" size="sm">
@@ -206,7 +236,7 @@ function AdminList() {
           />
         )}
         <Text paddingX={"10px"}>
-          {page} of {totalPages ? totalPages : 1}
+          {page} of {totalPages || 1}
         </Text>
         {page < totalPages ? (
           <IconButton

@@ -24,13 +24,13 @@ const getAllUsers = async (req, res) => {
     let orderBy
     switch (sortBy) {
       case 'latest':
-        orderBy = { updatedAt: 'desc' }
+        orderBy = { id: 'desc' }
         break
       case 'oldest':
-        orderBy = { updatedAt: 'asc' }
+        orderBy = { id: 'asc' }
         break
       default:
-        orderBy = { updatedAt: 'desc' }
+        orderBy = { id: 'desc' }
         break
     }
 
@@ -73,7 +73,6 @@ const getAllUsers = async (req, res) => {
     })
     const totalPage = Math.ceil(resultCount / limit)
 
-    console.log(users)
     return res.status(200).send(
       response.responseSuccess(
         200,

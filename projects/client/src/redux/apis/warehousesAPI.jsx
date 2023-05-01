@@ -10,9 +10,11 @@ const warehousesApi = createApi({
       getAllWarehouses: builder.query({
         async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
           return await fetchWithBQ(
-            `/admin/stock/warehouses?page=${_arg.page ? _arg.page : 1}&size=${
-              _arg.size ? _arg.size : 10
-            }&manager=${_arg.user.role === "ADMIN" ? "" : _arg.user.id}`,
+            `/admin/stock/warehouses?page=${_arg.page || 1}&limit=${
+              _arg.limit || 10
+            }&manager=${
+              _arg.user.role === "ADMIN" ? "" : _arg.user.id
+            }&search=${_arg.search[0] || ""}&sortBy=${_arg.sort || "latest"}`,
           );
         },
         providesTags: ["Warehouses"],
@@ -20,7 +22,11 @@ const warehousesApi = createApi({
       getAllStockProductAndWarehouseInfoByWarehouseId: builder.query({
         async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
           return await fetchWithBQ(
-            `/admin/stock/warehouses/${_arg.warehouseId}?manager=${_arg.user.id}`,
+            `/admin/stock/warehouses/${_arg.warehouseId}?manager=${
+              _arg.user.id
+            }&page=${_arg.page || 1}&limit=${_arg.limit || 5}&sortBy=${
+              _arg.sort || "latest"
+            }&search=${_arg.search[0] || ""}`,
           );
         },
         providesTags: ["Products"],
@@ -47,6 +53,34 @@ const warehousesApi = createApi({
         },
         invalidatesTags: ["Products"],
       }),
+      getAllStockHistory: builder.query({
+        async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+          return await fetchWithBQ(
+            `/admin/stock/warehouses/${parseInt(
+              _arg.warehouseId,
+            )}/histories/${parseInt(_arg.productId)}?manager=${parseInt(
+              _arg.user.id,
+            )}&start=${_arg.startDate || ""}&end=${_arg.endDate || ""}&page=${
+              _arg.page || 1
+            }&limit=${_arg.limit || 5}&sortBy=${_arg.sort || "latest"}`,
+          );
+        },
+        providesTags: ["Products"],
+      }),
+      getStockSummary: builder.query({
+        async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
+          return await fetchWithBQ(
+            `/admin/stock/warehouses/${parseInt(
+              _arg.warehouseId,
+            )}/histories?manager=${parseInt(_arg.user.id)}&start=${
+              _arg.startDate || ""
+            }&end=${_arg.endDate || ""}&page=${_arg.page || 1}&limit=${
+              _arg.limit || 5
+            }&sortBy=${_arg.sort || "latest"}&search=${_arg.search[0] || ""}`,
+          );
+        },
+        providesTags: ["Products"],
+      }),
     };
   },
 });
@@ -56,5 +90,7 @@ export const {
   useGetAllStockProductAndWarehouseInfoByWarehouseIdQuery,
   useUpdateStockProductMutation,
   useDeleteStockProductMutation,
+  useGetAllStockHistoryQuery,
+  useGetStockSummaryQuery,
 } = warehousesApi;
 export { warehousesApi };

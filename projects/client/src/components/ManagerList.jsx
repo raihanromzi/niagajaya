@@ -19,6 +19,10 @@ import {
   InputLeftElement,
   Icon,
   Input,
+  RadioGroup,
+  HStack,
+  Radio,
+  Button,
 } from "@chakra-ui/react";
 import { FaChevronLeft, FaChevronRight, FaSearch } from "react-icons/fa";
 import { useSearchParams } from "react-router-dom";
@@ -26,13 +30,20 @@ import { useSearchParams } from "react-router-dom";
 function ManagerList() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
+  const [sort, setSort] = useState("latest");
   const [searchParams, setSearchParams] = useSearchParams();
-
   const [totalPages, setTotalPages] = useState(1);
+
   const { data, isError, isLoading } = useGetAllManagerQuery({
     page,
+    limit,
+    sort,
     search: searchParams.getAll("name"),
   });
+
+  const clearSort = () => {
+    setSort("");
+  };
 
   useEffect(() => {
     setTotalPages(data?.pagination?.total_page);
@@ -95,6 +106,25 @@ function ManagerList() {
     <Box>
       <TableContainer mb={5}>
         <Flex justifyContent={"flex-end"} mb={4}>
+          <InputGroup size="sm">
+            <RadioGroup value={sort}>
+              <Flex justifyContent="center" alignItems="center" height="100%">
+                <HStack spacing="24px">
+                  <Radio value="oldest" onClick={() => setSort("oldest")}>
+                    Oldest
+                  </Radio>
+                  <Radio value="latest" onClick={() => setSort("latest")}>
+                    Latest
+                  </Radio>
+                  <IconButton
+                    icon={<FaTimes />}
+                    size="sm"
+                    onClick={clearSort}
+                  />
+                </HStack>
+              </Flex>
+            </RadioGroup>
+          </InputGroup>
           <InputGroup w={48} size="sm">
             <InputLeftElement pointerEvents="none">
               <Icon as={FaSearch} />
@@ -165,7 +195,7 @@ function ManagerList() {
           />
         )}
         <Text paddingX={"10px"}>
-          {page} of {totalPages ? totalPages : 1}
+          {page} of {totalPages || 1}
         </Text>
         {page < totalPages ? (
           <IconButton

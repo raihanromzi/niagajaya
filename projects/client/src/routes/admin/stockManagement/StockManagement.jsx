@@ -9,8 +9,8 @@ import {
 } from "@chakra-ui/react";
 import PageProtected from "../../protected";
 import AdminProductsLayout from "../../../components/AdminProductsLayout";
-import StockList from "./StockList";
-import StockHistory from "./stockHistory";
+import StockList from "../../../components/StockList";
+import StockHistory from "./StockHistory";
 
 function StockManagement() {
   return (

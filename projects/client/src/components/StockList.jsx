@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { useParams, useSearchParams } from "react-router-dom";
-import PageProtected from "../../protected";
+import PageProtected from "../routes/protected";
 import {
   useGetAllStockProductAndWarehouseInfoByWarehouseIdQuery,
   useDeleteStockProductMutation,
-} from "../../../redux/store";
+} from "../redux/store";
 import {
   FaTrash,
   FaPen,
@@ -13,6 +13,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaSearch,
+  FaTimes,
 } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useSelector } from "react-redux";
@@ -35,7 +36,9 @@ import {
   Input,
   InputGroup,
   Icon,
-  useDisclosure,
+  RadioGroup,
+  HStack,
+  Radio,
 } from "@chakra-ui/react";
 import { EditStock } from "./EditStock";
 
@@ -44,6 +47,7 @@ function StockList() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [limit, setLimit] = useState(5);
+  const [sort, setSort] = useState("latest");
   const { id } = useParams();
   const user = useSelector((state) => state.auth);
 
@@ -51,8 +55,20 @@ function StockList() {
     useGetAllStockProductAndWarehouseInfoByWarehouseIdQuery({
       warehouseId: parseInt(id),
       user,
+      page,
+      limit,
+      sort,
+      search: searchParams.getAll("name"),
     });
   const [deleteStockProduct] = useDeleteStockProductMutation();
+
+  useEffect(() => {
+    setTotalPages(data?.pagination?.total_page);
+  }, [data]);
+
+  const clearSort = () => {
+    setSort("");
+  };
 
   const deleteWarning = async (productId) => {
     try {
@@ -146,6 +162,26 @@ function StockList() {
       <Box>
         <TableContainer mb={5}>
           <Flex justifyContent={"flex-end"} mb={4}>
+            <InputGroup size="sm">
+              <RadioGroup value={sort}>
+                <Flex justifyContent="center" alignItems="center" height="100%">
+                  <HStack spacing="24px">
+                    <Radio value="oldest" onClick={() => setSort("oldest")}>
+                      Oldest
+                    </Radio>
+                    <Radio value="latest" onClick={() => setSort("latest")}>
+                      Latest
+                    </Radio>
+                    <IconButton
+                      icon={<FaTimes />}
+                      size="sm"
+                      onClick={clearSort}
+                    />
+                  </HStack>
+                </Flex>
+              </RadioGroup>
+            </InputGroup>
+
             <InputGroup w={48} size="sm">
               <InputLeftElement pointerEvents="none">
                 <Icon as={FaSearch} />
@@ -219,7 +255,7 @@ function StockList() {
             />
           )}
           <Text paddingX={"10px"}>
-            {page} of {totalPages ? totalPages : 1}
+            {page} of {totalPages || 1}
           </Text>
           {page < totalPages ? (
             <IconButton

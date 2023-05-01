@@ -1,4 +1,4 @@
-import { useUpdateStockProductMutation } from "../../../redux/store";
+import { useUpdateStockProductMutation } from "../redux/store";
 import { Formik, ErrorMessage, Form, Field } from "formik";
 import * as Yup from "yup";
 import { useParams } from "react-router-dom";

@@ -3,32 +3,42 @@ const response = require('../utils/responses')
 
 const getWarehouses = async (req, res) => {
   try {
+    const { search, manager, page = 1, limit = 10, sortBy } = req.query
+    const skip = (page - 1) * limit
+
     if (!req.session.id) {
       return res
         .status(400)
         .send(response.responseError(401, 'UNAUTHORIZED', 'NEED TO LOGIN'))
     }
 
-    const search = req.query.search
-    const managerId = req.query.manager
-    const page = parseInt(req.query.page) || 1
-    const size = parseInt(req.query.size) || 5
-    const skip = (page - 1) * size
-    const take = size
-
     const where = {}
     if (search) {
       where.OR = [{ name: { contains: search } }]
     }
 
-    if (managerId) {
-      where.manager = { id: parseInt(managerId) }
+    if (manager) {
+      where.manager = { id: parseInt(manager) }
+    }
+
+    let orderBy
+    switch (sortBy) {
+      case 'latest':
+        orderBy = { id: 'desc' }
+        break
+      case 'oldest':
+        orderBy = { id: 'asc' }
+        break
+      default:
+        orderBy = { id: 'desc' }
+        break
     }
 
     const warehouses = await prisma.warehouse.findMany({
       where,
       skip,
-      take,
+      orderBy,
+      take: parseInt(limit),
       select: {
         id: true,
         name: true,
@@ -50,7 +60,7 @@ const getWarehouses = async (req, res) => {
 
     const count = await prisma.warehouse.count({ where })
 
-    const totalPages = Math.ceil(count / size)
+    const totalPages = Math.ceil(count / limit)
 
     res
       .status(200)
@@ -71,6 +81,16 @@ const getWarehouses = async (req, res) => {
 }
 
 const getStockByWarehouse = async (req, res) => {
+  const { id: warehouseId = parseInt(req.params.id) } = req.params
+  const {
+    manager: managerId,
+    search = '',
+    page = 1,
+    limit = 5,
+    sortBy,
+  } = req.query
+  const skip = (page - 1) * limit
+
   try {
     if (!req.session.id) {
       return res
@@ -78,14 +98,18 @@ const getStockByWarehouse = async (req, res) => {
         .send(response.responseError(401, 'UNAUTHORIZED', 'NEED TO LOGIN'))
     }
 
-    const warehouseId = parseInt(req.params.id)
-    const managerId = req.query.manager
-
-    const search = req.query.search
-    const page = parseInt(req.query.page) || 1
-    const size = parseInt(req.query.size) || 10
-    const skip = (page - 1) * size
-    const take = size
+    let orderBy
+    switch (sortBy) {
+      case 'latest':
+        orderBy = { productId: 'desc' }
+        break
+      case 'oldest':
+        orderBy = { productId: 'asc' }
+        break
+      default:
+        orderBy = { productId: 'desc' }
+        break
+    }
 
     const checkIsAdmin = await prisma.user.findFirst({
       where: {
@@ -96,7 +120,7 @@ const getStockByWarehouse = async (req, res) => {
 
     const checkWarehouseAdmin = await prisma.warehouse.findFirst({
       where: {
-        id: warehouseId,
+        id: parseInt(warehouseId),
         managerId: parseInt(managerId),
       },
     })
@@ -113,11 +137,15 @@ const getStockByWarehouse = async (req, res) => {
     }
 
     const stocks = await prisma.stock.findMany({
-      where: {
-        warehouseId,
-      },
       skip,
-      take,
+      take: parseInt(limit),
+      orderBy,
+      where: {
+        AND: [
+          { warehouseId: parseInt(warehouseId) },
+          { product: { name: { contains: search } } },
+        ],
+      },
       select: {
         warehouseId: true,
         productId: true,
@@ -145,21 +173,27 @@ const getStockByWarehouse = async (req, res) => {
       },
     })
 
-    const count = await prisma.stock.count({ where })
-    const totalPages = Math.ceil(count / size)
+    const count = await prisma.stock.count({
+      where: {
+        warehouseId: parseInt(warehouseId),
+      },
+    })
+    const totalPages = Math.ceil(count / limit)
 
-    res
-      .status(200)
-      .send(
-        response.responseSuccess(
-          200,
-          'SUCCESS',
-          { current_page: page, total_page: totalPages, totalData: count },
-          stocks
-        )
+    res.status(200).send(
+      response.responseSuccess(
+        200,
+        'SUCCESS',
+        {
+          current_page: parseInt(page),
+          total_page: totalPages,
+          totalData: count,
+        },
+        stocks
       )
+    )
   } catch (error) {
-    // console.log(error)
+    console.log(error)
     return res
       .status(500)
       .send(response.responseError(500, 'SERVER_ERROR', { message: error }))
@@ -462,22 +496,39 @@ const deleteStockProduct = async (req, res) => {
   }
 }
 
+// Show all changes
 const showAllStockHistory = async (req, res) => {
   try {
+    const { warehouseId, productId } = req.params
+    const {
+      manager: managerId,
+      start,
+      end,
+      page = 1,
+      limit = 10,
+      sortBy,
+    } = req.query
+    const skip = (page - 1) * limit
+
     if (!req.session.id) {
       res
         .status(400)
         .send(response.responseError(401, 'UNAUTHORIZED', 'NEED TO LOGIN'))
       return
     }
-    const { warehouseId, productId } = req.params
-    const managerId = req.query.manager
 
-    const search = req.query.search
-    const page = parseInt(req.query.page) || 1
-    const size = parseInt(req.query.size) || 10
-    const skip = (page - 1) * size
-    const take = size
+    let orderBy
+    switch (sortBy) {
+      case 'latest':
+        orderBy = { id: 'desc' }
+        break
+      case 'oldest':
+        orderBy = { id: 'asc' }
+        break
+      default:
+        orderBy = { id: 'desc' }
+        break
+    }
 
     const checkIsAdmin = await prisma.user.findFirst({
       where: {
@@ -500,15 +551,23 @@ const showAllStockHistory = async (req, res) => {
     }
 
     const getAllStockChange = await prisma.journal.findMany({
+      take: parseInt(limit),
+      skip,
+      orderBy,
       where: {
         warehouseId: parseInt(warehouseId),
         productId: parseInt(productId),
+        createdAt: {
+          gt: start ? new Date(start).toISOString() : undefined,
+          lt: end ? new Date(end).toISOString() : undefined,
+        },
       },
       select: {
         id: true,
         warehouseId: true,
         stock_before: true,
         stock_after: true,
+        createdAt: true,
         Type_Journal: {
           select: {
             id: true,
@@ -569,6 +628,7 @@ const showAllStockHistory = async (req, res) => {
         stockAfter: getAllStockChange[i].stock_after,
         typeName: getAllStockChange[i].Type_Journal.name,
         type: getAllStockChange[i].Type_Journal.type ? 'IN' : 'OUT',
+        createdAt: getAllStockChange[i].createdAt,
       })
       // if type true = total_out = 0, else if stock_before = stock_after = 0, else total_out = stock_before - stock_after
       getAllStockChange[i].Type_Journal.type
@@ -596,9 +656,208 @@ const showAllStockHistory = async (req, res) => {
     }
     result.changes = changes
 
+    const totalStockChangesCount = await prisma.journal.count({
+      where: {
+        warehouseId: parseInt(warehouseId),
+        productId: parseInt(productId),
+        createdAt: {
+          gt: start ? new Date(start).toISOString() : undefined,
+          lt: end ? new Date(end).toISOString() : undefined,
+        },
+      },
+    })
+
+    const totalPage = Math.ceil(totalStockChangesCount / limit)
+
+    return res.status(200).send(
+      response.responseSuccess(
+        200,
+        'SUCCESS',
+        {
+          current_page: parseInt(page),
+          total_page: totalPage,
+          total_data: result.changes.length,
+        },
+        result
+      )
+    )
+  } catch (error) {
+    console.error(error)
     return res
-      .status(200)
-      .send(response.responseSuccess(200, 'SUCCESS', {}, result))
+      .status(500)
+      .send(response.responseError(500, 'SERVER_ERROR', { message: error }))
+  }
+}
+
+// Show only summary
+const showStockSummary = async (req, res) => {
+  try {
+    const { warehouseId } = req.params
+    const {
+      manager: managerId,
+      start,
+      end,
+      search = '',
+      page = 1,
+      limit = 10,
+      sortBy,
+    } = req.query
+
+    const skip = (page - 1) * limit
+    const result = []
+    let totalOut = 0
+    let totalIn = 0
+    let temp_totalStock = 0
+
+    if (!req.session.id) {
+      res
+        .status(400)
+        .send(response.responseError(401, 'UNAUTHORIZED', 'NEED TO LOGIN'))
+      return
+    }
+
+    let orderBy
+    switch (sortBy) {
+      case 'latest':
+        orderBy = { productId: 'desc' }
+        break
+      case 'oldest':
+        orderBy = { productId: 'asc' }
+        break
+      default:
+        orderBy = { productId: 'desc' }
+        break
+    }
+
+    const checkIsAdmin = await prisma.user.findFirst({
+      where: {
+        id: parseInt(managerId),
+        role: 'ADMIN',
+      },
+    })
+
+    const checkWarehouseAdmin = await prisma.warehouse.findFirst({
+      where: {
+        id: parseInt(warehouseId),
+        managerId: parseInt(managerId),
+      },
+    })
+
+    if (!checkWarehouseAdmin && !checkIsAdmin) {
+      return res
+        .status(400)
+        .send(response.responseError(400, 'BAD_REQUEST', 'NOT AUTHORIZED'))
+    }
+
+    const getAllStock = await prisma.stock.findMany({
+      take: parseInt(limit),
+      skip,
+      orderBy,
+      where: {
+        warehouseId: parseInt(warehouseId),
+        OR: [{ product: { name: { contains: search } } }],
+      },
+      select: {
+        quantity: true,
+        product: {
+          select: {
+            id: true,
+            name: true,
+            imageUrl: true,
+          },
+        },
+      },
+    })
+
+    for (let i = 0; i < getAllStock.length; i++) {
+      const getAllStockChange = await prisma.journal.findMany({
+        where: {
+          warehouseId: parseInt(warehouseId),
+          productId: parseInt(getAllStock[i].product.id),
+          createdAt: {
+            gt: start ? new Date(start).toISOString() : undefined,
+            lt: end ? new Date(end).toISOString() : undefined,
+          },
+        },
+        select: {
+          id: true,
+          warehouseId: true,
+          stock_before: true,
+          stock_after: true,
+          Type_Journal: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+            },
+          },
+          Product: {
+            select: {
+              id: true,
+              name: true,
+              imageUrl: true,
+            },
+          },
+          Warehouse: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      })
+      for (let i = 0; i < getAllStockChange.length; i++) {
+        // if type true = total_out = 0, else if stock_before = stock_after = 0, else total_out = stock_before - stock_after
+        // if type true = total_in = stock_after - stock_before, else if stock_before = stock_after = 0, else total_in = 0
+
+        if (getAllStockChange[i].Type_Journal.type) {
+          totalIn +=
+            getAllStockChange[i].stock_after - getAllStockChange[i].stock_before
+        } else {
+          if (
+            getAllStockChange[i].stock_before !==
+            getAllStockChange[i].stock_after
+          ) {
+            totalOut +=
+              getAllStockChange[i].stock_before -
+              getAllStockChange[i].stock_after
+          }
+        }
+        temp_totalStock = getAllStockChange[i].stock_after
+      }
+      result.push({
+        productId: getAllStock[i].product.id,
+        productName: getAllStock[i].product.name,
+        imageUrl: getAllStock[i]?.product?.imageUrl,
+        total_out: totalOut,
+        total_in: totalIn,
+        last_stock: temp_totalStock,
+      })
+      totalIn = 0
+      totalOut = 0
+      temp_totalStock = 0
+    }
+
+    const totalStockCount = await prisma.stock.count({
+      where: {
+        warehouseId: parseInt(warehouseId),
+        OR: [{ product: { name: { contains: search } } }],
+      },
+    })
+
+    const totalPage = Math.ceil(totalStockCount / limit)
+
+    return res.status(200).send(
+      response.responseSuccess(
+        200,
+        'SUCCESS',
+        {
+          current_page: parseInt(page),
+          total_page: totalPage,
+          total_data: result.length,
+        },
+        result
+      )
+    )
   } catch (error) {
     console.error(error)
     return res
@@ -613,4 +872,5 @@ module.exports = {
   updateStockProduct,
   deleteStockProduct,
   showAllStockHistory,
+  showStockSummary,
 }

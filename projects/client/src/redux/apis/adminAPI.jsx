@@ -10,9 +10,9 @@ const adminAPI = createApi({
       getAllAdmin: builder.query({
         async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
           return await fetchWithBQ(
-            `/admin?role=Admin&page=${_arg.page ? _arg.page : 1}&limit=${
-              _arg.limit ? _arg.limit : 5
-            }&name=${_arg.search[0] ? _arg.search[0] : ""}`,
+            `/admin?role=Admin&page=${_arg.page || 1}&limit=${
+              _arg.limit || 5
+            }&name=${_arg.search[0] || ""}&sortBy=${_arg.sort || "latest"}`,
           );
         },
         providesTags: ["Admin"],
@@ -21,9 +21,9 @@ const adminAPI = createApi({
       getAllManager: builder.query({
         async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
           return await fetchWithBQ(
-            `/admin?role=Manager&page=${_arg.page ? _arg.page : 1}&limit=${
-              _arg.limit ? _arg.limit : 5
-            }&name=${_arg.search[0] ? _arg.search[0] : ""}`,
+            `/admin?role=Manager&page=${_arg.page || 1}&limit=${
+              _arg.limit || 5
+            }&name=${_arg.search[0] || ""}&sortBy=${_arg.sort || "latest"}`,
           );
         },
         providesTags: ["Manager"],
@@ -31,9 +31,9 @@ const adminAPI = createApi({
       getAllUser: builder.query({
         async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
           return await fetchWithBQ(
-            `/admin?role=User&page=${_arg.page ? _arg.page : 1}&limit=${
-              _arg.limit ? _arg.limit : 5
-            }&name=${_arg.search[0] ? _arg.search[0] : ""}`,
+            `/admin?role=User&page=${_arg.page || 1}&limit=${
+              _arg.limit || 5
+            }&name=${_arg.search[0] || ""}&sortBy=${_arg.sort || "latest"}`,
           );
         },
         providesTags: ["User"],

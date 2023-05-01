@@ -22,23 +22,33 @@ import {
   InputLeftElement,
   Icon,
   Input,
+  RadioGroup,
+  HStack,
+  Radio,
+  Button,
 } from "@chakra-ui/react";
 
 function UserList() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [sort, setSort] = useState("latest");
   const [limit, setLimit] = useState(5);
 
   const { data, isError, isLoading } = useGetAllUserQuery({
     page,
     limit,
     search: searchParams.getAll("name"),
+    sort,
   });
 
   useEffect(() => {
     setTotalPages(data?.pagination?.total_page);
   }, [data]);
+
+  const clearSort = () => {
+    setSort("");
+  };
 
   const tableHead = [
     { name: "Id", width: "5em" },
@@ -76,6 +86,25 @@ function UserList() {
     <Box>
       <TableContainer mb={5}>
         <Flex justifyContent={"flex-end"} mb={4}>
+          <InputGroup size="sm">
+            <RadioGroup value={sort}>
+              <Flex justifyContent="center" alignItems="center" height="100%">
+                <HStack spacing="24px">
+                  <Radio value="oldest" onClick={() => setSort("oldest")}>
+                    Oldest
+                  </Radio>
+                  <Radio value="latest" onClick={() => setSort("latest")}>
+                    Latest
+                  </Radio>
+                  <IconButton
+                    icon={<FaTimes />}
+                    size="sm"
+                    onClick={clearSort}
+                  />
+                </HStack>
+              </Flex>
+            </RadioGroup>
+          </InputGroup>
           <InputGroup w={48} size="sm">
             <InputLeftElement pointerEvents="none">
               <Icon as={FaSearch} />
@@ -146,7 +175,7 @@ function UserList() {
           />
         )}
         <Text paddingX={"10px"}>
-          {page} of {totalPages ? totalPages : 0}
+          {page} of {totalPages || 0}
         </Text>
         {page < totalPages ? (
           <IconButton
