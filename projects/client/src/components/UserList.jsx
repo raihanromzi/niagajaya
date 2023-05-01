@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useGetAllUserQuery } from "../redux/store";
-import { FaChevronLeft, FaChevronRight, FaSearch } from "react-icons/fa";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaSearch,
+  FaTimes,
+} from "react-icons/fa";
 import { useSearchParams } from "react-router-dom";
 
 import {

@@ -24,7 +24,12 @@ import {
   Radio,
   Button,
 } from "@chakra-ui/react";
-import { FaChevronLeft, FaChevronRight, FaSearch } from "react-icons/fa";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaSearch,
+  FaTimes,
+} from "react-icons/fa";
 import { useSearchParams } from "react-router-dom";
 
 function ManagerList() {

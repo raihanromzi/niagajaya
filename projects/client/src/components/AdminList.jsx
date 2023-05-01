@@ -30,6 +30,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaSearch,
+  FaTimes,
 } from "react-icons/fa";
 import { EditAdmin } from "./EditAdmin";
 import { AddAdmin } from "./AddAdmin";
