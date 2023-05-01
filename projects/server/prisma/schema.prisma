@@ -17,122 +17,124 @@ enum UserRole {
 }
 
 model User {
-  id              Int             @id @default(autoincrement())
-  email           String          @unique @db.VarChar(255)
-  hashedPassword  String?          
-  imageUrl        String?     
-  role            UserRole
-  token           String?         @unique
+  id             Int      @id @default(autoincrement())
+  email          String   @unique @db.VarChar(255)
+  hashedPassword String?
+  imageUrl       String?
+  role           UserRole
+  token          String?  @unique
 
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  deletedAt       DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  names           UserName[]
-  warehouse       Warehouse?
-  addresses       UserAddress[]
-  primaryAddress  UserPrimaryAddress?
-  orders          Order[]
+  names          UserName[]
+  warehouse      Warehouse?
+  addresses      UserAddress[]
+  primaryAddress UserPrimaryAddress?
+  orders         Order[]
 }
 
 model UserName {
-  userId          Int             
-  name            String          @db.VarChar(255)
-  usageCount      Int             @default(1)
+  userId     Int
+  name       String @db.VarChar(255)
+  usageCount Int    @default(1)
 
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user            User            @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
   @@id([userId, name])
 }
 
 model UserAddress {
-  id              Int                   @id @default(autoincrement())
-  userId          Int
-  latitude        Decimal
-  longitude       Decimal
-  province        String                @db.VarChar(255)
-  city            String                @db.VarChar(255)
-  street          String                @db.VarChar(255)
-  detail          String
-  postalCode      String                @db.VarChar(255)
+  id         Int     @id @default(autoincrement())
+  userId     Int
+  latitude   Decimal
+  longitude  Decimal
+  province   String  @db.VarChar(255)
+  city       String  @db.VarChar(255)
+  street     String  @db.VarChar(255)
+  detail     String
+  postalCode String  @db.VarChar(255)
 
-  createdAt       DateTime              @default(now())
-  updatedAt       DateTime              @updatedAt
-  deletedAt       DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  user            User                  @relation(fields: [userId], references: [id])
-  primaryAddress  UserPrimaryAddress?
+  user           User                @relation(fields: [userId], references: [id])
+  primaryAddress UserPrimaryAddress?
 }
 
 model UserPrimaryAddress {
-  userId      Int           @id
-  addressId   Int           @unique
+  userId    Int @id
+  addressId Int @unique
 
-  user        User          @relation(fields: [userId], references: [id])
-  address     UserAddress   @relation(fields: [addressId], references: [id])
+  user    User        @relation(fields: [userId], references: [id])
+  address UserAddress @relation(fields: [addressId], references: [id])
 }
 
 model Warehouse {
-  id              Int                   @id @default(autoincrement())
-  managerId       Int                   @unique
-  name            String                @db.VarChar(255)
-  latitude        Decimal
-  longitude       Decimal
-  province        String                @db.VarChar(255)
-  city            String                @db.VarChar(255)
-  district        String                @db.VarChar(255)
-  detail          String  
+  id        Int     @id @default(autoincrement())
+  managerId Int     @unique
+  name      String  @db.VarChar(255)
+  latitude  Decimal
+  longitude Decimal
+  province  String  @db.VarChar(255)
+  city      String  @db.VarChar(255)
+  district  String  @db.VarChar(255)
+  detail    String
 
-  createdAt       DateTime              @default(now())
-  updatedAt       DateTime              @updatedAt
-  deletedAt       DateTime?  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  manager         User                  @relation(fields: [managerId], references: [id])
-  stocks          Stock[]
-  exports         StockMutation[]       @relation(name: "Out")
-  imports         StockMutation[]       @relation(name: "In")
-  orders          Order[]
+  manager User            @relation(fields: [managerId], references: [id])
+  stocks  Stock[]
+  exports StockMutation[] @relation(name: "Out")
+  imports StockMutation[] @relation(name: "In")
+  orders  Order[]
+  Journal Journal[]
 }
 
 model Product {
-  id                  Int         @id @default(autoincrement())
-  categoryId          Int
-  name                String      @unique
-  description         String
-  imageUrl            String
-  priceRupiahPerUnit  Int
+  id                 Int    @id @default(autoincrement())
+  categoryId         Int
+  name               String @unique
+  description        String
+  imageUrl           String
+  priceRupiahPerUnit Int
 
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
-  deletedAt           DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  category            ProductCategory @relation(fields: [categoryId], references: [id])
-  stocks              Stock[]
-  stockMutations      StockMutation[]
-  orders              OrderDetail[]
+  category       ProductCategory @relation(fields: [categoryId], references: [id])
+  stocks         Stock[]
+  stockMutations StockMutation[]
+  orders         OrderDetail[]
+  Journal        Journal[]
 }
 
 model ProductCategory {
-  id          Int         @id @default(autoincrement())
-  name        String      @unique @db.VarChar(255)
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(255)
 
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  deletedAt   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  products    Product[]
+  products Product[]
 }
 
 model Stock {
-  productId     Int
-  warehouseId   Int
-  quantity      Int
+  productId   Int
+  warehouseId Int
+  quantity    Int
 
-  product       Product     @relation(fields: [productId], references: [id])
-  warehouse     Warehouse   @relation(fields: [warehouseId], references: [id])
+  product   Product   @relation(fields: [productId], references: [id])
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id])
 
   @@id([productId, warehouseId])
 }
@@ -145,19 +147,19 @@ enum StockMutationStatus {
 }
 
 model StockMutation {
-  id          Int                   @id @default(autoincrement())
-  productId   Int
-  exporterId  Int
-  importerId  Int
-  quantity    Int
-  status      StockMutationStatus
+  id         Int                 @id @default(autoincrement())
+  productId  Int
+  exporterId Int
+  importerId Int
+  quantity   Int
+  status     StockMutationStatus
 
-  createdAt   DateTime              @default(now())
-  updatedAt   DateTime              @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  product     Product               @relation(fields: [productId], references: [id])
-  exporter    Warehouse             @relation(name: "Out", fields: [exporterId], references: [id])
-  importer    Warehouse             @relation(name: "In", fields: [importerId], references: [id])
+  product  Product   @relation(fields: [productId], references: [id])
+  exporter Warehouse @relation(name: "Out", fields: [exporterId], references: [id])
+  importer Warehouse @relation(name: "In", fields: [importerId], references: [id])
 }
 
 enum OrderStatus {
@@ -185,22 +187,50 @@ model Order {
   shipmentPrice     Int
   paymentImageUrl   String?
 
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user              User              @relation(fields: [userId], references: [id])
-  warehouse         Warehouse         @relation(fields: [warehouseId], references: [id])
-  details           OrderDetail[]
+  user      User          @relation(fields: [userId], references: [id])
+  warehouse Warehouse     @relation(fields: [warehouseId], references: [id])
+  details   OrderDetail[]
 }
 
 model OrderDetail {
-  orderId             Int
-  productId           Int
-  quantity            Int
-  priceRupiahPerUnit  Int
+  orderId            Int
+  productId          Int
+  quantity           Int
+  priceRupiahPerUnit Int
 
-  order               Order   @relation(fields: [orderId], references: [id])
-  product             Product @relation(fields: [productId], references: [id])
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
 
   @@id([orderId, productId])
+}
+
+model Type_Journal {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  journals Journal[]
+}
+
+model Journal {
+  id           Int      @id @default(autoincrement())
+  warehouseId  Int
+  productId    Int
+  typeId       Int
+  stock_before Int
+  stock_after  Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  Warehouse    Warehouse    @relation(fields: [warehouseId], references: [id])
+  Product      Product      @relation(fields: [productId], references: [id])
+  Type_Journal Type_Journal @relation(fields: [typeId], references: [id])
+
+  @@index([productId], map: "Journal_productId_fkey")
+  @@index([typeId], map: "Journal_typeId_fkey")
 }

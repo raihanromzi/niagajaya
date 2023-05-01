@@ -33,6 +33,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import AuthProvider from "./hoc/authProvider";
 import rootReducer from "./redux/store";
+import { adminAPI } from "./redux/apis/adminAPI";
 
 import "leaflet/dist/leaflet.css";
 
@@ -48,6 +49,11 @@ import AdminOrdersPage from "./routes/admin/orders";
 import WarehousePage from "./routes/admin/warehouses";
 import WarehouseCreatePage from "./routes/admin/warehouses/create";
 import WarehouseUpdatePage from "./routes/admin/warehouses/update";
+import AdminLoginPage from "./routes/admin/AdminLoginPage";
+import AdminManagement from "./routes/admin/AdminManagement";
+import WarehousesList from "./routes/admin/stockManagement/WarehousesList";
+import { warehousesApi } from "./redux/apis/warehousesAPI";
+import StockManagement from "./routes/admin/stockManagement/StockManagement";
 
 const router = createBrowserRouter([
   {
@@ -87,6 +93,10 @@ const router = createBrowserRouter([
       {
         path: "login",
         Component: LoginPage,
+      },
+      {
+        path: "/admin/login",
+        Component: AdminLoginPage,
       },
       {
         path: "reset-password/email",
@@ -144,6 +154,7 @@ const router = createBrowserRouter([
     path: "admin",
     Component: AdminLayout,
     children: [
+      { path: "management", Component: AdminManagement },
       {
         path: "product-categories",
         children: [
@@ -219,11 +230,20 @@ const router = createBrowserRouter([
           },
         ],
       },
+      { path: "stock-management", Component: WarehousesList },
+      { path: "stock-management/warehouse/:id", Component: StockManagement },
     ],
   },
 ]);
 
-const store = configureStore({ reducer: rootReducer });
+const store = configureStore({
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) => {
+    return getDefaultMiddleware()
+      .concat(adminAPI.middleware)
+      .concat(warehousesApi.middleware);
+  },
+});
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -234,5 +254,5 @@ createRoot(document.getElementById("root")).render(
         </AuthProvider>
       </ChakraProvider>
     </Provider>
-  </StrictMode>
+  </StrictMode>,
 );
