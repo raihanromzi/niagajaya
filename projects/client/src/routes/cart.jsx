@@ -227,8 +227,8 @@ const CartPage = () => {
                         <Td>
                           <Flex align="center">
                             <Image
-                              src={product.imageUrl}
-                              alt={product.name}
+                              src={`http://localhost:8000/products/${product.imageUrl}`}
+                              alt={`Gambar Produk ${product.name}`}
                               w={"64"}
                               mr={4}
                             />
