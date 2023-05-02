@@ -7,6 +7,7 @@ const orderRoute = require('./order.cjs')
 const userRouter = require('./admin/userRouter')
 const adminAuthRoute = require('./admin/authRouter')
 const stockRoute = require('./stockRoute')
+const salesReportRoute = require('./salesReportRoute')
 
 module.exports = {
   authRoute,
@@ -18,4 +19,5 @@ module.exports = {
   userRouter,
   adminAuthRoute,
   stockRoute,
+  salesReportRoute,
 }

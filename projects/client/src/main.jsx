@@ -54,6 +54,8 @@ import AdminManagement from "./routes/admin/AdminManagement";
 import WarehousesList from "./routes/admin/stockManagement/WarehousesList";
 import { warehousesApi } from "./redux/apis/warehousesAPI";
 import StockManagement from "./routes/admin/stockManagement/StockManagement";
+import SalesReport from "./routes/admin/SalesReport";
+import { salesReportAPI } from "./redux/apis/salesReportAPI";
 
 const router = createBrowserRouter([
   {
@@ -232,6 +234,7 @@ const router = createBrowserRouter([
       },
       { path: "stock-management", Component: WarehousesList },
       { path: "stock-management/warehouse/:id", Component: StockManagement },
+      { path: "sales-report/warehouse/:id", Component: SalesReport },
     ],
   },
 ]);
@@ -241,7 +244,8 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware()
       .concat(adminAPI.middleware)
-      .concat(warehousesApi.middleware);
+      .concat(warehousesApi.middleware)
+      .concat(salesReportAPI.middleware);
   },
 });
 

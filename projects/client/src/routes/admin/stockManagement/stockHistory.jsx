@@ -85,8 +85,7 @@ function StockHistory() {
   };
 
   const tableHead = [
-    { name: "id", width: "10em" },
-    { name: "Foto Produk", width: "20em" },
+    { name: "Foto Produk", width: "10em" },
     { name: "Nama Produk", width: "40em" },
     { name: "Total Out", width: "20em" },
     { name: "Total In", width: "20em" },
@@ -107,7 +106,6 @@ function StockHistory() {
           bgColor="white"
           _hover={{ bg: "#EEEEEE" }}>
           <Tr>
-            <Td textAlign={"center"}>{data.productId}</Td>
             <Td textAlign={"center"}>
               {data.imageUrl.includes("NULL") ? (
                 <Icon

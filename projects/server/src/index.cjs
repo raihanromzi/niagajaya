@@ -71,6 +71,7 @@ app.use('/api/v1/products', require('./routes/products.cjs'))
 app.use('/api', routes.adminAuthRoute)
 app.use('/api', routes.userRouter)
 app.use('/api', routes.stockRoute)
+app.use('/api', routes.salesReportRoute)
 
 app.listen(port, () => {
   console.log(`APP RUNNING at ${port} ✅`)
