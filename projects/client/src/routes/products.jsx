@@ -338,28 +338,34 @@ const ProductsPage = () => {
           {sortBy ? <TagSorting /> : null}
         </HStack>
       </Box>
-
-      <Grid
-        templateColumns={[
-          "repeat(1, 1fr)",
-          "repeat(2, 1fr)",
-          "repeat(3, 1fr)",
-          "repeat(5, 1fr)",
-        ]}
-        gap={6}
-        mb={3}
-      >
-        {products.map((product) => {
-          return <ProductCardUser key={product.id} product={product} />;
-        })}
-      </Grid>
-      <Center>
-        <PaginationNumber
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      </Center>
+      {products.length !== 0 ? (
+        <>
+          {" "}
+          <Grid
+            templateColumns={[
+              "repeat(1, 1fr)",
+              "repeat(2, 1fr)",
+              "repeat(3, 1fr)",
+              "repeat(5, 1fr)",
+            ]}
+            gap={6}
+            mb={3}
+          >
+            {products.map((product) => {
+              return <ProductCardUser key={product.id} product={product} />;
+            })}
+          </Grid>
+          <Center>
+            <PaginationNumber
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </Center>
+        </>
+      ) : (
+        <Center>Produk tidak ditemukan</Center>
+      )}
     </>
   );
 };
