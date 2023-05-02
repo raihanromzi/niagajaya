@@ -25,6 +25,8 @@ const ProductDetailPage = () => {
 
   const [count, setCount] = useState(0);
   const [product, setProduct] = useState(null);
+  const [isError, setIsError] = useState(false);
+
   const toast = useToast();
 
   async function fetchDetailProduct(id) {
@@ -34,6 +36,7 @@ const ProductDetailPage = () => {
       });
       setProduct(res.data);
     } catch (error) {
+      setIsError(true);
       console.error(error);
     }
   }
@@ -134,7 +137,6 @@ const ProductDetailPage = () => {
 
   useEffect(() => {
     if (product && cart) {
-      console.log("jalan");
       const itemIndex = cart.findIndex((item) => item.id === product.id);
       setProductIndex(itemIndex);
     } else {
@@ -155,9 +157,14 @@ const ProductDetailPage = () => {
     >
       {product ? (
         <>
-          {" "}
           <Center flex="1 1 50%">
-            <Image src={product.imageUrl} alt="eco bag with food" />
+            <Image
+              src={`http://localhost:8000/products/${product.imageUrl}`}
+              alt={`Gambar Produk ${product.name}`}
+              w={"full"}
+              objectFit={"cover"}
+              borderRadius="lg"
+            />
           </Center>
           <VStack alignItems={"start"} flex="1 1 50%" gap={"2"}>
             <Heading fontSize="3xl">{product.name}</Heading>
@@ -246,8 +253,10 @@ const ProductDetailPage = () => {
             </VStack>
           </VStack>
         </>
+      ) : isError ? (
+        <Center>Data produk gagal dimuat</Center>
       ) : (
-        <Center>Loading</Center>
+        <Center>Sedang memuat data</Center>
       )}
     </Flex>
   );
