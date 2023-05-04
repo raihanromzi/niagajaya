@@ -21,7 +21,7 @@ const salesReportAPI = createApi({
             }&category=${_arg.category || ""}`,
           );
         },
-        providesTags: ["SalesReport"],
+        providesTags: ["sales"],
       }),
     };
   },

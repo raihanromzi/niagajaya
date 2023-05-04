@@ -3,7 +3,7 @@ import PageProtected from "../protected";
 import AdminProductsLayout from "../../components/AdminProductsLayout";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useGetAllSalesReportByWarehouseQuery } from "../../redux/store";
 import {
   Spinner,
@@ -57,6 +57,7 @@ function SalesReport() {
   const [limit, setLimit] = useState(10);
   const [sort, setSort] = useState("latest");
   const [startDate, setStartDate] = useState(null);
+  const [allProductsCategory, setallProductsCategory] = useState([]);
   const [category, setCategory] = useState("");
   const [endDate, setEndDate] = useState(null);
   const { id } = useParams();
@@ -85,7 +86,25 @@ function SalesReport() {
 
   useEffect(() => {
     setTotalPages(data?.pagination?.total_page);
-  }, [data, startDate, endDate]);
+  }, [data, startDate, endDate, category]);
+
+  useEffect(() => {
+    if (data) {
+      const productCategories = [...data.data];
+      setallProductsCategory(productCategories);
+    }
+  }, []);
+
+  const categories = useMemo(() => {
+    if (!data) {
+      return [];
+    }
+
+    const uniqueCategories = new Set(
+      allProductsCategory.map((item) => item.productCategory),
+    );
+    return Array.from(uniqueCategories);
+  }, [data]);
 
   const tableHead = [
     { name: "Order ID", width: "10em" },
@@ -142,13 +161,6 @@ function SalesReport() {
         </Tbody>
       );
     });
-
-    const categories = new Set(data.data.map((data) => data.productCategory));
-    optionProductCategory = Array.from(categories).map((category, index) => (
-      <option key={index} value={category}>
-        {category}
-      </option>
-    ));
   }
 
   return (
@@ -161,11 +173,12 @@ function SalesReport() {
                 <Select
                   size="sm"
                   placeholder="Select product category"
-                  onChange={(e) => {
-                    // Update the search parameter with the selected category
-                    () => setCategory(e.target.value);
-                  }}>
-                  {optionProductCategory}
+                  onChange={(e) => setCategory(e.target.value)}>
+                  {categories.map((category, index) => (
+                    <option key={index} value={category}>
+                      {category}
+                    </option>
+                  ))}
                 </Select>
               </Flex>
 
