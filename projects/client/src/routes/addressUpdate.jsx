@@ -278,7 +278,11 @@ const AddressUpdatePage = () => {
 
   useEffect(() => {
     if (formik.values.province && formik.values.city && formik.values.street) {
-      fetchPosition(formik.values.province, formik.values.street);
+      fetchPosition(
+        formik.values.province,
+        formik.values.city,
+        formik.values.street
+      );
       setShowMap(true);
     }
   }, [showMap]);
