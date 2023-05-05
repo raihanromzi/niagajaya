@@ -72,6 +72,7 @@ app.use('/api', routes.adminAuthRoute)
 app.use('/api', routes.userRouter)
 app.use('/api', routes.stockRoute)
 app.use('/api', routes.salesReportRoute)
+app.use('/api', routes.stockMutationRoute)
 
 app.listen(port, () => {
   console.log(`APP RUNNING at ${port} ✅`)
