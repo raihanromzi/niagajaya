@@ -51,13 +51,13 @@ import DatePicker from "react-datepicker";
 
 function SalesReport() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [limit, setLimit] = useState(10);
   const [sort, setSort] = useState("latest");
   const [startDate, setStartDate] = useState(null);
   const [allProductsCategory, setallProductsCategory] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState("");
   const [endDate, setEndDate] = useState(null);
   const { id } = useParams();
@@ -93,18 +93,21 @@ function SalesReport() {
       const productCategories = [...data.data];
       setallProductsCategory(productCategories);
     }
-  }, []);
+  }, [data]);
 
-  const categories = useMemo(() => {
+  useEffect(() => {
+    if (data) {
+      setCategories(getUniqueCategories(data.data));
+    }
+  }, [data]);
+
+  function getUniqueCategories(data) {
     if (!data) {
       return [];
     }
-
-    const uniqueCategories = new Set(
-      allProductsCategory.map((item) => item.productCategory),
-    );
+    const uniqueCategories = new Set(data.map((item) => item.productCategory));
     return Array.from(uniqueCategories);
-  }, [data]);
+  }
 
   const tableHead = [
     { name: "Order ID", width: "10em" },
@@ -169,17 +172,27 @@ function SalesReport() {
         <Box>
           <TableContainer mb={5}>
             <Flex justifyContent={"space-between"} mb={4} gap={2}>
-              <Flex>
+              <Flex justifyContent={"space-between"} gap={2}>
                 <Select
                   size="sm"
-                  placeholder="Select product category"
-                  onChange={(e) => setCategory(e.target.value)}>
+                  placeholder={"select category"}
+                  value={""}
+                  onChange={(e) => {
+                    setCategory(e.target.value);
+                  }}>
                   {categories.map((category, index) => (
                     <option key={index} value={category}>
                       {category}
                     </option>
                   ))}
                 </Select>
+                <IconButton
+                  icon={<FaTimes />}
+                  size="sm"
+                  onClick={() => {
+                    setCategory("");
+                  }}
+                />
               </Flex>
 
               <Flex
