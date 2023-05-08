@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Center,
   Heading,
   HStack,
   IconButton,
@@ -49,6 +50,7 @@ const SettingAddressPage = () => {
   const [sortBy, setSortBy] = useState();
   const [tempSortBy, setTempSortBy] = useState();
   const [size, setSize] = useState();
+  const [isError, setIsError] = useState(false);
 
   const options = [
     {
@@ -162,6 +164,7 @@ const SettingAddressPage = () => {
         });
         setAddresses(res.data);
       } catch (error) {
+        setIsError(true);
         console.error(error);
       }
     }
@@ -330,7 +333,11 @@ const SettingAddressPage = () => {
                         );
                       })}
                     </VStack>
-                  ) : null}
+                  ) : isError ? (
+                    <Center minH={"32"}>Data alamat gagal dimuat</Center>
+                  ) : (
+                    <Center minH={"32"}>Data alamat tidak ditemukan</Center>
+                  )}
                   <PaginationNumber
                     currentPage={currentPage}
                     totalPages={totalPages}
