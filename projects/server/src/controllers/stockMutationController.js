@@ -120,7 +120,7 @@ const getAllStockMutation = async (req, res) => {
       const { id, product, exporter, importer, status, quantity, createdAt } =
         getAllOnProgressStockMutation[i]
       result.push({
-        stockMutataionId: id,
+        stockMutationId: id,
         productId: product.id,
         productName: product.name,
         originWarehouseId: exporter.id,
@@ -166,27 +166,17 @@ const getAllStockMutation = async (req, res) => {
       )
     )
   } catch (error) {
-    console.log(error)
     return res
       .status(500)
       .send(response.responseError(500, 'SERVER_ERROR', { message: error }))
   }
 }
 
-const updateStockMutation = async (req, res) => {
+const approveStockMutation = async (req, res) => {
   try {
     const { warehouseId = parseInt(req.params.warehouseId), stockMutationId } =
       req.params
-    const {
-      manager: managerId,
-      page = 1,
-      limit = 5,
-      search = '',
-      start,
-      end,
-      sortBy,
-    } = req.query
-    const skip = (page - 1) * limit
+    const { manager: managerId } = req.query
 
     if (!req.session.id) {
       return res
@@ -213,18 +203,7 @@ const updateStockMutation = async (req, res) => {
         .send(response.responseError(400, 'BAD_REQUEST', 'NOT AUTHORIZED'))
     }
 
-    let orderBy
-    switch (sortBy) {
-      case 'latest':
-        orderBy = { orderId: 'desc' }
-        break
-      case 'oldest':
-        orderBy = { orderId: 'asc' }
-        break
-      default:
-        orderBy = { orderId: 'desc' }
-        break
-    }
+    // STEP 1 CARI STOCK MUTATION & HARUS REQUESTED
     const findStockMutation = await prisma.stockMutation.findUnique({
       where: {
         id: parseInt(stockMutationId),
@@ -249,7 +228,8 @@ const updateStockMutation = async (req, res) => {
         )
     }
 
-    // Cek apakah di warehouse exporternya ada stocknya
+    // STEP 2 CARI STOCK EXPORTER (GUDANG ASAL)
+    // Cek apakah di warehouse exporternya (gudang asal) ada stocknya
     const checkStock = await prisma.stock.findFirst({
       where: {
         warehouseId: findStockMutation.exporterId,
@@ -272,6 +252,8 @@ const updateStockMutation = async (req, res) => {
         )
     }
 
+    // STEP 3 KALAU ADA, UPDATE STOCK EXPORTER (GUDANG ASAL)
+    // KURANGI STOCK EXPORTER (GUDANG ASAL) DENGAN QUANTITY YANG DI MUTASI
     // update stock exporter
     await prisma.stock.update({
       where: {
@@ -281,17 +263,18 @@ const updateStockMutation = async (req, res) => {
         },
       },
       data: {
-        quantity: findStockMutation.quantity,
+        quantity: checkStock.quantity - findStockMutation.quantity,
       },
     })
 
+    // STEP 4 CARI STOCK YANG TELAH DI UPDATE DI EXPORTER (GUDANG ASAL)
     const findUpdatedProductExporter = await prisma.stock.findFirst({
       where: {
         productId: parseInt(findStockMutation.productId),
         warehouseId: parseInt(findStockMutation.exporterId),
       },
       select: {
-        id: true,
+        productId: true,
         quantity: true,
       },
     })
@@ -302,19 +285,20 @@ const updateStockMutation = async (req, res) => {
         .send(response.responseError(400, 'BAD_REQUEST', 'NOT FOUND'))
     }
 
+    // STEP 5 CREATE JOURNAL APAKAH BENAR TERJADI PENGURANGAN?
     const stockBeforeExporter = checkStock.quantity
     const stockAfterExporter = findUpdatedProductExporter.quantity
 
-    // Untuk ngecek nambah atau ngurang
     const addOrAdd = (stockBefore, stockAfter) => {
       const count = Math.max(stockBefore, stockAfter)
-      if (count === stockBeforeExporter) {
+      if (count === stockBefore) {
         return false
       } else {
         return true
       }
     }
 
+    // STEP 6 CREATE JOURNAL
     const newJournalExporter = await prisma.type_Journal.create({
       data: {
         name: 'Update Stock',
@@ -344,39 +328,79 @@ const updateStockMutation = async (req, res) => {
         )
     }
 
-    // update stock importer
-    await prisma.stock.update({
+    // STEP 7 UPDATE STOCK IMPORTER (GUDANG TUJUAN)
+    const findStockImporter = await prisma.stock.findFirst({
       where: {
-        productId_warehouseId: {
-          productId: parseInt(findStockMutation.productId),
-          warehouseId: parseInt(findStockMutation.exporterId),
-        },
-      },
-      data: {
-        quantity: findStockMutation.quantity,
-      },
-    })
-
-    const findUpdatedProductImporter = await prisma.stock.findFirst({
-      where: {
-        productId: parseInt(findStockMutation.productId),
-        warehouseId: parseInt(findStockMutation.exporterId),
+        warehouseId: findStockMutation.importerId,
+        productId: findStockMutation.productId,
       },
       select: {
-        id: true,
+        productId: true,
         quantity: true,
       },
     })
 
-    if (!findUpdatedProductImporter) {
+    await prisma.stock.update({
+      where: {
+        productId_warehouseId: {
+          productId: parseInt(findStockMutation.productId),
+          warehouseId: parseInt(findStockMutation.importerId),
+        },
+      },
+      data: {
+        quantity: findStockImporter.quantity + findStockMutation.quantity,
+      },
+    })
+
+    // STEP 8 CARI STOCK DI IMPORTER (GUDANG TUJUAN)
+    const findProductImporter = await prisma.stock.findFirst({
+      where: {
+        productId: parseInt(findStockMutation.productId),
+        warehouseId: parseInt(findStockMutation.importerId),
+      },
+      select: {
+        productId: true,
+        quantity: true,
+      },
+    })
+
+    if (!findProductImporter) {
       return res
         .status(400)
         .send(response.responseError(400, 'BAD_REQUEST', 'NOT FOUND'))
     }
 
-    const stockBeforeImporter = checkStock.quantity
-    const stockAfterImporter = findUpdatedProductExporter.quantity
+    await prisma.stockMutation.update({
+      where: {
+        id: parseInt(stockMutationId),
+      },
+      data: {
+        status: 'ACCEPTED',
+      },
+    })
 
+    // STEP 9 CARI STOCK YANG TELAH DI UPDATE DI IMPORTER (GUDANG TUJUAN)
+    const findUpdatedProductImported = await prisma.stock.findFirst({
+      where: {
+        productId: parseInt(findStockMutation.productId),
+        warehouseId: parseInt(findStockMutation.importerId),
+      },
+      select: {
+        productId: true,
+        quantity: true,
+      },
+    })
+
+    if (!findUpdatedProductImported) {
+      return res
+        .status(400)
+        .send(response.responseError(400, 'BAD_REQUEST', 'NOT FOUND'))
+    }
+
+    const stockBeforeImporter = findStockImporter.quantity
+    const stockAfterImporter = findUpdatedProductImported.quantity
+
+    // STEP 10 BUAT JURNAL JIKA TERJADI PERUBAHAN
     const newJournalImporter = await prisma.type_Journal.create({
       data: {
         name: 'Update Stock',
@@ -388,7 +412,7 @@ const updateStockMutation = async (req, res) => {
       data: {
         typeId: newJournalExporter.id,
         productId: parseInt(findStockMutation.productId),
-        warehouseId: parseInt(findStockMutation.exporterId),
+        warehouseId: parseInt(findStockMutation.importerId),
         stock_before: stockBeforeImporter,
         stock_after: stockAfterImporter,
       },
@@ -415,7 +439,158 @@ const updateStockMutation = async (req, res) => {
 
     res.status(200).send(response.responseSuccess(200, 'SUCCESS', {}, result))
   } catch (error) {
-    console.log(error)
+    return res
+      .status(500)
+      .send(response.responseError(500, 'SERVER_ERROR', { message: error }))
+  }
+}
+
+const cancelStockMutation = async (req, res) => {
+  try {
+    const { warehouseId = parseInt(req.params.warehouseId), stockMutationId } =
+      req.params
+    const { manager: managerId } = req.query
+
+    if (!req.session.id) {
+      return res
+        .status(400)
+        .send(response.responseError(401, 'UNAUTHORIZED', 'NEED TO LOGIN'))
+    }
+    const checkIsAdmin = await prisma.user.findFirst({
+      where: {
+        id: parseInt(managerId),
+        role: 'ADMIN',
+      },
+    })
+
+    const checkWarehouseAdmin = await prisma.warehouse.findFirst({
+      where: {
+        id: parseInt(warehouseId),
+        managerId: parseInt(managerId),
+      },
+    })
+
+    if (!checkWarehouseAdmin && !checkIsAdmin) {
+      return res
+        .status(400)
+        .send(response.responseError(400, 'BAD_REQUEST', 'NOT AUTHORIZED'))
+    }
+
+    // STEP 1 CARI STOCK MUTATION & HARUS REQUESTED
+    const findStockMutation = await prisma.stockMutation.findUnique({
+      where: {
+        id: parseInt(stockMutationId),
+      },
+    })
+
+    if (!findStockMutation) {
+      return res
+        .status(400)
+        .send(response.responseError(400, 'BAD_REQUEST', 'NOT FOUND'))
+    }
+
+    if (findStockMutation.status !== 'REQUESTED') {
+      return res
+        .status(400)
+        .send(
+          response.responseError(
+            400,
+            'BAD_REQUEST',
+            'STOCK MUTATION ALREADY APPROVED / REJECTED'
+          )
+        )
+    }
+
+    const cancel = await prisma.stockMutation.update({
+      where: {
+        id: parseInt(stockMutationId),
+      },
+      data: {
+        status: 'CANCELLED',
+      },
+    })
+    if (!cancel) {
+      return res
+        .status(400)
+        .send(response.responseError(400, 'BAD_REQUEST', 'NOT FOUND'))
+    }
+
+    res.status(200).send(response.responseSuccess(200, 'SUCCESS', {}, cancel))
+  } catch (error) {
+    return res
+      .status(500)
+      .send(response.responseError(500, 'SERVER_ERROR', { message: error }))
+  }
+}
+
+const postNewStockMutation = async (req, res) => {
+  try {
+    const { warehouseId = parseInt(req.params.warehouseId) } = req.params
+    const { manager: managerId } = req.query
+    const { exportedId, importerId, productId, quantity } = req.body
+
+    if (!req.session.id) {
+      return res
+        .status(400)
+        .send(response.responseError(401, 'UNAUTHORIZED', 'NEED TO LOGIN'))
+    }
+    const checkIsAdmin = await prisma.user.findFirst({
+      where: {
+        id: parseInt(managerId),
+        role: 'ADMIN',
+      },
+    })
+
+    const checkWarehouseAdmin = await prisma.warehouse.findFirst({
+      where: {
+        id: parseInt(warehouseId),
+        managerId: parseInt(managerId),
+      },
+    })
+
+    if (!checkWarehouseAdmin && !checkIsAdmin) {
+      return res
+        .status(400)
+        .send(response.responseError(400, 'BAD_REQUEST', 'NOT AUTHORIZED'))
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .send(response.responseError(500, 'SERVER_ERROR', { message: error }))
+  }
+}
+
+const getAllImporterWarehouse = async (req, res) => {
+  try {
+    const { warehouseId: exporterWarehouseId } = req.params
+
+    const warehouses = await prisma.warehouse.findMany({
+      where: {
+        NOT: {
+          id: parseInt(exporterWarehouseId),
+        },
+      },
+    })
+
+    if (!warehouses) {
+      return res
+        .status(400)
+        .send(response.responseError(400, 'BAD_REQUEST', 'NOT FOUND'))
+    }
+
+    return res
+      .status(200)
+      .send(response.responseSuccess(200, 'SUCCESS', {}, warehouses))
+  } catch (error) {
+    return res
+      .status(500)
+      .send(response.responseError(500, 'SERVER_ERROR', { message: error }))
+  }
+}
+
+const getAllImporterWarehouseStock = async (req, res) => {
+  try {
+  } catch (error) {
     return res
       .status(500)
       .send(response.responseError(500, 'SERVER_ERROR', { message: error }))
@@ -424,5 +599,8 @@ const updateStockMutation = async (req, res) => {
 
 module.exports = {
   getAllStockMutation,
-  updateStockMutation,
+  approveStockMutation,
+  cancelStockMutation,
+  postNewStockMutation,
+  getAllImporterWarehouse,
 }

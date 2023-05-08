@@ -123,7 +123,6 @@ function SalesReport() {
   ];
 
   let contentProduct;
-  let optionProductCategory;
   if (isLoading) {
     contentProduct = <Spinner />;
   } else if (isError) {

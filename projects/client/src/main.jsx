@@ -56,6 +56,8 @@ import { warehousesApi } from "./redux/apis/warehousesAPI";
 import StockManagement from "./routes/admin/stockManagement/StockManagement";
 import SalesReport from "./routes/admin/SalesReport";
 import { salesReportAPI } from "./redux/apis/salesReportAPI";
+import StockMutation from "./routes/admin/stockMutation/StockMutation";
+import { stockMutationApi } from "./redux/apis/stockMutationAPI";
 
 const router = createBrowserRouter([
   {
@@ -235,6 +237,7 @@ const router = createBrowserRouter([
       { path: "stock-management", Component: WarehousesList },
       { path: "stock-management/warehouse/:id", Component: StockManagement },
       { path: "sales-report/warehouse/:id", Component: SalesReport },
+      { path: "stock-mutation/warehouse/:id", Component: StockMutation },
     ],
   },
 ]);
@@ -245,7 +248,8 @@ const store = configureStore({
     return getDefaultMiddleware()
       .concat(adminAPI.middleware)
       .concat(warehousesApi.middleware)
-      .concat(salesReportAPI.middleware);
+      .concat(salesReportAPI.middleware)
+      .concat(stockMutationApi.middleware);
   },
 });
 

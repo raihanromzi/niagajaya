@@ -3,7 +3,10 @@ const router = express.Router()
 
 const {
   getAllStockMutation,
-  updateStockMutation,
+  approveStockMutation,
+  cancelStockMutation,
+  postNewStockMutation,
+  getAllImporterWarehouse,
 } = require('../controllers/stockMutationController')
 
 // Get all on progress stock mutation
@@ -13,8 +16,23 @@ router.get(
 )
 
 router.put(
-  '/admin/warehouses/:warehouseId/stock-mutations/:stockMutationId',
-  updateStockMutation
+  '/admin/warehouses/:warehouseId/stock-mutations/:stockMutationId/approve',
+  approveStockMutation
+)
+
+router.put(
+  '/admin/warehouses/:warehouseId/stock-mutations/:stockMutationId/cancel',
+  cancelStockMutation
+)
+
+router.put(
+  '/admin/warehouses/:warehouseId/stock-mutations/create',
+  postNewStockMutation
+)
+
+router.get(
+  '/admin/importerwarehouses/:warehouseId',
+  getAllImporterWarehouse
 )
 
 module.exports = router
