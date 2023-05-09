@@ -552,7 +552,7 @@ const AdminOrdersPage = () => {
             <Center>
               <Image
                 maxHeight="75vh"
-                src={modalImage}
+                src={`http://localhost:8000/payments/${modalImage}`}
                 alt="Gambar Bukti Pembayaran"
               />
             </Center>

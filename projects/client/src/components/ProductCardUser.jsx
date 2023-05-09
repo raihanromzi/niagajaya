@@ -97,8 +97,8 @@ const ProductCardUser = ({ product }) => {
     <Card maxW={["md", "xs", "xs", "lg"]}>
       <CardBody mb={{ lg: "4", xl: "2" }} onClick={handleCardClick}>
         <Image
-          src={product.imageUrl}
-          alt="Green double couch with wooden legs"
+          src={`http://localhost:8000/products/${product.imageUrl}`}
+          alt={`Gambar Produk ${product.name}`}
           borderRadius="lg"
           objectFit="cover"
           h={"60%"}
