@@ -78,7 +78,7 @@ const getAllStockMutation = async (req, res) => {
       take: parseInt(limit),
       orderBy,
       where: {
-        importerId: parseInt(warehouseId),
+        exporterId: parseInt(warehouseId),
         status,
         createdAt: {
           gt: start ? new Date(start).toISOString() : undefined,
@@ -525,9 +525,14 @@ const cancelStockMutation = async (req, res) => {
 
 const postNewStockMutation = async (req, res) => {
   try {
-    const { warehouseId = parseInt(req.params.warehouseId) } = req.params
     const { manager: managerId } = req.query
-    const { exportedId, importerId, productId, quantity } = req.body
+    const { exporterId, importerId, productId, quantity } = req.body
+
+    if (!exporterId || !importerId || !productId || !quantity) {
+      return res
+        .status(400)
+        .send(response.responseError(400, 'BAD_REQUEST', 'MISSING PARAMS'))
+    }
 
     if (!req.session.id) {
       return res
@@ -543,7 +548,7 @@ const postNewStockMutation = async (req, res) => {
 
     const checkWarehouseAdmin = await prisma.warehouse.findFirst({
       where: {
-        id: parseInt(warehouseId),
+        id: parseInt(exporterId),
         managerId: parseInt(managerId),
       },
     })
@@ -553,7 +558,50 @@ const postNewStockMutation = async (req, res) => {
         .status(400)
         .send(response.responseError(400, 'BAD_REQUEST', 'NOT AUTHORIZED'))
     }
+
+    const exporterWarehouse = await prisma.warehouse.findUnique({
+      where: { id: exporterId },
+    })
+    const importerWarehouse = await prisma.warehouse.findUnique({
+      where: { id: importerId },
+    })
+
+    if (!exporterWarehouse || !importerWarehouse) {
+      return res
+        .status(400)
+        .send(
+          response.responseError('400', 'BAD_REQUEST', 'NOT FOUND WAREHOUSE')
+        )
+    }
+
+    const stockMutation = await prisma.stockMutation.create({
+      data: {
+        productId: parseInt(productId),
+        exporterId: parseInt(exporterId),
+        importerId: parseInt(importerId),
+        quantity: parseInt(quantity),
+        status: 'REQUESTED',
+        createdAt: new Date().toISOString(),
+      },
+    })
+
+    if (!stockMutation) {
+      return res
+        .status(400)
+        .send(
+          response.responseError(
+            '400',
+            'BAD_REQUEST',
+            'ERROR CREATE STOCK MUTATION'
+          )
+        )
+    }
+
+    return res
+      .status(200)
+      .send(response.responseSuccess(200, 'SUCCESS', {}, stockMutation))
   } catch (error) {
+    console.log(error)
     return res
       .status(500)
       .send(response.responseError(500, 'SERVER_ERROR', { message: error }))
@@ -569,6 +617,10 @@ const getAllImporterWarehouse = async (req, res) => {
         NOT: {
           id: parseInt(exporterWarehouseId),
         },
+      },
+      select: {
+        id: true,
+        name: true,
       },
     })
 
@@ -590,6 +642,68 @@ const getAllImporterWarehouse = async (req, res) => {
 
 const getAllImporterWarehouseStock = async (req, res) => {
   try {
+    const { warehouseId: importerWarehouseId } = req.params
+    const result = []
+
+    const importerWarehouseStock = await prisma.stock.findMany({
+      where: {
+        warehouseId: parseInt(importerWarehouseId),
+        quantity: {
+          gt: 0,
+        },
+      },
+      select: {
+        quantity: true,
+        product: {
+          select: {
+            id: true,
+            name: true,
+            category: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    })
+
+    for (let i = 0; i < importerWarehouseStock.length; i++) {
+      result.push({
+        productId: importerWarehouseStock[i].product.id,
+        productName: importerWarehouseStock[i].product.name,
+        category: importerWarehouseStock[i].product.category.name,
+        quantity: importerWarehouseStock[i].quantity,
+      })
+    }
+
+    res.status(200).send(response.responseSuccess(200, 'SUCCESS', {}, result))
+  } catch (error) {
+    return res
+      .status(500)
+      .send(response.responseError(500, 'SERVER_ERROR', { message: error }))
+  }
+}
+
+const getWarehouseById = async (req, res) => {
+  try {
+    const { warehouseId } = req.params
+
+    const warehouses = await prisma.warehouse.findUnique({
+      where: {
+        id: parseInt(warehouseId),
+      },
+    })
+
+    if (!warehouses) {
+      return res
+        .status(400)
+        .send(response.responseError(400, 'BAD_REQUEST', 'NOT FOUND'))
+    }
+
+    return res
+      .status(200)
+      .send(response.responseSuccess(200, 'SUCCESS', {}, warehouses))
   } catch (error) {
     return res
       .status(500)
@@ -603,4 +717,6 @@ module.exports = {
   cancelStockMutation,
   postNewStockMutation,
   getAllImporterWarehouse,
+  getAllImporterWarehouseStock,
+  getWarehouseById,
 }

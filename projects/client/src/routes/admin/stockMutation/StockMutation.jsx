@@ -13,9 +13,14 @@ import AdminProductsLayout from "../../../components/AdminProductsLayout";
 import StockMutationCompletedList from "../../../components/StockMutationCompletedList";
 import StockMutationCancelled from "../../../components/StockMutationCancelled";
 import StockMutationOnProgress from "../../../components/StockMutationOnProgressList";
-import { AddAdmin } from "../../../components/AddAdmin";
+import { AddStockMutation } from "../../../components/AddStockMutation";
+import { useParams, useSearchParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function StockMutation() {
+  const { id } = useParams();
+  const user = useSelector((state) => state.auth);
+
   return (
     <PageProtected needLogin={true}>
       <AdminProductsLayout heading="Stock Mutation">
@@ -29,9 +34,9 @@ function StockMutation() {
               <Tab>On Progress</Tab>
               <Tab>Completed</Tab>
               <Tab>Cancelled</Tab>
-              <Flex alignItems={'center'}>
-                <Box ml={"645px"}>
-                  <AddAdmin />
+              <Flex alignItems={"center"}>
+                <Box ml={"617px"}>
+                  <AddStockMutation warehouseId={id} managerId={user.id} />
                 </Box>
               </Flex>
             </TabList>

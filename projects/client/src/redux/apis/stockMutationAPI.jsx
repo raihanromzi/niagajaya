@@ -41,6 +41,49 @@ const stockMutationApi = createApi({
         },
         invalidatesTags: ["stockMutation"],
       }),
+      postNewStockMutation: builder.mutation({
+        query: (data) => {
+          console.log(data);
+          return {
+            url: `/admin/warehouses/stock-mutations/create?manager=${data.managerId}`,
+            method: "POST",
+            body: {
+              exporterId: parseInt(data.exporterId),
+              importerId: parseInt(data.importerId),
+              productId: data.productId,
+              quantity: data.quantity,
+            },
+          };
+        },
+        invalidatesTags: ["stockMutation"],
+      }),
+      getAllImporterWarehouse: builder.query({
+        query: (data) => {
+          return {
+            url: `/admin/importerwarehouses/${parseInt(data.warehouseId)}`,
+            method: "GET",
+          };
+        },
+        providesTags: ["importerWarehouse"],
+      }),
+      getAllImporterWarehouseStock: builder.query({
+        query: (data) => {
+          return {
+            url: `/admin/exporterwarehouse/${parseInt(data.warehouseId)}/stock`,
+            method: "GET",
+          };
+        },
+        providesTags: ["importerWarehouseStock"],
+      }),
+      getWarehouseById: builder.query({
+        query: (data) => {
+          return {
+            url: `/admin/warehouses/${parseInt(data.warehouseId)}`,
+            method: "GET",
+          };
+        },
+        providesTags: ["warehouse"],
+      }),
     };
   },
 });
@@ -49,5 +92,9 @@ export const {
   useGetAllStockMutationQuery,
   usePutApproveStockMutationMutation,
   usePutCancelStockMutationMutation,
+  usePostNewStockMutationMutation,
+  useGetAllImporterWarehouseQuery,
+  useGetAllImporterWarehouseStockQuery,
+  useGetWarehouseByIdQuery,
 } = stockMutationApi;
 export { stockMutationApi };

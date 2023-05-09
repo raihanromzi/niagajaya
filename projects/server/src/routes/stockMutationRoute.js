@@ -7,6 +7,8 @@ const {
   cancelStockMutation,
   postNewStockMutation,
   getAllImporterWarehouse,
+  getAllImporterWarehouseStock,
+  getWarehouseById,
 } = require('../controllers/stockMutationController')
 
 // Get all on progress stock mutation
@@ -20,19 +22,20 @@ router.put(
   approveStockMutation
 )
 
+router.get('/admin/warehouses/:warehouseId', getWarehouseById)
+
 router.put(
   '/admin/warehouses/:warehouseId/stock-mutations/:stockMutationId/cancel',
   cancelStockMutation
 )
 
-router.put(
-  '/admin/warehouses/:warehouseId/stock-mutations/create',
-  postNewStockMutation
-)
+router.post('/admin/warehouses/stock-mutations/create', postNewStockMutation)
+
+router.get('/admin/importerwarehouses/:warehouseId', getAllImporterWarehouse)
 
 router.get(
-  '/admin/importerwarehouses/:warehouseId',
-  getAllImporterWarehouse
+  '/admin/exporterwarehouse/:warehouseId/stock',
+  getAllImporterWarehouseStock
 )
 
 module.exports = router
