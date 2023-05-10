@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { axiosInstance } from "../config/config";
 import user_types from "../redux/auth/types";
+import { Center } from "@chakra-ui/react";
 
 const AuthProvider = ({ children }) => {
   const dispatch = useDispatch();
@@ -28,7 +29,7 @@ const AuthProvider = ({ children }) => {
       });
   }, []);
 
-  return isLoading ? <div>Loadingxxxxxx</div> : children;
+  return isLoading ? <Center h={"100vh"}>Loading</Center> : children;
 };
 
 export default AuthProvider;
