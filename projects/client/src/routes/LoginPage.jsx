@@ -25,10 +25,9 @@ import * as Yup from "yup";
 import paperBagImg from "../assets/paper-bag.png";
 import { axiosInstance } from "../config/config";
 import user_types from "../redux/auth/types";
-import PageProtected from "./protected";
 
 const LoginPage = () => {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [status, setStatus] = useState(false);
@@ -77,8 +76,7 @@ const LoginPage = () => {
       boxShadow={{ lg: "0 8px 16px rgba(171, 190, 209, 0.4)" }}
       borderRadius="10px"
       justifyContent="space-evenly"
-      flexDir={{ base: "column-reverse", lg: "row" }}
-    >
+      flexDir={{ base: "column-reverse", lg: "row" }}>
       <Center>
         <Image src={paperBagImg} alt="eco bag with food" />
       </Center>
@@ -95,8 +93,7 @@ const LoginPage = () => {
                   zIndex={2}
                   variant="top-accent"
                   fontSize={"md"}
-                  mb={"1"}
-                >
+                  mb={"1"}>
                   <AlertIcon />
                   {msg}
                 </Alert>
@@ -148,8 +145,7 @@ const LoginPage = () => {
               textColor={"gray.500"}
               onClick={() => {
                 navigate("/reset-password/email", { replace: true });
-              }}
-            >
+              }}>
               Lupa Password?
             </Link>
             <Button
@@ -159,8 +155,7 @@ const LoginPage = () => {
               onClick={formik.handleSubmit}
               _hover={{
                 backgroundColor: "#00b377",
-              }}
-            >
+              }}>
               Masuk
             </Button>
           </VStack>

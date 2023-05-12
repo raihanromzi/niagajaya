@@ -16,6 +16,12 @@ function PageProtected({
 
   useEffect(() => {
     localStorage.setItem("lastPath", location.pathname);
+    if (needLogin && adminOnly && !userSelector?.id) {
+      localStorage.setItem("lastPath", location.pathname);
+      return navigate("/admin/login", {
+        replace: true,
+      });
+    }
     if (needLogin && !userSelector?.id) {
       if (location.pathname.includes("admin")) {
         return navigate("/login", {
@@ -35,6 +41,9 @@ function PageProtected({
     }
     if (exceptUser && userSelector?.role === "USER") {
       return navigate("/no-authority", { replace: true });
+    }
+    if (needLogin && adminOnly && userSelector?.role === "ADMIN") {
+      return navigate(location.pathname, { replace: true });
     }
   }, []);
   return children;
