@@ -8,6 +8,7 @@ const userRouter = require('./admin/userRouter')
 const adminAuthRoute = require('./admin/authRouter')
 const stockRoute = require('./stockRoute')
 const salesReportRoute = require('./salesReportRoute')
+const stockMutationRoute = require('./stockMutationRoute')
 
 module.exports = {
   authRoute,
@@ -20,4 +21,5 @@ module.exports = {
   adminAuthRoute,
   stockRoute,
   salesReportRoute,
+  stockMutationRoute,
 }
