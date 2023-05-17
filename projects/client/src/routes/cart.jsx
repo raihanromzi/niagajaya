@@ -57,7 +57,7 @@ const CartPage = () => {
 
   const handleQuantityChange = (productId, quantity) => {
     const productIndex = products.findIndex(
-      (product) => product.id === productId
+      (product) => product.id === productId,
     );
     if (productIndex !== -1) {
       const updatedProducts = [...products];
@@ -77,7 +77,7 @@ const CartPage = () => {
   const handleProductToggle = (productId) => {
     if (selectedProducts.includes(productId)) {
       setSelectedProducts((prevSelectedProducts) =>
-        prevSelectedProducts.filter((id) => id !== productId)
+        prevSelectedProducts.filter((id) => id !== productId),
       );
     } else {
       setSelectedProducts((prevSelectedProducts) => [
@@ -97,7 +97,7 @@ const CartPage = () => {
 
   const submitHandler = () => {
     const myOrderCart = cart.filter((product) =>
-      selectedProducts.includes(product.id)
+      selectedProducts.includes(product.id),
     );
     console.log("myOrderCart");
     console.log(myOrderCart);
@@ -105,7 +105,7 @@ const CartPage = () => {
 
   const totalPrice = selectedProducts.reduce((acc, productId) => {
     const selectedProduct = products.find(
-      (product) => product.id === productId
+      (product) => product.id === productId,
     );
     const price = selectedProduct.priceRupiahPerUnit * selectedProduct.quantity;
     return acc + price;
@@ -137,7 +137,7 @@ const CartPage = () => {
 
   const handleDelete = (productId) => {
     const productIndex = products.findIndex(
-      (product) => product.id === productId
+      (product) => product.id === productId,
     );
     if (productIndex !== -1) {
       const updatedProducts = [...products];
@@ -164,8 +164,7 @@ const CartPage = () => {
             <Text
               fontWeight={"bold"}
               textAlign={"center"}
-              fontSize={{ base: "md", md: "xl" }}
-            >
+              fontSize={{ base: "md", md: "xl" }}>
               Keranjang belanja anda masih kosong
             </Text>
             <Text>Silahkan isi keranjang belanja anda</Text>
@@ -177,8 +176,7 @@ const CartPage = () => {
               }}
               _hover={{
                 backgroundColor: "#00b377",
-              }}
-            >
+              }}>
               Kembali Belanja
             </Button>
           </VStack>
@@ -191,8 +189,7 @@ const CartPage = () => {
               base: "0 8px 16px rgba(171, 190, 209, 0.4)",
             }}
             borderRadius="10px"
-            p={{ base: "2", md: "5" }}
-          >
+            p={{ base: "2", md: "5" }}>
             {showTable ? (
               <Table w="100%">
                 <Thead>
@@ -200,8 +197,7 @@ const CartPage = () => {
                     <Th w={"5%"}>
                       <Checkbox
                         isChecked={selectedProducts.length === products.length}
-                        onChange={handleAllProductToggle}
-                      >
+                        onChange={handleAllProductToggle}>
                         <Text fontSize={"xs"}>Pilih Semua</Text>
                       </Checkbox>
                     </Th>
@@ -221,8 +217,9 @@ const CartPage = () => {
                         <Td>
                           <Checkbox
                             isChecked={selectedProducts.includes(product.id)}
-                            onChange={() => handleProductToggle(product.id)}
-                          ></Checkbox>
+                            onChange={() =>
+                              handleProductToggle(product.id)
+                            }></Checkbox>
                         </Td>
                         <Td>
                           <Flex align="center">
@@ -250,8 +247,7 @@ const CartPage = () => {
                             value={product.quantity}
                             onChange={(value) =>
                               handleQuantityChange(product.id, value)
-                            }
-                          >
+                            }>
                             <NumberInputField />
                             <NumberInputStepper>
                               <NumberIncrementStepper />
@@ -300,12 +296,10 @@ const CartPage = () => {
               <VStack
                 w="100%"
                 alignItems={"start"}
-                divider={<StackDivider borderColor="gray.200" />}
-              >
+                divider={<StackDivider borderColor="gray.200" />}>
                 <Checkbox
                   isChecked={selectedProducts.length === products.length}
-                  onChange={handleAllProductToggle}
-                >
+                  onChange={handleAllProductToggle}>
                   Pilih Semua
                 </Checkbox>
                 {products &&
@@ -313,11 +307,12 @@ const CartPage = () => {
                     <Flex key={product.id} w="100%" mt={2} p={2}>
                       <Checkbox
                         isChecked={selectedProducts.includes(product.id)}
-                        onChange={() => handleProductToggle(product.id)}
-                      ></Checkbox>
+                        onChange={() =>
+                          handleProductToggle(product.id)
+                        }></Checkbox>
                       <Image
-                        src={product.imageUrl}
-                        alt={product.name}
+                        src={`http://localhost:8000/products/${product.imageUrl}`}
+                        alt={`Gambar Produk ${product.name}`}
                         w={"28"}
                         marginX={4}
                         boxSize={{ base: "90px", md: "150px" }}
@@ -338,8 +333,7 @@ const CartPage = () => {
                             max={product.totalQuantity}
                             onChange={(value) =>
                               handleQuantityChange(product.id, parese)
-                            }
-                          >
+                            }>
                             <NumberInputField />
                             <NumberInputStepper>
                               <NumberIncrementStepper />
@@ -384,8 +378,7 @@ const CartPage = () => {
               isDisabled={selectedProducts.length === 0 ? true : false}
               _hover={{
                 backgroundColor: "#00b377",
-              }}
-            >
+              }}>
               Pesan
             </Button>
           </Box>
@@ -394,8 +387,7 @@ const CartPage = () => {
             leastDestructiveRef={cancelRef}
             onClose={onCloseDialogDelete}
             isOpen={isOpenDialogDelete}
-            isCentered
-          >
+            isCentered>
             <AlertDialogOverlay />
             <AlertDialogContent>
               <AlertDialogHeader>Hapus produk</AlertDialogHeader>
@@ -409,8 +401,7 @@ const CartPage = () => {
                   variant={"outline"}
                   colorScheme={"teal"}
                   ref={cancelRef}
-                  onClick={onCloseDialogDelete}
-                >
+                  onClick={onCloseDialogDelete}>
                   Nanti Saja
                 </Button>
                 <Button
@@ -420,8 +411,7 @@ const CartPage = () => {
                   onClick={() => {
                     handleDelete(selectedDelete.id);
                     onCloseDialogDelete();
-                  }}
-                >
+                  }}>
                   Ya, Hapus
                 </Button>
               </AlertDialogFooter>
