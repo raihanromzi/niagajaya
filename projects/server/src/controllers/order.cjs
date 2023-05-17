@@ -1,4 +1,4 @@
-const prisma = require("../utils/client.cjs");
+const prisma = require('../utils/client.cjs')
 
 /** @type {Object<string, import("express").RequestHandler>} */
 module.exports = {
@@ -6,8 +6,8 @@ module.exports = {
     try {
       if (!req.session.user) {
         return res.status(400).json({
-          message: "Harus login",
-        });
+          message: 'Harus login',
+        })
       }
 
       const {
@@ -15,49 +15,49 @@ module.exports = {
         productName,
         page = 1,
         size = 4,
-        sortBy = "latest",
-        status = "UNSETTLED",
-      } = req.query;
-      const skip = (page - 1) * size;
+        sortBy = 'latest',
+        status = 'UNSETTLED',
+      } = req.query
+      const skip = (page - 1) * size
 
-      let orderBy;
+      let orderBy
       switch (sortBy) {
-        case "latest":
-          orderBy = { createdAt: "desc" };
-          break;
-        case "oldest":
-          orderBy = { createdAt: "asc" };
-          break;
+        case 'latest':
+          orderBy = { createdAt: 'desc' }
+          break
+        case 'oldest':
+          orderBy = { createdAt: 'asc' }
+          break
         default:
-          orderBy = { createdAt: "desc" };
-          break;
+          orderBy = { createdAt: 'desc' }
+          break
       }
-      const where = {};
-      where.AND = [{ status: status }];
+      const where = {}
+      where.AND = [{ status: status }]
 
-      const user = prisma.user.findFirst({
+      const user = await prisma.user.findFirst({
         where: { id: req.session.user.id },
-      });
+      })
 
-      if (user.role === "USER") {
+      if (user.role === 'USER') {
         return res.status(400).json({
-          message: "Anda tidak memiliki otoritas untuk mengakses data ini",
-        });
+          message: 'Anda tidak memiliki otoritas untuk mengakses data ini',
+        })
       }
 
-      if (user.role === "MANAGER") {
-        const warehouse = await prisma.warehouse.findMany({
+      if (user.role === 'MANAGER') {
+        const warehouse = await prisma.warehouse.findFirst({
           where: {
             managerId: user.id,
           },
-        });
+        })
         where.AND.push({
           warehouseId: warehouse.id,
-        });
+        })
       }
 
       if (warehouseName) {
-        where.OR = [{ warehouse: { name: { contains: warehouseName } } }];
+        where.OR = [{ warehouse: { name: { contains: warehouseName } } }]
       } else if (productName) {
         where.OR = [
           {
@@ -65,7 +65,7 @@ module.exports = {
               some: { product: { name: { contains: productName } } },
             },
           },
-        ];
+        ]
       }
       const orders = await prisma.order.findMany({
         where,
@@ -99,66 +99,66 @@ module.exports = {
         skip: parseInt(skip),
         take: parseInt(size),
         orderBy: orderBy,
-      });
+      })
 
       const ordersWithTotalCost = orders.map((order) => {
         const subTotal = order.details.reduce(
           (acc, cur) => acc + cur.quantity * cur.priceRupiahPerUnit,
           0
-        );
-        const totalCost = subTotal + order.shipmentPrice;
-        return { ...order, subTotal, totalCost };
-      });
+        )
+        const totalCost = subTotal + order.shipmentPrice
+        return { ...order, subTotal, totalCost }
+      })
 
-      res.send(ordersWithTotalCost);
+      res.send(ordersWithTotalCost)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       res.status(400).json({
         message: error,
-      });
+      })
     }
   },
   getTotalPage: async (req, res) => {
     try {
       if (!req.session.user) {
         return res.status(400).json({
-          message: "Harus login",
-        });
+          message: 'Harus login',
+        })
       }
 
       const {
         warehouseName,
         productName,
-        status = "UNSETTLED",
+        status = 'UNSETTLED',
         size = 4,
-      } = req.query;
+      } = req.query
 
-      const where = {};
-      where.AND = [{ status: status }];
+      const where = {}
+      where.AND = [{ status: status }]
 
-      const user = prisma.user.findFirst({
+      const user = await prisma.user.findFirst({
         where: { id: req.session.user.id },
-      });
+      })
 
-      if (user.role === "USER") {
+      if (user.role === 'USER') {
         return res.status(400).json({
-          message: "Anda tidak memiliki otoritas untuk mengakses data ini",
-        });
+          message: 'Anda tidak memiliki otoritas untuk mengakses data ini',
+        })
       }
 
-      if (user.role === "MANAGER") {
-        const warehouse = await prisma.warehouse.findMany({
+      if (user.role === 'MANAGER') {
+        const warehouse = await prisma.warehouse.findFirst({
           where: {
             managerId: user.id,
           },
-        });
+        })
         where.AND.push({
           warehouseId: warehouse.id,
-        });
+        })
       }
 
       if (warehouseName) {
-        where.OR = [{ warehouse: { name: { contains: warehouseName } } }];
+        where.OR = [{ warehouse: { name: { contains: warehouseName } } }]
       } else if (productName) {
         where.OR = [
           {
@@ -166,80 +166,80 @@ module.exports = {
               some: { product: { name: { contains: productName } } },
             },
           },
-        ];
+        ]
       }
 
       const totalOrder = await prisma.order.count({
         where,
-      });
-      const totalPage = Math.ceil(totalOrder / size);
-      res.send({ totalPage });
+      })
+      const totalPage = Math.ceil(totalOrder / size)
+      res.send({ totalPage })
     } catch (error) {
-      console.error(error);
+      console.error(error)
       res.status(400).json({
         message: error,
-      });
+      })
     }
   },
   cancelOrder: async (req, res) => {
     try {
       if (!req.session.user) {
         return res.status(400).json({
-          message: "Harus login",
-        });
+          message: 'Harus login',
+        })
       }
 
       const user = await prisma.user.findFirst({
         where: { id: req.session.user.id },
-      });
+      })
 
-      if (user.role === "USER") {
+      if (user.role === 'USER') {
         return res.status(400).json({
-          message: "Anda tidak memiliki otoritas untuk mengubah data ini",
-        });
+          message: 'Anda tidak memiliki otoritas untuk mengubah data ini',
+        })
       }
 
       const order = await prisma.order.findFirst({
         where: {
           id: parseInt(req.params.id),
         },
-      });
+      })
 
-      if (user.role === "MANAGER") {
+      if (user.role === 'MANAGER') {
         const warehouse = await prisma.warehouse.findFirst({
           where: {
             id: order.warehouseId,
           },
-        });
+        })
         if (warehouse.managerId !== user.id) {
           return res.status(400).json({
-            message: "Anda tidak memiliki otoritas untuk mengubah data ini",
-          });
+            message: 'Anda tidak memiliki otoritas untuk mengubah data ini',
+          })
         }
       }
 
       if (
-        order.status === "UNSETTLED" ||
-        order.status === "REQUESTED" ||
-        order.status === "PREPARING"
+        order.status === 'UNSETTLED' ||
+        order.status === 'REQUESTED' ||
+        order.status === 'PREPARING'
       ) {
         await prisma.order.update({
           where: { id: parseInt(req.params.id) },
           data: {
-            status: "CANCELLED",
+            status: 'CANCELLED',
           },
-        });
+        })
       } else {
         return res.status(400).json({
-          message: "Anda tidak dapat membatalkan pesanan",
-        });
+          message: 'Anda tidak dapat membatalkan pesanan',
+        })
       }
-      res.send("Order Canceled");
+      res.send('Order Canceled')
     } catch (error) {
-      console.error(error);
+      console.error(error)
       res.status(400).json({
         message: error,
-      });
+      })
     }
   },
-};
+}
