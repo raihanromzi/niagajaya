@@ -144,8 +144,8 @@ const AddForm = ({ close, warehouseId, managerId }) => {
     <Box>
       <Formik
         initialValues={{
-          exporter_gudang_asal: warehouseId,
-          importer_gudang_tujuan: "",
+          importer_gudang_tujuan: warehouseId,
+          exporter_gudang_asal: "",
           product: "",
           quantity: "",
         }}
@@ -157,8 +157,8 @@ const AddForm = ({ close, warehouseId, managerId }) => {
         {({ setFieldValue }) => (
           <Form>
             <FormControl>
-              <FormLabel>Exporter</FormLabel>
-              <Field as="select" name="exporter_gudang_asal">
+              <FormLabel>Importer / Gudang Tujuan</FormLabel>
+              <Field as="select" name="importer_gudang_tujuan">
                 {isLoadingCurrWarehouse ? (
                   <option>Loading...</option>
                 ) : (
@@ -172,11 +172,11 @@ const AddForm = ({ close, warehouseId, managerId }) => {
               <ErrorMessage
                 style={{ color: "red" }}
                 component="div"
-                name="exporter"
+                name="importer"
               />
-              <FormLabel>Importer</FormLabel>
-              <Field as="select" name="importer_gudang_tujuan">
-                <option value="">Select Importer Warehouse</option>
+              <FormLabel>Exporter / Gudang Asal</FormLabel>
+              <Field as="select" name="exporter_gudang_asal">
+                <option value="">Select Exporter Warehouse</option>
                 {isLoadingWarehouses ? (
                   <option>Loading...</option>
                 ) : (
@@ -190,7 +190,7 @@ const AddForm = ({ close, warehouseId, managerId }) => {
               <ErrorMessage
                 style={{ color: "red" }}
                 component="div"
-                name="importer"
+                name="exporter"
               />
               <FormLabel>Product</FormLabel>
               <Field
