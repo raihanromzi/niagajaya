@@ -4,7 +4,7 @@ const prisma = require('../utils/client.cjs')
 module.exports = {
   getCategories: async (req, res) => {
     try {
-      const { name, sortBy, page = 1, size = 8 } = req.query
+      const { name, sortBy, page = 1, size = 16 } = req.query
       const skip = (page - 1) * size
       let orderBy
       switch (sortBy) {
@@ -37,7 +37,7 @@ module.exports = {
   },
   getTotalPage: async (req, res) => {
     try {
-      const { name, size = 8 } = req.query
+      const { name, size = 16 } = req.query
       const totalProduct = await prisma.productCategory.count({
         where: {
           name: name ? { contains: name } : undefined,
