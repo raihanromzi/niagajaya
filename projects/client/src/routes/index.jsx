@@ -66,7 +66,8 @@ const IndexPage = () => {
     const filteredParams = { name, sortBy, page, size };
     Object.keys(filteredParams)
       .filter(
-        (key) => filteredParams[key] !== undefined && filteredParams[key] !== ""
+        (key) =>
+          filteredParams[key] !== undefined && filteredParams[key] !== "",
       )
       .forEach((key, index) => {
         if (key === "name") {
@@ -74,7 +75,7 @@ const IndexPage = () => {
         }
         const prefix = index === 0 ? "?" : "&";
         queryParams += `${prefix}${key}=${encodeURIComponent(
-          filteredParams[key]
+          filteredParams[key],
         )}`;
       });
     return queryParams;
@@ -127,7 +128,7 @@ const IndexPage = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const { name, sortBy, page, size } = Object.fromEntries(
-      queryParams.entries()
+      queryParams.entries(),
     );
     if (name !== undefined) {
       setName(name);
@@ -189,8 +190,7 @@ const IndexPage = () => {
               setTempName(name);
               setTempSortBy(sortBy);
               onClose();
-            }}
-          >
+            }}>
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>Filter dengan</ModalHeader>
@@ -199,8 +199,7 @@ const IndexPage = () => {
                 <RadioGroup
                   onChange={setFilterValue}
                   defaultValue={filterValue}
-                  colorScheme={"teal"}
-                >
+                  colorScheme={"teal"}>
                   <HStack spacing="24px">
                     <Radio value="">Tidak Memfilter</Radio>
                     <Radio value="Nama">Nama</Radio>
@@ -235,8 +234,7 @@ const IndexPage = () => {
                   colorScheme={"teal"}
                   onChange={setTempSortBy}
                   defaultValue={tempSortBy}
-                  value={tempSortBy}
-                >
+                  value={tempSortBy}>
                   <HStack gap={"4"} flexWrap={"wrap"}>
                     {options.map((option, index) => {
                       return (
@@ -262,8 +260,7 @@ const IndexPage = () => {
                     });
                     setCurrentPage(1);
                     onClose();
-                  }}
-                >
+                  }}>
                   Terapkan
                 </Button>
               </ModalFooter>
@@ -281,12 +278,11 @@ const IndexPage = () => {
             "repeat(3, 1fr)",
             "repeat(5, 1fr)",
             "repeat(6, 1fr)",
-            "repeat(7, 1fr)",
             "repeat(8, 1fr)",
           ]}
           gap={6}
           marginY={"5"}
-        >
+          justifyItems="center">
           {categories.map((category, index) => (
             <CategoryCardUser
               key={category.id}
